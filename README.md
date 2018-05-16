@@ -1,2 +1,2 @@
 # gozxing
-Port of [zxing](https://github.com/zxing/zxing) core to Go.
+Port of [ZXing](https://github.com/zxing/zxing) core to Go.
