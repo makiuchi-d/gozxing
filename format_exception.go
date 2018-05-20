@@ -8,6 +8,12 @@ type FormatException struct {
 	error
 }
 
-func NewFormatException(msg string) FormatException {
-	return FormatException{errors.New(msg)}
+var formatInstance FormatException = FormatException{errors.New("")}
+
+func FormatException_GetFormatInstance() FormatException {
+	return formatInstance
+}
+
+func FormatException_GetFormatInstanceWithError(err error) FormatException {
+	return FormatException{err}
 }

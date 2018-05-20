@@ -8,6 +8,8 @@ type NotFoundException struct {
 	error
 }
 
-func NewNotFoundException(msg string) NotFoundException {
-	return NotFoundException{errors.New(msg)}
+var notFoundInstance NotFoundException = NotFoundException{errors.New("")}
+
+func NotFoundException_GetNotFoundInstance() NotFoundException {
+	return notFoundInstance
 }

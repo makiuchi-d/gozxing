@@ -5,8 +5,8 @@ import (
 	"testing"
 )
 
-func TestNewNotFoundException(t *testing.T) {
-	var e error = NewNotFoundException("test")
+func TestNotFoundException_GetNotFoundInstance(t *testing.T) {
+	var e error = NotFoundException_GetNotFoundInstance()
 	switch e.(type) {
 	case NotFoundException:
 		break
