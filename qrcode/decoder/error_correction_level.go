@@ -13,7 +13,7 @@ const (
 	ErrorCorrectionLevel_H ErrorCorrectionLevel = 0x02 // ~30% correction
 )
 
-func ErrorCorrectionLevel_ForBits(bits int) (ErrorCorrectionLevel, error) {
+func ErrorCorrectionLevel_ForBits(bits uint) (ErrorCorrectionLevel, error) {
 	switch bits {
 	case 0:
 		return ErrorCorrectionLevel_M, nil

@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func testErrorCorrectionLevel_ForBits(t *testing.T, bits int, expect ErrorCorrectionLevel){
+func testErrorCorrectionLevel_ForBits(t *testing.T, bits uint, expect ErrorCorrectionLevel) {
 	r, e := ErrorCorrectionLevel_ForBits(bits)
 	if e != nil {
 		t.Fatalf("ForBits(0) returns error, %v", e)
@@ -14,10 +14,10 @@ func testErrorCorrectionLevel_ForBits(t *testing.T, bits int, expect ErrorCorrec
 	}
 }
 
-func TestErrorCorrectionLevel_ForBits(t *testing.T){
+func TestErrorCorrectionLevel_ForBits(t *testing.T) {
 
-	if _, e := ErrorCorrectionLevel_ForBits(-1); e == nil {
-		t.Fatalf("ForBits(-1) must be error")
+	if _, e := ErrorCorrectionLevel_ForBits(4); e == nil {
+		t.Fatalf("ForBits(4) must be error")
 	}
 
 	testErrorCorrectionLevel_ForBits(t, 0, ErrorCorrectionLevel_M)
@@ -26,7 +26,7 @@ func TestErrorCorrectionLevel_ForBits(t *testing.T){
 	testErrorCorrectionLevel_ForBits(t, 3, ErrorCorrectionLevel_Q)
 }
 
-func TestErrorCorrectionLevel_String(t *testing.T){
+func TestErrorCorrectionLevel_String(t *testing.T) {
 	if s := ErrorCorrectionLevel_L.String(); s != "L" {
 		t.Fatalf("ErrorCorrectionLevel_L string is %v, expect L", s)
 	}
