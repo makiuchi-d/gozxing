@@ -1,6 +1,7 @@
 package common
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/makiuchi-d/gozxing"
@@ -41,7 +42,7 @@ func TestGridSampler_checkAndNudgePoints(t *testing.T) {
 		t.Fatalf("return must be error")
 	}
 	if _, ok := e.(gozxing.NotFoundException); !ok {
-		t.Fatalf("return must be NotFoundException")
+		t.Fatalf("return must be NotFoundException, %v", reflect.TypeOf(e))
 	}
 
 	points = []float64{11, 0}
@@ -50,7 +51,7 @@ func TestGridSampler_checkAndNudgePoints(t *testing.T) {
 		t.Fatalf("return must be error")
 	}
 	if _, ok := e.(gozxing.NotFoundException); !ok {
-		t.Fatalf("return must be NotFoundException")
+		t.Fatalf("return must be NotFoundException, %v", reflect.TypeOf(e))
 	}
 
 	points = []float64{0, -2}
@@ -59,7 +60,7 @@ func TestGridSampler_checkAndNudgePoints(t *testing.T) {
 		t.Fatalf("return must be error")
 	}
 	if _, ok := e.(gozxing.NotFoundException); !ok {
-		t.Fatalf("return must be NotFoundException")
+		t.Fatalf("return must be NotFoundException, %v", reflect.TypeOf(e))
 	}
 
 	points = []float64{0, 11}
@@ -68,7 +69,7 @@ func TestGridSampler_checkAndNudgePoints(t *testing.T) {
 		t.Fatalf("return must be error")
 	}
 	if _, ok := e.(gozxing.NotFoundException); !ok {
-		t.Fatalf("return must be NotFoundException")
+		t.Fatalf("return must be NotFoundException, %v", reflect.TypeOf(e))
 	}
 
 	points = []float64{0, 0, -2, 0}
@@ -77,7 +78,7 @@ func TestGridSampler_checkAndNudgePoints(t *testing.T) {
 		t.Fatalf("return must be error")
 	}
 	if _, ok := e.(gozxing.NotFoundException); !ok {
-		t.Fatalf("return must be NotFoundException")
+		t.Fatalf("return must be NotFoundException, %v", reflect.TypeOf(e))
 	}
 
 	points = []float64{0, 0, 11, 0}
@@ -86,7 +87,7 @@ func TestGridSampler_checkAndNudgePoints(t *testing.T) {
 		t.Fatalf("return must be error")
 	}
 	if _, ok := e.(gozxing.NotFoundException); !ok {
-		t.Fatalf("return must be NotFoundException")
+		t.Fatalf("return must be NotFoundException, %v", reflect.TypeOf(e))
 	}
 
 	points = []float64{0, 0, 0, -2}
@@ -95,7 +96,7 @@ func TestGridSampler_checkAndNudgePoints(t *testing.T) {
 		t.Fatalf("return must be error")
 	}
 	if _, ok := e.(gozxing.NotFoundException); !ok {
-		t.Fatalf("return must be NotFoundException")
+		t.Fatalf("return must be NotFoundException, %v", reflect.TypeOf(e))
 	}
 
 	points = []float64{0, 0, 0, 11}
@@ -104,7 +105,7 @@ func TestGridSampler_checkAndNudgePoints(t *testing.T) {
 		t.Fatalf("return must be error")
 	}
 	if _, ok := e.(gozxing.NotFoundException); !ok {
-		t.Fatalf("return must be NotFoundException")
+		t.Fatalf("return must be NotFoundException, %v", reflect.TypeOf(e))
 	}
 
 	points = []float64{-1, -1, 10, 10, 0, 0, -1, -1, 10, 10}

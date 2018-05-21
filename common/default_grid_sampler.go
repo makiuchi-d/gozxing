@@ -27,10 +27,7 @@ func (s DefaultGridSampler) SampleGridFromTransform(image *BitMatrix,
 	if dimensionX <= 0 || dimensionY <= 0 {
 		return nil, gozxing.NotFoundException_GetNotFoundInstance()
 	}
-	bits, e := NewBitMatrix(dimensionX, dimensionY)
-	if e != nil {
-		return nil, e
-	}
+	bits, _ := NewBitMatrix(dimensionX, dimensionY) // always success
 	points := make([]float64, 2*dimensionX)
 	for y := 0; y < dimensionY; y++ {
 		max := len(points)
