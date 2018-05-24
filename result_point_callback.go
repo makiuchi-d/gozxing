@@ -1,5 +1,5 @@
 package gozxing
 
 type ResultPointCallback interface {
-	foundPossibleResultPoint(point ResultPoint)
+	FoundPossibleResultPoint(point ResultPoint)
 }

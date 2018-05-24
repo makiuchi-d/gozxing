@@ -2,10 +2,12 @@ package detector
 
 import (
 	"testing"
+
+	"github.com/makiuchi-d/gozxing"
 )
 
 func TestFinderPatternInfo(t *testing.T) {
-	pts := []FinderPattern{
+	pts := []gozxing.ResultPoint{
 		NewFinderPattern(1, 2, 3, 4),
 		NewFinderPattern(2, 3, 4, 5),
 		NewFinderPattern(3, 4, 5, 6),

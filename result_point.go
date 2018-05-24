@@ -4,20 +4,25 @@ import (
 	"github.com/makiuchi-d/gozxing/common/detector"
 )
 
-type ResultPoint struct {
+type ResultPoint interface {
+	GetX() float64
+	GetY() float64
+}
+
+type ResultPointBase struct {
 	x float64
 	y float64
 }
 
 func NewResultPoint(x, y float64) ResultPoint {
-	return ResultPoint{x, y}
+	return ResultPointBase{x, y}
 }
 
-func (rp ResultPoint) GetX() float64 {
+func (rp ResultPointBase) GetX() float64 {
 	return rp.x
 }
 
-func (rp ResultPoint) GetY() float64 {
+func (rp ResultPointBase) GetY() float64 {
 	return rp.y
 }
 
@@ -55,11 +60,11 @@ func ResultPoint_OrderBestPatterns(patterns []ResultPoint) {
 }
 
 func distance(pattern1, pattern2 ResultPoint) float64 {
-	return detector.MathUtils_DistanceFloat(pattern1.x, pattern1.y, pattern2.x, pattern2.y)
+	return detector.MathUtils_DistanceFloat(pattern1.GetX(), pattern1.GetY(), pattern2.GetX(), pattern2.GetY())
 }
 
 func crossProductZ(pointA, pointB, pointC ResultPoint) float64 {
-	bX := pointB.x
-	bY := pointB.y
-	return ((pointC.x - bX) * (pointA.y - bY)) - ((pointC.y - bY) * (pointA.x - bX))
+	bX := pointB.GetX()
+	bY := pointB.GetY()
+	return ((pointC.GetX() - bX) * (pointA.GetY() - bY)) - ((pointC.GetX() - bY) * (pointA.GetY() - bX))
 }
