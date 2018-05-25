@@ -1,5 +1,3 @@
 package gozxing
 
-type ResultPointCallback interface {
-	FoundPossibleResultPoint(point ResultPoint)
-}
+type ResultPointCallback func(ResultPoint)
