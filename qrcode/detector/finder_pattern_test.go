@@ -20,7 +20,7 @@ func TestNewFinderPattern1(t *testing.T) {
 	}
 }
 
-func testFinderPattern_AboutEquals(t *testing.T, f FinderPattern, moduleSize, i, j float64, expect bool) {
+func testFinderPattern_AboutEquals(t *testing.T, f *FinderPattern, moduleSize, i, j float64, expect bool) {
 	if r := f.AboutEquals(moduleSize, i, j); r != expect {
 		t.Fatalf("AboutEquals(%v,%v,%v) = %v, expect %v", moduleSize, i, j, r, expect)
 	}
@@ -39,7 +39,7 @@ func TestFinderPattern_CombineEstimate(t *testing.T) {
 	f := NewFinderPattern(10, 20, 4, 3)
 	f2 := f.CombineEstimate(5, 8, 2)
 	expect := NewFinderPattern(9.5, 16.25, 3.5, 4)
-	if f2 != expect {
+	if *f2 != *expect {
 		t.Fatalf("CombinedEstimate = %v, expect %v", f2, expect)
 	}
 }

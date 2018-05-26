@@ -12,27 +12,27 @@ type FinderPattern struct {
 	count               int
 }
 
-func NewFinderPattern1(posX, posY, estimatedModuleSize float64) FinderPattern {
+func NewFinderPattern1(posX, posY, estimatedModuleSize float64) *FinderPattern {
 	return NewFinderPattern(posX, posY, estimatedModuleSize, 1)
 }
 
-func NewFinderPattern(posX, posY, estimatedModuleSize float64, count int) FinderPattern {
-	return FinderPattern{
+func NewFinderPattern(posX, posY, estimatedModuleSize float64, count int) *FinderPattern {
+	return &FinderPattern{
 		gozxing.NewResultPoint(posX, posY),
 		estimatedModuleSize,
 		count,
 	}
 }
 
-func (f FinderPattern) GetEstimatedModuleSize() float64 {
+func (f *FinderPattern) GetEstimatedModuleSize() float64 {
 	return f.estimatedModuleSize
 }
 
-func (f FinderPattern) GetCount() int {
+func (f *FinderPattern) GetCount() int {
 	return f.count
 }
 
-func (f FinderPattern) AboutEquals(moduleSize, i, j float64) bool {
+func (f *FinderPattern) AboutEquals(moduleSize, i, j float64) bool {
 	if math.Abs(i-f.GetY()) <= moduleSize && math.Abs(j-f.GetX()) <= moduleSize {
 		moduleSizeDiff := math.Abs(moduleSize - f.estimatedModuleSize)
 		return moduleSizeDiff <= 1.0 || moduleSizeDiff <= f.estimatedModuleSize
@@ -40,7 +40,7 @@ func (f FinderPattern) AboutEquals(moduleSize, i, j float64) bool {
 	return false
 }
 
-func (f FinderPattern) CombineEstimate(i, j, newModuleSize float64) FinderPattern {
+func (f *FinderPattern) CombineEstimate(i, j, newModuleSize float64) *FinderPattern {
 	combinedCount := float64(f.count + 1)
 	combinedX := (float64(f.count)*f.GetX() + j) / combinedCount
 	combinedY := (float64(f.count)*f.GetY() + i) / combinedCount
