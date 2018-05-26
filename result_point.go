@@ -30,12 +30,14 @@ func (rp ResultPointBase) GetY() float64 {
 // and BC is less than AC, and the angle between BC and BA is less than 180 degrees.
 // @param patterns array of three {@code ResultPoint} to order
 func ResultPoint_OrderBestPatterns(patterns []ResultPoint) {
+	// Find distances between pattern centers
 	zeroOneDistance := distance(patterns[0], patterns[1])
 	oneTwoDistance := distance(patterns[1], patterns[2])
 	zeroTwoDistance := distance(patterns[0], patterns[2])
 
 	var pointA, pointB, pointC ResultPoint
 
+	// Assume one closest to other two is B; A and C will just be guesses at first
 	if oneTwoDistance >= zeroOneDistance && oneTwoDistance >= zeroTwoDistance {
 		pointB = patterns[0]
 		pointA = patterns[1]
@@ -50,6 +52,10 @@ func ResultPoint_OrderBestPatterns(patterns []ResultPoint) {
 		pointC = patterns[1]
 	}
 
+    // Use cross product to figure out whether A and C are correct or flipped.
+    // This asks whether BC x BA has a positive z component, which is the arrangement
+    // we want for A, B, C. If it's negative, then we've got it flipped around and
+    // should swap A and C.
 	if crossProductZ(pointA, pointB, pointC) < 0.0 {
 		pointA, pointC = pointC, pointA
 	}
@@ -66,5 +72,5 @@ func distance(pattern1, pattern2 ResultPoint) float64 {
 func crossProductZ(pointA, pointB, pointC ResultPoint) float64 {
 	bX := pointB.GetX()
 	bY := pointB.GetY()
-	return ((pointC.GetX() - bX) * (pointA.GetY() - bY)) - ((pointC.GetX() - bY) * (pointA.GetY() - bX))
+	return ((pointC.GetX() - bX) * (pointA.GetY() - bY)) - ((pointC.GetY() - bY) * (pointA.GetX() - bX))
 }
