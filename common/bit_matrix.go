@@ -127,16 +127,6 @@ func (b *BitMatrix) Xor(mask *BitMatrix) error {
 		b.rowSize != mask.GetRowSize() {
 		return errors.New("IllegalArgumentException: input matrix dimensions do not match")
 	}
-	/*
-		rowArray := NewBitArray(b.width/32 + 1)
-		for y := 0; y < b.height; y++ {
-			offset := y * b.rowSize
-			row := mask.GetRow(y, rowArray).GetBitArray()
-			for x := 0; x < b.rowSize; x++ {
-				b.bits[offset+x] ^= row[x]
-			}
-		}
-	*/
 	for y := 0; y < b.height; y++ {
 		bOffset := y * b.rowSize
 		mOffset := y * mask.rowSize
