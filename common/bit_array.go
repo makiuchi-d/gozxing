@@ -213,13 +213,7 @@ func (b *BitArray) Reverse() {
 	len := (b.size - 1) / 32
 	oldBitsLen := len + 1
 	for i := 0; i < oldBitsLen; i++ {
-		x := b.bits[i]
-		x = ((x >> 1) & 0x55555555) | ((x & 0x55555555) << 1)
-		x = ((x >> 2) & 0x33333333) | ((x & 0x33333333) << 2)
-		x = ((x >> 4) & 0x0f0f0f0f) | ((x & 0x0f0f0f0f) << 4)
-		x = ((x >> 8) & 0x00ff00ff) | ((x & 0x00ff00ff) << 8)
-		x = ((x >> 16) & 0x0000ffff) | ((x & 0x0000ffff) << 16)
-		newBits[len-i] = x
+		newBits[len-i] = bits.Reverse32(b.bits[i])
 	}
 	if b.size != oldBitsLen*32 {
 		leftOffset := uint(oldBitsLen*32 - b.size)
