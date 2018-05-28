@@ -2,6 +2,7 @@ package common
 
 import (
 	"errors"
+	"math/bits"
 )
 
 type BitMatrix struct {
@@ -185,17 +186,29 @@ func (b *BitMatrix) SetRow(y int, row *BitArray) {
 }
 
 func (b *BitMatrix) Rotate180() {
-	width := b.GetWidth()
-	height := b.GetHeight()
-	topRow := NewBitArray(width)
-	bottomRow := NewBitArray(width)
-	for i := 0; i < (height+1)/2; i++ {
-		topRow = b.GetRow(i, topRow)
-		bottomRow = b.GetRow(height-1-i, bottomRow)
-		topRow.Reverse()
-		bottomRow.Reverse()
-		b.SetRow(i, bottomRow)
-		b.SetRow(height-1-i, topRow)
+	width := b.width
+	height := b.height
+	rowSize := b.rowSize
+	for i := 0; i < height/2; i++ {
+		topOffset := i * rowSize
+		bottomOffset := (height - 1 - i) * rowSize
+		for j := 0; j < rowSize; j++ {
+			top := topOffset + j
+			bottom := bottomOffset + j
+			b.bits[top], b.bits[bottom] = b.bits[bottom], b.bits[top]
+		}
+	}
+
+	shift := uint(32 - width%32)
+	for i := 0; i < height; i++ {
+		offset := i * rowSize
+		curBits := bits.Reverse32(b.bits[offset]) >> shift
+		for j := 0; j < rowSize-1; j++ {
+			nextBits := bits.Reverse32(b.bits[offset+j+1])
+			b.bits[offset+j] = curBits | (nextBits << (32 - shift))
+			curBits = nextBits >> shift
+		}
+		b.bits[offset+rowSize-1] = curBits
 	}
 }
 
