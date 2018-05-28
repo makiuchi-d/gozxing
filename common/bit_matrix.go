@@ -186,29 +186,36 @@ func (b *BitMatrix) SetRow(y int, row *BitArray) {
 }
 
 func (b *BitMatrix) Rotate180() {
-	width := b.width
 	height := b.height
 	rowSize := b.rowSize
 	for i := 0; i < height/2; i++ {
 		topOffset := i * rowSize
-		bottomOffset := (height - 1 - i) * rowSize
+		bottomOffset := (height-i)*rowSize - 1
 		for j := 0; j < rowSize; j++ {
 			top := topOffset + j
-			bottom := bottomOffset + j
+			bottom := bottomOffset - j
 			b.bits[top], b.bits[bottom] = b.bits[bottom], b.bits[top]
 		}
 	}
-
-	shift := uint(32 - width%32)
-	for i := 0; i < height; i++ {
-		offset := i * rowSize
-		curBits := bits.Reverse32(b.bits[offset]) >> shift
-		for j := 0; j < rowSize-1; j++ {
-			nextBits := bits.Reverse32(b.bits[offset+j+1])
-			b.bits[offset+j] = curBits | (nextBits << (32 - shift))
-			curBits = nextBits >> shift
+	if height%2 != 0 {
+		offset := rowSize * (height - 1) / 2
+		for j := 0; j < rowSize/2; j++ {
+			left := offset + j
+			right := offset + rowSize - 1 - j
+			b.bits[left], b.bits[right] = b.bits[right], b.bits[left]
 		}
-		b.bits[offset+rowSize-1] = curBits
+	}
+
+	if shift := uint(b.width % 32); shift != 0 {
+		for i := 0; i < height; i++ {
+			offset := rowSize * i
+			b.bits[offset] = bits.Reverse32(b.bits[offset]) >> uint(32-shift)
+			for j := 1; j < rowSize; j++ {
+				curbits := bits.Reverse32(b.bits[offset+j])
+				b.bits[offset+j-1] |= curbits << shift
+				b.bits[offset+j] = curbits >> uint(32-shift)
+			}
+		}
 	}
 }
 

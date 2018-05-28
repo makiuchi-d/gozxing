@@ -285,6 +285,36 @@ func TestBitMatrix_Rotate180(t *testing.T) {
 	testBitMatrixGet(t, b, 4, 2, false)
 }
 
+func TestBitMatrix_Rotate180WideWidth(t *testing.T) {
+	b, _ := NewBitMatrix(130, 3)
+	for i := 0; i < b.width; i++ {
+		if i%3 == 0 {
+			b.Set(i, 0)
+		}
+		if i%5 == 0 {
+			b.Set(i, 1)
+		}
+		if i%7 == 0 {
+			b.Set(i, 2)
+		}
+	}
+
+	b.Rotate180()
+
+	for i := 0; i < b.width; i++ {
+		x := b.width - 1 - i
+		if b.Get(x, 2) != (i%3 == 0) {
+			t.Fatalf("[%v,0] must be %v", x, (i%3 == 0))
+		}
+		if b.Get(x, 1) != (i%5 == 0) {
+			t.Fatalf("[%v,1] must be %v", x, (i%5 == 0))
+		}
+		if b.Get(x, 0) != (i%7 == 0) {
+			t.Fatalf("[%v,2] must be %v", x, (i%7 == 0))
+		}
+	}
+}
+
 func TestGetEnclosingRectangle(t *testing.T) {
 
 }
