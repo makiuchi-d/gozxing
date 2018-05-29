@@ -18,10 +18,10 @@ func (s DefaultGridSampler) SampleGrid(image *BitMatrix, dimensionX, dimensionY 
 		p1ToX, p1ToY, p2ToX, p2ToY, p3ToX, p3ToY, p4ToX, p4ToY,
 		p1FromX, p1FromY, p2FromX, p2FromY, p3FromX, p3FromY, p4FromX, p4FromY)
 
-	return s.SampleGridFromTransform(image, dimensionX, dimensionY, transform)
+	return s.SampleGridWithTransform(image, dimensionX, dimensionY, transform)
 }
 
-func (s DefaultGridSampler) SampleGridFromTransform(image *BitMatrix,
+func (s DefaultGridSampler) SampleGridWithTransform(image *BitMatrix,
 	dimensionX, dimensionY int, transform *PerspectiveTransform) (*BitMatrix, error) {
 
 	if dimensionX <= 0 || dimensionY <= 0 {

@@ -16,7 +16,7 @@ func (s DummyGridSampler) SampleGrid(image *BitMatrix, dimensionX, dimensionY in
 	return nil, nil
 }
 
-func (s DummyGridSampler) SampleGridFromTransform(image *BitMatrix,
+func (s DummyGridSampler) SampleGridWithTransform(image *BitMatrix,
 	dimensionX, dimensionY int, transform *PerspectiveTransform) (*BitMatrix, error) {
 	return nil, nil
 }

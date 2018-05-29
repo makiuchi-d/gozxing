@@ -9,7 +9,7 @@ type GridSampler interface {
 		p1ToX, p1ToY, p2ToX, p2ToY, p3ToX, p3ToY, p4ToX, p4ToY float64,
 		p1FromX, p1FromY, p2FromX, p2FromY, p3FromX, p3FromY, p4FromX, p4FromY float64) (*BitMatrix, error)
 
-	SampleGridFromTransform(image *BitMatrix,
+	SampleGridWithTransform(image *BitMatrix,
 		dimensionX, dimensionY int, transform *PerspectiveTransform) (*BitMatrix, error)
 }
 
