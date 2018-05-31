@@ -31,9 +31,9 @@ func (rp ResultPointBase) GetY() float64 {
 // @param patterns array of three {@code ResultPoint} to order
 func ResultPoint_OrderBestPatterns(patterns []ResultPoint) {
 	// Find distances between pattern centers
-	zeroOneDistance := distance(patterns[0], patterns[1])
-	oneTwoDistance := distance(patterns[1], patterns[2])
-	zeroTwoDistance := distance(patterns[0], patterns[2])
+	zeroOneDistance := ResultPoint_Distance(patterns[0], patterns[1])
+	oneTwoDistance := ResultPoint_Distance(patterns[1], patterns[2])
+	zeroTwoDistance := ResultPoint_Distance(patterns[0], patterns[2])
 
 	var pointA, pointB, pointC ResultPoint
 
@@ -65,7 +65,7 @@ func ResultPoint_OrderBestPatterns(patterns []ResultPoint) {
 	patterns[2] = pointC
 }
 
-func distance(pattern1, pattern2 ResultPoint) float64 {
+func ResultPoint_Distance(pattern1, pattern2 ResultPoint) float64 {
 	return detector.MathUtils_DistanceFloat(pattern1.GetX(), pattern1.GetY(), pattern2.GetX(), pattern2.GetY())
 }
 
