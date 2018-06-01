@@ -37,22 +37,31 @@ func (s DefaultGridSampler) SampleGridWithTransform(image *BitMatrix,
 			points[x+1] = iValue
 		}
 		transform.TransformPoints(points)
-
+		// Quick check to see if points transformed to something inside the image;
+		// sufficient to check the endpoints
 		e := GridSampler_checkAndNudgePoints(image, points)
 		if e != nil {
 			return nil, e
 		}
-
 		for x := 0; x < max; x += 2 {
 			px := int(points[x])
-			py := int(points[y])
+			py := int(points[x+1])
 
 			if px >= image.GetWidth() || py >= image.GetHeight() {
 				// cause of ArrayIndexOutOfBoundsException in image.Get(px, py)
+
+				// This feels wrong, but, sometimes if the finder patterns are misidentified, the resulting
+				// transform gets "twisted" such that it maps a straight line of points to a set of points
+				// whose endpoints are in bounds, but others are not. There is probably some mathematical
+				// way to detect this about the transformation that I don't know yet.
+				// This results in an ugly runtime exception despite our clever checks above -- can't have
+				// that. We could check each point's coordinates but that feels duplicative. We settle for
+				// catching and wrapping ArrayIndexOutOfBoundsException.
 				return nil, gozxing.NotFoundException_GetNotFoundInstance()
 			}
 
 			if image.Get(px, py) {
+				// Black(-ish) pixel
 				bits.Set(x/2, y)
 			}
 		}
