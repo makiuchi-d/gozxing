@@ -33,7 +33,7 @@ func GridSampler_checkAndNudgePoints(image *BitMatrix, points []float64) error {
 		x := int(points[offset])
 		y := int(points[offset+1])
 		if x < -1 || x > width || y < -1 || y > height {
-			return gozxing.NotFoundException_GetNotFoundInstance()
+			return gozxing.GetNotFoundExceptionInstance()
 		}
 		nudged = false
 		if x == -1 {
@@ -57,7 +57,7 @@ func GridSampler_checkAndNudgePoints(image *BitMatrix, points []float64) error {
 		x := int(points[offset])
 		y := int(points[offset+1])
 		if x < -1 || x > width || y < -1 || y > height {
-			return gozxing.NotFoundException_GetNotFoundInstance()
+			return gozxing.GetNotFoundExceptionInstance()
 		}
 		nudged = false
 		if x == -1 {

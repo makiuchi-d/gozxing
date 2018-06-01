@@ -1,16 +1,19 @@
 package gozxing
 
 import (
-	"reflect"
 	"testing"
 )
 
-func TestNotFoundException_GetNotFoundInstance(t *testing.T) {
-	var e error = NotFoundException_GetNotFoundInstance()
-	switch e.(type) {
-	case NotFoundException:
-		break
-	default:
-		t.Fatalf("Type is not NotFoundException, %v", reflect.TypeOf(e))
+func TestNotFoundException(t *testing.T) {
+	var e error = GetNotFoundExceptionInstance()
+
+	if _, ok := e.(NotFoundException); !ok {
+		t.Fatalf("Not NotFoundException, %T", e)
+	}
+	if _, ok := e.(ReaderException); !ok {
+		t.Fatalf("Not ReaderException, %T", e)
+	}
+	if _, ok := e.(FormatException); ok {
+		t.Fatalf("Type must not be FormatException")
 	}
 }

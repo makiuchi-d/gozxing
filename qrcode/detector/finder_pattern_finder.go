@@ -447,7 +447,7 @@ func (f *FinderPatternFinder) HaveMultiplyConfirmedCenters() bool {
 func (f *FinderPatternFinder) SelectBestPatterns() ([]gozxing.ResultPoint, error) {
 	startSize := float64(len(f.possibleCenters))
 	if startSize < 3 {
-		return nil, gozxing.NotFoundException_GetNotFoundInstance()
+		return nil, gozxing.GetNotFoundExceptionInstance()
 	}
 
 	if startSize > 3 {

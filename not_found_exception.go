@@ -4,12 +4,20 @@ import (
 	"errors"
 )
 
-type NotFoundException struct {
+type NotFoundException interface {
+	ReaderException
+	NotFoundException()
+}
+
+type notFoundException struct {
 	error
 }
 
-var notFoundInstance NotFoundException = NotFoundException{errors.New("NotFoundException")}
+func (notFoundException) ReaderException()   {}
+func (notFoundException) NotFoundException() {}
 
-func NotFoundException_GetNotFoundInstance() NotFoundException {
+var notFoundInstance = notFoundException{errors.New("NotFoundException")}
+
+func GetNotFoundExceptionInstance() NotFoundException {
 	return notFoundInstance
 }

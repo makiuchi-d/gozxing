@@ -2,25 +2,37 @@ package gozxing
 
 import (
 	"errors"
-	"reflect"
 	"testing"
 )
 
-func TestNewFormatException(t *testing.T) {
-	var e error = FormatException_GetFormatInstance()
-	switch e.(type) {
-	case FormatException:
-		break
-	default:
-		t.Fatalf("Type is not FormatException, %v", reflect.TypeOf(e))
-	}
+func TestFormatException(t *testing.T) {
+	var e error = GetFormatExceptionInstance()
 
-	base := errors.New("test")
-	e = FormatException_GetFormatInstanceWithError(base)
 	if _, ok := e.(FormatException); !ok {
-		t.Fatalf("Type is not FormatException, %v", reflect.TypeOf(e))
+		t.Fatalf("Type is not FormatException")
+	}
+	if _, ok := e.(ReaderException); !ok {
+		t.Fatalf("Type is not ReaderException")
+	}
+	if _, ok := e.(NotFoundException); ok {
+		t.Fatalf("Type must not be NotFoundException")
+	}
+}
+
+func TestNewFormatException(t *testing.T) {
+	base := errors.New("newformatexception")
+	var e error = NewFormatExceptionInstance(base)
+
+	if _, ok := e.(FormatException); !ok {
+		t.Fatalf("Type is not FormatException")
+	}
+	if _, ok := e.(ReaderException); !ok {
+		t.Fatalf("Type is not ReaderException")
+	}
+	if _, ok := e.(NotFoundException); ok {
+		t.Fatalf("Type must not be NotFoundException")
 	}
 	if e.Error() != base.Error() {
-		t.Fatalf("error is not inhelited, %v, expect %v", e, base)
+		t.Fatalf("e.Error() = %v, expect %v", e.Error(), base.Error())
 	}
 }

@@ -4,16 +4,24 @@ import (
 	"errors"
 )
 
-type FormatException struct {
+type FormatException interface {
+	ReaderException
+	FormatException()
+}
+
+type formatException struct {
 	error
 }
 
-var formatInstance FormatException = FormatException{errors.New("FormatException")}
+func (formatException) ReaderException() {}
+func (formatException) FormatException() {}
 
-func FormatException_GetFormatInstance() FormatException {
+var formatInstance = formatException{errors.New("FormatException")}
+
+func GetFormatExceptionInstance() FormatException {
 	return formatInstance
 }
 
-func FormatException_GetFormatInstanceWithError(err error) FormatException {
-	return FormatException{err}
+func NewFormatExceptionInstance(e error) FormatException {
+	return formatException{e}
 }

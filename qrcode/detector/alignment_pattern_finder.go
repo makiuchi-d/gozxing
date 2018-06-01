@@ -105,7 +105,7 @@ func (this *AlignmentPatternFinder) Find() (*AlignmentPattern, error) {
 		return this.possibleCenters[0], nil
 	}
 
-	return nil, gozxing.NotFoundException_GetNotFoundInstance()
+	return nil, gozxing.GetNotFoundExceptionInstance()
 }
 
 func AlignmentPatternFinder_centerFromEnd(stateCount []int, end int) float64 {

@@ -51,7 +51,7 @@ func (this *Detector) processFinderPatternInfo(info *FinderPatternInfo) (*common
 
 	moduleSize := this.calculateModuleSize(topLeft, topRight, bottomLeft)
 	if moduleSize < 1.0 {
-		return nil, gozxing.NotFoundException_GetNotFoundInstance()
+		return nil, gozxing.GetNotFoundExceptionInstance()
 	}
 	dimension, e := this.computeDimension(topLeft, topRight, bottomLeft, moduleSize)
 	if e != nil {
@@ -84,11 +84,8 @@ func (this *Detector) processFinderPatternInfo(info *FinderPatternInfo) (*common
 				float64(i))
 			if e == nil {
 				break
-			} else {
-				// if error is NotFoundException, try next round
-				if _, ok := e.(gozxing.NotFoundException); !ok {
-					return nil, e
-				}
+			} else if _, ok := e.(gozxing.NotFoundException); !ok {
+				return nil, e
 			}
 		}
 		// If we didn't find alignment pattern... well try anyway without it
@@ -167,7 +164,7 @@ func (this *Detector) computeDimension(topLeft, topRight, bottomLeft gozxing.Res
 		dimension--
 		break
 	case 3:
-		return 0, gozxing.NotFoundException_GetNotFoundInstance()
+		return 0, gozxing.GetNotFoundExceptionInstance()
 	}
 	return dimension, nil
 }
@@ -313,7 +310,7 @@ func (this *Detector) findAlignmentInRegion(overallEstModuleSize float64, estAli
 		alignmentAreaRightX = a
 	}
 	if float64(alignmentAreaRightX-alignmentAreaLeftX) < overallEstModuleSize*3 {
-		return nil, gozxing.NotFoundException_GetNotFoundInstance()
+		return nil, gozxing.GetNotFoundExceptionInstance()
 	}
 
 	alignmentAreaTopY := estAlignmentY - allowance
@@ -326,7 +323,7 @@ func (this *Detector) findAlignmentInRegion(overallEstModuleSize float64, estAli
 	}
 
 	if float64(alignmentAreaBottomY-alignmentAreaTopY) < overallEstModuleSize*3 {
-		return nil, gozxing.NotFoundException_GetNotFoundInstance()
+		return nil, gozxing.GetNotFoundExceptionInstance()
 	}
 
 	alignmentFinder := NewAlignmentPatternFinder(

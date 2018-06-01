@@ -71,11 +71,11 @@ func (v *Version) GetECBlocksForLevel(ecLevel ErrorCorrectionLevel) *ECBlocks {
 
 func Version_GetProvisionalVersionForDimension(dimension int) (*Version, error) {
 	if dimension%4 != 1 {
-		return nil, gozxing.FormatException_GetFormatInstance()
+		return nil, gozxing.GetFormatExceptionInstance()
 	}
 	v, e := Version_GetVersionForNumber((dimension - 17) / 4)
 	if e != nil {
-		return nil, gozxing.FormatException_GetFormatInstance()
+		return nil, gozxing.GetFormatExceptionInstance()
 	}
 	return v, nil
 }
