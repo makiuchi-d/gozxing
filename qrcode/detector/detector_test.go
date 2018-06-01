@@ -541,7 +541,7 @@ func TestDetector_DetectWithoutHint(t *testing.T) {
 	}
 
 	bits := r.GetBits()
-	normalizedstr :=
+	normalizedstr := "" +
 		"X X X X X X X                                       X X X X X X X \n" +
 		"X           X                                       X           X \n" +
 		"X   X X X   X                                       X   X X X   X \n" +
@@ -576,7 +576,7 @@ func TestDetector_DetectWithoutHint(t *testing.T) {
 		"X           X                                                     \n" +
 		"X X X X X X X                                                     \n"
 
-	normalized, _ := common.ParseStringToBitMatrix(normalizedstr,"X ", "  ")
+	normalized, _ := common.ParseStringToBitMatrix(normalizedstr, "X ", "  ")
 
 	if normalized.GetWidth() != bits.GetWidth() || normalized.GetHeight() != bits.GetHeight() {
 		t.Fatalf("bits = %vx%v, normalized = %vx%v",
