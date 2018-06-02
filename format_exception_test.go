@@ -17,6 +17,9 @@ func TestFormatException(t *testing.T) {
 	if _, ok := e.(NotFoundException); ok {
 		t.Fatalf("Type must not be NotFoundException")
 	}
+
+	e.(FormatException).FormatException()
+	e.(FormatException).ReaderException()
 }
 
 func TestNewFormatException(t *testing.T) {

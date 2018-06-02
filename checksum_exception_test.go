@@ -17,6 +17,9 @@ func TestChecksumException(t *testing.T) {
 	if _, ok := e.(NotFoundException); ok {
 		t.Fatalf("Type must not be NotFoundException")
 	}
+
+	e.(ChecksumException).ChecksumException()
+	e.(ChecksumException).ReaderException()
 }
 
 func TestNewChecksumException(t *testing.T) {
