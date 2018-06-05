@@ -195,15 +195,19 @@ func (this *GenericGFPoly) Divide(other *GenericGFPoly) ([]*GenericGFPoly, error
 }
 
 func (this *GenericGFPoly) String() string {
-	if this.GetDegree() == 0 {
-		return fmt.Sprintf("%d", this.GetCoefficient(0))
+	if this.IsZero() {
+		return "0"
 	}
 	result := make([]byte, 0, 8*this.GetDegree())
 	for degree := this.GetDegree(); degree >= 0; degree-- {
 		coefficient := this.GetCoefficient(degree)
 		if coefficient != 0 {
 			if coefficient < 0 {
-				result = append(result, []byte(" - ")...)
+				if degree == this.GetDegree() {
+					result = append(result, '-')
+				} else {
+					result = append(result, []byte(" - ")...)
+				}
 				coefficient = -coefficient
 			} else {
 				if len(result) > 0 {

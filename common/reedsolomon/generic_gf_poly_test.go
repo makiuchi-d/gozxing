@@ -249,4 +249,16 @@ func TestGenericGFPoly_String(t *testing.T) {
 	if s := p.String(); s != expect {
 		t.Fatalf("string is %s, expect %s", s, expect)
 	}
+
+	p, _ = NewGenericGFPoly(gf, []int{-1})
+	expect = "-1"
+	if s := p.String(); s != expect {
+		t.Fatalf("string is %s, expect %s", s, expect)
+	}
+
+	p, _ = NewGenericGFPoly(gf, []int{3})
+	expect = "a^25"
+	if s := p.String(); s != expect {
+		t.Fatalf("string is %s, expect %s", s, expect)
+	}
 }
