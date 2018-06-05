@@ -193,24 +193,24 @@ func TestGenericGFPoly_MultiplyByMonomial(t *testing.T) {
 }
 
 func testGenericGFPoly_Divide(t *testing.T, p, o *GenericGFPoly, expquot, exprem []int) {
-	arr, e := p.Divide(o)
+	quot, rem, e := p.Divide(o)
 	if e != nil {
 		t.Fatalf("Divide(%v) returns error, %v", o, e)
 	}
-	if len(arr) != 2 {
-		t.Fatalf("Divide(%v) must return 2 GenericGFPoly, count=%v", o, len(arr))
+	if quot == nil || rem == nil {
+		t.Fatalf("Divide(%v) returns nil, %v, %v", o, quot, rem)
 	}
-	if arr[0].field != p.field {
-		t.Fatalf("Divide(%v) quotient has different GF, %v", o, arr[0].field)
+	if quot.field != p.field {
+		t.Fatalf("Divide(%v) quotient has different GF, %v", o, quot.field)
 	}
-	if arr[1].field != p.field {
-		t.Fatalf("Divide(%v) remainder has different GF, %v", o, arr[1].field)
+	if rem.field != p.field {
+		t.Fatalf("Divide(%v) remainder has different GF, %v", o, rem.field)
 	}
-	if !reflect.DeepEqual(arr[0].coefficients, expquot) {
-		t.Fatalf("Divide(%v) quotient coefficients = '%v', expect '%v'", o, arr[0].coefficients, expquot)
+	if !reflect.DeepEqual(quot.coefficients, expquot) {
+		t.Fatalf("Divide(%v) quotient coefficients = '%v', expect '%v'", o, quot.coefficients, expquot)
 	}
-	if !reflect.DeepEqual(arr[1].coefficients, exprem) {
-		t.Fatalf("Divide(%v) reminder coefficients = '%v', expect '%v'", o, arr[1].coefficients, exprem)
+	if !reflect.DeepEqual(rem.coefficients, exprem) {
+		t.Fatalf("Divide(%v) reminder coefficients = '%v', expect '%v'", o, rem.coefficients, exprem)
 	}
 }
 
@@ -219,12 +219,12 @@ func TestGenericGFPoly_Divide(t *testing.T) {
 	p, _ := NewGenericGFPoly(gf, []int{11, 7, 5, 0, 3})
 	o, _ := NewGenericGFPoly(GenericGF_AZTEC_PARAM, []int{1, 2, 3})
 
-	if _, e := p.Divide(o); e == nil {
+	if _, _, e := p.Divide(o); e == nil {
 		t.Fatalf("Divide by different field must be error")
 	}
 
 	o, _ = NewGenericGFPoly(gf, []int{0})
-	if _, e := p.Divide(o); e == nil {
+	if _, _, e := p.Divide(o); e == nil {
 		t.Fatalf("Divide by 0 must be error")
 	}
 

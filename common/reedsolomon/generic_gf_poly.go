@@ -152,21 +152,21 @@ func (this *GenericGFPoly) MultiplyByMonomial(degree, coefficient int) (*Generic
 	return NewGenericGFPoly(this.field, product)
 }
 
-func (this *GenericGFPoly) Divide(other *GenericGFPoly) ([]*GenericGFPoly, error) {
+func (this *GenericGFPoly) Divide(other *GenericGFPoly) (quotient, remainder *GenericGFPoly, e error) {
 	if this.field != other.field {
-		return nil, errors.New("IllegalArgumentException: GenericGFPolys do not have same GenericGF field")
+		return nil, nil, errors.New("IllegalArgumentException: GenericGFPolys do not have same GenericGF field")
 	}
 	if other.IsZero() {
-		return nil, errors.New("IllegalArgumentException: Divide by 0")
+		return nil, nil, errors.New("IllegalArgumentException: Divide by 0")
 	}
 
-	quotient := this.field.GetZero()
-	remainder := this
+	quotient = this.field.GetZero()
+	remainder = this
 
 	denominatorLeadingTerm := other.GetCoefficient(other.GetDegree())
 	inverseDenominatorLeadingTerm, e := this.field.Inverse(denominatorLeadingTerm)
 	if e != nil {
-		return nil, e
+		return nil, nil, e
 	}
 
 	for remainder.GetDegree() >= other.GetDegree() && !remainder.IsZero() {
@@ -175,23 +175,23 @@ func (this *GenericGFPoly) Divide(other *GenericGFPoly) ([]*GenericGFPoly, error
 
 		term, e := other.MultiplyByMonomial(degreeDifference, scale)
 		if e != nil {
-			return nil, e
+			return nil, nil, e
 		}
 		iterationQuotient, e := this.field.BuildMonomial(degreeDifference, scale)
 		if e != nil {
-			return nil, e
+			return nil, nil, e
 		}
 		quotient, e = quotient.AddOrSubtract(iterationQuotient)
 		if e != nil {
-			return nil, e
+			return nil, nil, e
 		}
 		remainder, e = remainder.AddOrSubtract(term)
 		if e != nil {
-			return nil, e
+			return nil, nil, e
 		}
 	}
 
-	return []*GenericGFPoly{quotient, remainder}, nil
+	return quotient, remainder, nil
 }
 
 func (this *GenericGFPoly) String() string {

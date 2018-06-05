@@ -129,7 +129,7 @@ func testGenericGF_Multiply(t *testing.T, g *GenericGF, a, b, expect int) {
 	}
 }
 
-func TestGenericGF_Multiply(t *testing.T){
+func TestGenericGF_Multiply(t *testing.T) {
 	g := NewGenericGF(0x011D, 256, 0)
 	testGenericGF_Multiply(t, g, 0, 1, 0)
 	testGenericGF_Multiply(t, g, 1, 0, 0)
