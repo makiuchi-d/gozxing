@@ -51,8 +51,8 @@ func TestParseImageToBitMatrix(t *testing.T) {
 	}
 
 	image := [][]bool{
-		[]bool{true, true, false},
-		[]bool{false, true, false},
+		{true, true, false},
+		{false, true, false},
 	}
 	b, e := ParseImageToBitMatrix(image)
 

@@ -79,10 +79,10 @@ func TestDecodeVersionInformation(t *testing.T) {
 
 func TestVersion1(t *testing.T) {
 	v := NewVersion(1, []int{},
-		ECBlocks{7, []ECB{ECB{1, 19}}},
-		ECBlocks{10, []ECB{ECB{1, 16}}},
-		ECBlocks{13, []ECB{ECB{1, 13}}},
-		ECBlocks{17, []ECB{ECB{1, 9}}})
+		ECBlocks{7, []ECB{{1, 19}}},
+		ECBlocks{10, []ECB{{1, 16}}},
+		ECBlocks{13, []ECB{{1, 13}}},
+		ECBlocks{17, []ECB{{1, 9}}})
 
 	if r := v.GetTotalCodewords(); r != 26 {
 		t.Fatalf("totalCodewords = %v, expect 26", r)
@@ -94,22 +94,22 @@ func TestVersion1(t *testing.T) {
 	}
 
 	ecbs = v.GetECBlocksForLevel(ErrorCorrectionLevel_L)
-	expect := &ECBlocks{7, []ECB{ECB{1, 19}}}
+	expect := &ECBlocks{7, []ECB{{1, 19}}}
 	if !reflect.DeepEqual(ecbs, expect) {
 		t.Fatalf("ECBlocksForLevel(L) is %v, expect %v", ecbs, expect)
 	}
 	ecbs = v.GetECBlocksForLevel(ErrorCorrectionLevel_M)
-	expect = &ECBlocks{10, []ECB{ECB{1, 16}}}
+	expect = &ECBlocks{10, []ECB{{1, 16}}}
 	if !reflect.DeepEqual(ecbs, expect) {
 		t.Fatalf("ECBlocksForLevel(M) is %v, expect %v", ecbs, expect)
 	}
 	ecbs = v.GetECBlocksForLevel(ErrorCorrectionLevel_Q)
-	expect = &ECBlocks{13, []ECB{ECB{1, 13}}}
+	expect = &ECBlocks{13, []ECB{{1, 13}}}
 	if !reflect.DeepEqual(ecbs, expect) {
 		t.Fatalf("ECBlocksForLevel(Q) is %v, expect %v", ecbs, expect)
 	}
 	ecbs = v.GetECBlocksForLevel(ErrorCorrectionLevel_H)
-	expect = &ECBlocks{17, []ECB{ECB{1, 9}}}
+	expect = &ECBlocks{17, []ECB{{1, 9}}}
 	if !reflect.DeepEqual(ecbs, expect) {
 		t.Fatalf("ECBlocksForLevel(H) is %v, expect %v", ecbs, expect)
 	}

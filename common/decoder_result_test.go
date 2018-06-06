@@ -32,14 +32,14 @@ func TestNewDecoderResult(t *testing.T) {
 		t.Fatalf("GetECLevel() = %v, expect %v", r, ecLevel)
 	}
 	dr.SetErrorsCorrected(10)
-	if r := dr.GetErrorsCorrected(); r !=  10 {
+	if r := dr.GetErrorsCorrected(); r != 10 {
 		t.Fatalf("GetErrorsCorrected() = %v, expect %v", r, 10)
 	}
 	dr.SetErasures(15)
 	if r := dr.GetErasures(); r != 15 {
 		t.Fatalf("GetErasures() = %v, expect %v", r, 15)
 	}
-	other := struct{num int}{25}
+	other := struct{ num int }{25}
 	dr.SetOther(other)
 	if r := dr.GetOther(); r != other {
 		t.Fatalf("GetErasures() = %v, expect %v", r, other)
