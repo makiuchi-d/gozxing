@@ -107,14 +107,14 @@ func (f *FinderPatternFinder) Find(hints map[gozxing.DecodeHintType]interface{})
 		}
 	}
 
-	patternInfo, e := f.SelectBestPatterns()
+	fps, e := f.SelectBestPatterns()
 	if e != nil {
 		return nil, e
 	}
 
-	gozxing.ResultPoint_OrderBestPatterns(patternInfo)
-
-	return NewFinderPatternInfo(patternInfo), nil
+	bl, tl, tr := gozxing.ResultPoint_OrderBestPatterns(fps[0], fps[1], fps[2])
+	info := NewFinderPatternInfo(bl.(*FinderPattern), tl.(*FinderPattern), tr.(*FinderPattern))
+	return info, nil
 }
 
 func FinderPatternFinder_centerFromEnd(stateCount []int, end int) float64 {
@@ -444,7 +444,7 @@ func (f *FinderPatternFinder) HaveMultiplyConfirmedCenters() bool {
 	return totalDeviation <= 0.05*totalModuleSize
 }
 
-func (f *FinderPatternFinder) SelectBestPatterns() ([]gozxing.ResultPoint, error) {
+func (f *FinderPatternFinder) SelectBestPatterns() ([]*FinderPattern, error) {
 	startSize := float64(len(f.possibleCenters))
 	if startSize < 3 {
 		return nil, gozxing.GetNotFoundExceptionInstance()
@@ -502,8 +502,5 @@ func (f *FinderPatternFinder) SelectBestPatterns() ([]gozxing.ResultPoint, error
 		f.possibleCenters = f.possibleCenters[:3]
 	}
 
-	return []gozxing.ResultPoint{
-		f.possibleCenters[0],
-		f.possibleCenters[1],
-		f.possibleCenters[2]}, nil
+	return f.possibleCenters, nil
 }

@@ -391,10 +391,9 @@ func TestFinderPatternFinder_SelectBestPatterns(t *testing.T) {
 	expect2 := NewFinderPattern(10, 10, 2, 2)
 	expect3 := NewFinderPattern(10, 20, 2, 2)
 
-	for _, rp := range r {
-		fp := rp.(*FinderPattern)
+	for _, fp := range r {
 		if *fp != *expect1 && *fp != *expect2 && *fp != *expect3 {
-			t.Fatalf("%v is not contained, [%v, %v, %v]", rp, expect1, expect2, expect3)
+			t.Fatalf("%v is not contained, [%v, %v, %v]", fp, expect1, expect2, expect3)
 		}
 	}
 }

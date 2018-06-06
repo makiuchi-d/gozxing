@@ -1,20 +1,16 @@
 package detector
 
-import (
-	"github.com/makiuchi-d/gozxing"
-)
-
 type FinderPatternInfo struct {
 	bottomLeft *FinderPattern
 	topLeft    *FinderPattern
 	topRight   *FinderPattern
 }
 
-func NewFinderPatternInfo(patternCenters []gozxing.ResultPoint) *FinderPatternInfo {
+func NewFinderPatternInfo(bottomLeft, topLeft, topRight *FinderPattern) *FinderPatternInfo {
 	return &FinderPatternInfo{
-		bottomLeft: patternCenters[0].(*FinderPattern),
-		topLeft:    patternCenters[1].(*FinderPattern),
-		topRight:   patternCenters[2].(*FinderPattern),
+		bottomLeft: bottomLeft,
+		topLeft:    topLeft,
+		topRight:   topRight,
 	}
 }
 
