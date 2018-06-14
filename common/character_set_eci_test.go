@@ -182,7 +182,7 @@ func TestCharacterSetECI_GetEncoderDecoder(t *testing.T) {
 			continue
 		}
 		if e != nil {
-			t.Fatalf("IANA.Encoding(%s) returns error, %v",name, e)
+			t.Fatalf("IANA.Encoding(%s) returns error, %v", name, e)
 		}
 		if enc.NewEncoder() == nil {
 			t.Fatalf("%s encoder is nil", name)
