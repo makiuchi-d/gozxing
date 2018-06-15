@@ -6,8 +6,8 @@ import (
 
 type BitSource struct {
 	bytes      []byte
-	byteOffset uint
-	bitOffset  uint
+	byteOffset int
+	bitOffset  int
 }
 
 func NewBitSource(bytes []byte) *BitSource {
@@ -16,31 +16,31 @@ func NewBitSource(bytes []byte) *BitSource {
 	}
 }
 
-func (this *BitSource) GetBitOffset() uint {
+func (this *BitSource) GetBitOffset() int {
 	return this.bitOffset
 }
 
-func (this *BitSource) GetByteOffset() uint {
+func (this *BitSource) GetByteOffset() int {
 	return this.byteOffset
 }
 
-func (this *BitSource) ReadBit(numBits uint) (uint, error) {
+func (this *BitSource) ReadBits(numBits int) (int, error) {
 	if numBits < 1 || numBits > 32 || numBits > this.Available() {
 		return 0, fmt.Errorf("IllegalArgumentException: %v", numBits)
 	}
 
-	result := uint(0)
+	result := 0
 
 	// First, read remainder from current byte
 	if this.bitOffset > 0 {
-		bitsLeft := uint(8 - this.bitOffset)
-		toRead := uint(bitsLeft)
+		bitsLeft := 8 - this.bitOffset
+		toRead := bitsLeft
 		if numBits < bitsLeft {
 			toRead = numBits
 		}
-		bitsToNotRead := bitsLeft - toRead
-		mask := byte((0xFF >> (8 - toRead)) << bitsToNotRead)
-		result = uint(this.bytes[this.byteOffset]&mask) >> bitsToNotRead
+		bitsToNotRead := uint(bitsLeft - toRead)
+		mask := byte((0xFF >> uint(8 - toRead)) << bitsToNotRead)
+		result = int(this.bytes[this.byteOffset]&mask) >> bitsToNotRead
 		numBits -= toRead
 		this.bitOffset += toRead
 		if this.bitOffset == 8 {
@@ -52,16 +52,16 @@ func (this *BitSource) ReadBit(numBits uint) (uint, error) {
 	// Next read whole bytes
 	if numBits > 0 {
 		for numBits >= 8 {
-			result = (result << 8) | uint(this.bytes[this.byteOffset]&0xFF)
+			result = (result << 8) | int(this.bytes[this.byteOffset]&0xFF)
 			this.byteOffset++
 			numBits -= 8
 		}
 
 		// Finally read a partial byte
 		if numBits > 0 {
-			bitsToNotRead := 8 - numBits
+			bitsToNotRead := uint(8 - numBits)
 			mask := byte((0xFF >> bitsToNotRead) << bitsToNotRead)
-			result = (result << numBits) | uint((this.bytes[this.byteOffset]&mask)>>bitsToNotRead)
+			result = (result << uint(numBits)) | int((this.bytes[this.byteOffset]&mask)>>bitsToNotRead)
 			this.bitOffset += numBits
 		}
 	}
@@ -69,6 +69,6 @@ func (this *BitSource) ReadBit(numBits uint) (uint, error) {
 	return result, nil
 }
 
-func (this *BitSource) Available() uint {
-	return 8*(uint(len(this.bytes))-this.byteOffset) - this.bitOffset
+func (this *BitSource) Available() int {
+	return 8*(len(this.bytes)-this.byteOffset) - this.bitOffset
 }
