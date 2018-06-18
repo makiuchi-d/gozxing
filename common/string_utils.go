@@ -5,11 +5,11 @@ import (
 )
 
 const (
-	StringUtils_SHIFT_JIS                 = "SJIS"
+	StringUtils_SHIFT_JIS                 = "Shift_JIS" //"SJIS"
 	StringUtils_GB2312                    = "GB2312"
-	StringUtils_EUC_JP                    = "EUC_JP"
-	StringUtils_UTF8                      = "UTF8"
-	StringUtils_ISO88591                  = "ISO8859_1"
+	StringUtils_EUC_JP                    = "EUC-JP"     // "EUC_JP"
+	StringUtils_UTF8                      = "UTF-8"      // UTF8
+	StringUtils_ISO88591                  = "ISO-8859-1" // ISO8859_1
 	StringUtils_PLATFORM_DEFAULT_ENCODING = StringUtils_UTF8
 )
 
