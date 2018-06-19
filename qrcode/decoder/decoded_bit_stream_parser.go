@@ -93,22 +93,22 @@ func DecodedBitStreamParser_Decode(
 			}
 			switch mode {
 			case Mode_NUMERIC:
-				e := DecodedBitStreamParser_decodeNumericSegment(bits, result, count)
+				result, e = DecodedBitStreamParser_decodeNumericSegment(bits, result, count)
 				if e != nil {
 					return nil, e
 				}
 			case Mode_ALPHANUMERIC:
-				e := DecodedBitStreamParser_decodeAlphanumericSegment(bits, result, count, fc1InEffect)
+				result, e = DecodedBitStreamParser_decodeAlphanumericSegment(bits, result, count, fc1InEffect)
 				if e != nil {
 					return nil, e
 				}
 			case Mode_BYTE:
-				e := DecodedBitStreamParser_decodeByteSegment(bits, result, count, currentCharacterSetECI, byteSegments, hints)
+				result, byteSegments, e = DecodedBitStreamParser_decodeByteSegment(bits, result, count, currentCharacterSetECI, byteSegments, hints)
 				if e != nil {
 					return nil, e
 				}
 			case Mode_KANJI:
-				e := DecodedBitStreamParser_decodeKanjiSegment(bits, result, count)
+				result, e = DecodedBitStreamParser_decodeKanjiSegment(bits, result, count)
 				if e != nil {
 					return nil, e
 				}
@@ -169,10 +169,10 @@ func DecodedBitStreamParser_decodeHanziSegment(bits *common.BitSource, result []
 	return nil
 }
 
-func DecodedBitStreamParser_decodeKanjiSegment(bits *common.BitSource, result []byte, count int) error {
+func DecodedBitStreamParser_decodeKanjiSegment(bits *common.BitSource, result []byte, count int) ([]byte, error) {
 	// Don't crash trying to read more bits than we have available.
 	if count*13 > bits.Available() {
-		return gozxing.GetFormatExceptionInstance()
+		return result, gozxing.GetFormatExceptionInstance()
 	}
 
 	// Each character will require 2 bytes. Read the characters as 2-byte pairs
@@ -200,18 +200,18 @@ func DecodedBitStreamParser_decodeKanjiSegment(bits *common.BitSource, result []
 	dec := japanese.ShiftJIS.NewDecoder()
 	result, _, e := transform.Append(dec, result, buffer[:offset])
 	if e != nil {
-		return gozxing.GetFormatExceptionInstance()
+		return result, gozxing.GetFormatExceptionInstance()
 	}
-	return nil
+	return result, nil
 }
 
 func DecodedBitStreamParser_decodeByteSegment(bits *common.BitSource,
 	result []byte, count int, currentCharacterSetECI *common.CharacterSetECI,
-	byteSegments [][]byte, hints map[gozxing.DecodeHintType]interface{}) error {
+	byteSegments [][]byte, hints map[gozxing.DecodeHintType]interface{}) ([]byte, [][]byte, error) {
 
 	// Don't crash trying to read more bits than we have available.
 	if 8*count > bits.Available() {
-		return gozxing.GetFormatExceptionInstance()
+		return result, byteSegments, gozxing.GetFormatExceptionInstance()
 	}
 
 	readBytes := make([]byte, count)
@@ -220,29 +220,35 @@ func DecodedBitStreamParser_decodeByteSegment(bits *common.BitSource,
 		readBytes[i] = byte(b)
 	}
 
-	charSetECI := currentCharacterSetECI
-	if charSetECI == nil {
+	var encoding string
+	if currentCharacterSetECI == nil {
 		// The spec isn't clear on this mode; see
 		// section 6.4.5: t does not say which encoding to assuming
 		// upon decoding. I have seen ISO-8859-1 used as well as
 		// Shift_JIS -- without anything like an ECI designator to
 		// give a hint.
-		encoding := common.StringUtils_guessEncoding(readBytes, hints)
-		charSetECI = common.GetCharacterSetECIByName(encoding)
+		encoding = common.StringUtils_guessEncoding(readBytes, hints)
+	} else {
+		encoding = currentCharacterSetECI.Name()
 	}
 
-	encoding, e := ianaindex.IANA.Encoding(charSetECI.Name())
-	if e != nil {
-		return gozxing.GetFormatExceptionInstance()
+	if encoding == "ASCII" || encoding == "UTF-8" {
+		// no necessary to convert.
+		result = append(result, readBytes...)
+	} else {
+		ianaEncoding, e := ianaindex.IANA.Encoding(encoding)
+		if e != nil {
+			return result, byteSegments, gozxing.GetFormatExceptionInstance()
+		}
+		dec := ianaEncoding.NewDecoder()
+		result, _, e = transform.Append(dec, result, readBytes)
+		if e != nil {
+			return result, byteSegments, gozxing.GetFormatExceptionInstance()
+		}
 	}
 
-	dec := encoding.NewDecoder()
-	result, _, e = transform.Append(dec, result, readBytes)
-	if e != nil {
-		return gozxing.GetFormatExceptionInstance()
-	}
 	byteSegments = append(byteSegments, readBytes)
-	return nil
+	return result, byteSegments, nil
 }
 
 func toAlphaNumericChar(value int) (byte, error) {
@@ -252,23 +258,20 @@ func toAlphaNumericChar(value int) (byte, error) {
 	return ALPHANUMERIC_CHARS[value], nil
 }
 
-func DecodedBitStreamParser_decodeAlphanumericSegment(bits *common.BitSource, result []byte, count int, fc1InEffect bool) error {
+func DecodedBitStreamParser_decodeAlphanumericSegment(bits *common.BitSource, result []byte, count int, fc1InEffect bool) ([]byte, error) {
 	// Read two characters at a time
 	start := len(result)
 	for count > 1 {
 		nextTwoCharsBits, e := bits.ReadBits(11)
 		if e != nil {
-			return gozxing.GetFormatExceptionInstance()
+			return result, gozxing.GetFormatExceptionInstance()
 		}
 		char, e := toAlphaNumericChar(nextTwoCharsBits / 45)
 		if e != nil {
-			return e
+			return result, e
 		}
 		result = append(result, char)
-		char, e = toAlphaNumericChar(nextTwoCharsBits % 45)
-		if e != nil {
-			return e
-		}
+		char, _ = toAlphaNumericChar(nextTwoCharsBits % 45)
 		result = append(result, char)
 		count -= 2
 	}
@@ -276,11 +279,11 @@ func DecodedBitStreamParser_decodeAlphanumericSegment(bits *common.BitSource, re
 		// special case: one character left
 		nextCharBits, e := bits.ReadBits(6)
 		if e != nil {
-			return gozxing.GetFormatExceptionInstance()
+			return result, gozxing.GetFormatExceptionInstance()
 		}
 		char, e := toAlphaNumericChar(nextCharBits)
 		if e != nil {
-			return e
+			return result, e
 		}
 		result = append(result, char)
 	}
@@ -299,19 +302,19 @@ func DecodedBitStreamParser_decodeAlphanumericSegment(bits *common.BitSource, re
 			}
 		}
 	}
-	return nil
+	return result, nil
 }
 
-func DecodedBitStreamParser_decodeNumericSegment(bits *common.BitSource, result []byte, count int) error {
+func DecodedBitStreamParser_decodeNumericSegment(bits *common.BitSource, result []byte, count int) ([]byte, error) {
 	// Read three digits at a time
 	for count >= 3 {
 		// Each 10 bits encodes three digits
 		threeDigitsBits, e := bits.ReadBits(10)
 		if e != nil {
-			return gozxing.GetFormatExceptionInstance()
+			return result, gozxing.GetFormatExceptionInstance()
 		}
 		if threeDigitsBits >= 1000 {
-			return gozxing.GetFormatExceptionInstance()
+			return result, gozxing.GetFormatExceptionInstance()
 		}
 		result = append(result, byte('0'+(threeDigitsBits/100)))
 		result = append(result, byte('0'+((threeDigitsBits/10)%10)))
@@ -322,10 +325,10 @@ func DecodedBitStreamParser_decodeNumericSegment(bits *common.BitSource, result 
 		// Two digits left over to read, encoded in 7 bits
 		twoDigitsBits, e := bits.ReadBits(7)
 		if e != nil {
-			return gozxing.GetFormatExceptionInstance()
+			return result, gozxing.GetFormatExceptionInstance()
 		}
 		if twoDigitsBits >= 100 {
-			return gozxing.GetFormatExceptionInstance()
+			return result, gozxing.GetFormatExceptionInstance()
 		}
 		result = append(result, byte('0'+(twoDigitsBits/10)))
 		result = append(result, byte('0'+(twoDigitsBits%10)))
@@ -333,20 +336,20 @@ func DecodedBitStreamParser_decodeNumericSegment(bits *common.BitSource, result 
 		// One digit left over to read
 		digitBits, e := bits.ReadBits(4)
 		if e != nil {
-			return gozxing.GetFormatExceptionInstance()
+			return result, gozxing.GetFormatExceptionInstance()
 		}
 		if digitBits >= 10 {
-			return gozxing.GetFormatExceptionInstance()
+			return result, gozxing.GetFormatExceptionInstance()
 		}
-		result = append(result, byte(digitBits))
+		result = append(result, byte('0'+digitBits))
 	}
-	return nil
+	return result, nil
 }
 
 func DecodedBitStreamParser_parseECIValue(bits *common.BitSource) (int, error) {
 	firstByte, e := bits.ReadBits(8)
 	if e != nil {
-		return 0, gozxing.GetFormatExceptionInstance()
+		return -1, gozxing.GetFormatExceptionInstance()
 	}
 	if (firstByte & 0x80) == 0 {
 		// just one byte
@@ -356,7 +359,7 @@ func DecodedBitStreamParser_parseECIValue(bits *common.BitSource) (int, error) {
 		// two bytes
 		secondByte, e := bits.ReadBits(8)
 		if e != nil {
-			return 0, gozxing.GetFormatExceptionInstance()
+			return -1, gozxing.GetFormatExceptionInstance()
 		}
 		return ((firstByte & 0x3F) << 8) | secondByte, nil
 	}
@@ -364,9 +367,9 @@ func DecodedBitStreamParser_parseECIValue(bits *common.BitSource) (int, error) {
 		// three bytes
 		secondThirdBytes, e := bits.ReadBits(16)
 		if e != nil {
-			return 0, gozxing.GetFormatExceptionInstance()
+			return -1, gozxing.GetFormatExceptionInstance()
 		}
 		return ((firstByte & 0x1F) << 16) | secondThirdBytes, nil
 	}
-	return 0, gozxing.GetFormatExceptionInstance()
+	return -1, gozxing.GetFormatExceptionInstance()
 }
