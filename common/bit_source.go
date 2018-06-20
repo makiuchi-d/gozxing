@@ -39,7 +39,7 @@ func (this *BitSource) ReadBits(numBits int) (int, error) {
 			toRead = numBits
 		}
 		bitsToNotRead := uint(bitsLeft - toRead)
-		mask := byte((0xFF >> uint(8 - toRead)) << bitsToNotRead)
+		mask := byte((0xFF >> uint(8-toRead)) << bitsToNotRead)
 		result = int(this.bytes[this.byteOffset]&mask) >> bitsToNotRead
 		numBits -= toRead
 		this.bitOffset += toRead

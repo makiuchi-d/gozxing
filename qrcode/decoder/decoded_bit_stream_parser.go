@@ -79,7 +79,7 @@ func DecodedBitStreamParser_Decode(
 				return nil, gozxing.GetFormatExceptionInstance()
 			}
 			if subset == GB2312_SUBSET {
-				e := DecodedBitStreamParser_decodeHanziSegment(bits, result, countHanzi)
+				result, e = DecodedBitStreamParser_decodeHanziSegment(bits, result, countHanzi)
 				if e != nil {
 					return nil, e
 				}
@@ -134,10 +134,10 @@ func DecodedBitStreamParser_Decode(
 		parityData), nil
 }
 
-func DecodedBitStreamParser_decodeHanziSegment(bits *common.BitSource, result []byte, count int) error {
+func DecodedBitStreamParser_decodeHanziSegment(bits *common.BitSource, result []byte, count int) ([]byte, error) {
 	// Don't crash trying to read more bits than we have available.
 	if count*13 > bits.Available() {
-		return gozxing.GetFormatExceptionInstance()
+		return result, gozxing.GetFormatExceptionInstance()
 	}
 
 	// Each character will require 2 bytes. Read the characters as 2-byte pairs
@@ -148,7 +148,7 @@ func DecodedBitStreamParser_decodeHanziSegment(bits *common.BitSource, result []
 		// Each 13 bits encodes a 2-byte character
 		twoBytes, _ := bits.ReadBits(13)
 		assembledTwoBytes := ((twoBytes / 0x060) << 8) | (twoBytes % 0x060)
-		if assembledTwoBytes < 0x003BF {
+		if assembledTwoBytes < 0x00a00 {
 			// In the 0xA1A1 to 0xAAFE range
 			assembledTwoBytes += 0x0A1A1
 		} else {
@@ -161,12 +161,12 @@ func DecodedBitStreamParser_decodeHanziSegment(bits *common.BitSource, result []
 		count--
 	}
 
-	dec := simplifiedchinese.HZGB2312.NewDecoder()
+	dec := simplifiedchinese.GBK.NewDecoder() // GBK is a extension of GB2312
 	result, _, e := transform.Append(dec, result, buffer[:offset])
 	if e != nil {
-		return gozxing.GetFormatExceptionInstance()
+		return result, gozxing.GetFormatExceptionInstance()
 	}
-	return nil
+	return result, nil
 }
 
 func DecodedBitStreamParser_decodeKanjiSegment(bits *common.BitSource, result []byte, count int) ([]byte, error) {
