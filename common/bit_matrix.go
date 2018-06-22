@@ -25,7 +25,7 @@ func NewBitMatrix(width, height int) (*BitMatrix, error) {
 	return &BitMatrix{width, height, rowSize, bits}, nil
 }
 
-func ParseImageToBitMatrix(image [][]bool) (*BitMatrix, error) {
+func ParseBoolMapToBitMatrix(image [][]bool) (*BitMatrix, error) {
 	var width, height int
 	height = len(image)
 	if height > 0 {

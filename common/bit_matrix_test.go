@@ -45,8 +45,8 @@ func testBitMatrixGet(t *testing.T, b *BitMatrix, x, y int, expect bool) {
 	}
 }
 
-func TestParseImageToBitMatrix(t *testing.T) {
-	if _, e := ParseImageToBitMatrix([][]bool{}); e == nil {
+func TestParseBoolMapToBitMatrix(t *testing.T) {
+	if _, e := ParseBoolMapToBitMatrix([][]bool{}); e == nil {
 		t.Fatalf("Parse from empty image must be error")
 	}
 
@@ -54,10 +54,10 @@ func TestParseImageToBitMatrix(t *testing.T) {
 		{true, true, false},
 		{false, true, false},
 	}
-	b, e := ParseImageToBitMatrix(image)
+	b, e := ParseBoolMapToBitMatrix(image)
 
 	if e != nil {
-		t.Fatalf("ParseImageToBitMatrix returns error, %v", e)
+		t.Fatalf("ParseBoolMapToBitMatrix returns error, %v", e)
 	}
 	if b.width != 3 || b.height != 2 {
 		t.Fatalf("BitMatrix size is (%v,%v), expect (3,2)", b.width, b.height)
@@ -408,5 +408,4 @@ func TestBitMatrix_String(t *testing.T) {
 	if r := b.ToString("X ", "."); r != s2 {
 		t.Fatalf("String is\n%s\nexpect:\n%s", r, s2)
 	}
-
 }
