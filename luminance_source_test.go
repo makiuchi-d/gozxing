@@ -69,7 +69,7 @@ func TestLuminanceSource(t *testing.T) {
 
 	inv := s.Invert()
 	if _, ok := inv.(*InvertedLuminanceSource); !ok {
-		t.Fatalf("Invert returns %T, expect InvertedLuminanceSource", inv)
+		t.Fatalf("Invert returns %T, expect *InvertedLuminanceSource", inv)
 	}
 
 	expect := "" +
