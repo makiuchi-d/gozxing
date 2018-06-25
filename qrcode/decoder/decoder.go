@@ -21,18 +21,18 @@ func (this *Decoder) DecodeBoolMapWithoutHint(image [][]bool) (*common.DecoderRe
 }
 
 func (this *Decoder) DecodeBoolMap(image [][]bool, hints map[gozxing.DecodeHintType]interface{}) (*common.DecoderResult, error) {
-	bits, e := common.ParseBoolMapToBitMatrix(image)
+	bits, e := gozxing.ParseBoolMapToBitMatrix(image)
 	if e != nil {
 		return nil, e
 	}
 	return this.Decode(bits, hints)
 }
 
-func (this *Decoder) DecodeWithoutHint(bits *common.BitMatrix) (*common.DecoderResult, error) {
+func (this *Decoder) DecodeWithoutHint(bits *gozxing.BitMatrix) (*common.DecoderResult, error) {
 	return this.Decode(bits, nil)
 }
 
-func (this *Decoder) Decode(bits *common.BitMatrix, hints map[gozxing.DecodeHintType]interface{}) (*common.DecoderResult, error) {
+func (this *Decoder) Decode(bits *gozxing.BitMatrix, hints map[gozxing.DecodeHintType]interface{}) (*common.DecoderResult, error) {
 
 	// Construct a parser and read version, error-correction level
 	parser, e := NewBitMatrixParser(bits)

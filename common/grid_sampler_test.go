@@ -10,14 +10,14 @@ import (
 type DummyGridSampler struct{}
 type Dummy struct{}
 
-func (s DummyGridSampler) SampleGrid(image *BitMatrix, dimensionX, dimensionY int,
+func (s DummyGridSampler) SampleGrid(image *gozxing.BitMatrix, dimensionX, dimensionY int,
 	p1ToX, p1ToY, p2ToX, p2ToY, p3ToX, p3ToY, p4ToX, p4ToY float64,
-	p1FromX, p1FromY, p2FromX, p2FromY, p3FromX, p3FromY, p4FromX, p4FromY float64) (*BitMatrix, error) {
+	p1FromX, p1FromY, p2FromX, p2FromY, p3FromX, p3FromY, p4FromX, p4FromY float64) (*gozxing.BitMatrix, error) {
 	return nil, nil
 }
 
-func (s DummyGridSampler) SampleGridWithTransform(image *BitMatrix,
-	dimensionX, dimensionY int, transform *PerspectiveTransform) (*BitMatrix, error) {
+func (s DummyGridSampler) SampleGridWithTransform(image *gozxing.BitMatrix,
+	dimensionX, dimensionY int, transform *PerspectiveTransform) (*gozxing.BitMatrix, error) {
 	return nil, nil
 }
 
@@ -32,7 +32,7 @@ func TestGridSampler_GetSetInstance(t *testing.T) {
 }
 
 func TestGridSampler_checkAndNudgePoints(t *testing.T) {
-	image, _ := NewBitMatrix(10, 10)
+	image, _ := gozxing.NewBitMatrix(10, 10)
 	var points []float64
 	var e error
 

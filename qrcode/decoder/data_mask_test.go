@@ -3,11 +3,11 @@ package decoder
 import (
 	"testing"
 
-	"github.com/makiuchi-d/gozxing/common"
+	"github.com/makiuchi-d/gozxing"
 )
 
 func testMask(t *testing.T, mask DataMask, dimension int, condition func(int, int) bool) {
-	bits, _ := common.NewSquareBitMatrix(dimension)
+	bits, _ := gozxing.NewSquareBitMatrix(dimension)
 	mask.UnmaskBitMatrix(bits, dimension)
 	for i := 0; i < dimension; i++ {
 		for j := 0; j < dimension; j++ {

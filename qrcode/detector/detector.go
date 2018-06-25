@@ -10,15 +10,15 @@ import (
 )
 
 type Detector struct {
-	image               *common.BitMatrix
+	image               *gozxing.BitMatrix
 	resultPointCallback gozxing.ResultPointCallback
 }
 
-func NewDetector(image *common.BitMatrix) *Detector {
+func NewDetector(image *gozxing.BitMatrix) *Detector {
 	return &Detector{image, nil}
 }
 
-func (this *Detector) GetImage() *common.BitMatrix {
+func (this *Detector) GetImage() *gozxing.BitMatrix {
 	return this.image
 }
 
@@ -145,7 +145,7 @@ func Detector_createTransform(topLeft, topRight, bottomLeft gozxing.ResultPoint,
 		bottomLeft.GetY())
 }
 
-func Detector_sampleGrid(image *common.BitMatrix, transform *common.PerspectiveTransform, dimension int) (*common.BitMatrix, error) {
+func Detector_sampleGrid(image *gozxing.BitMatrix, transform *common.PerspectiveTransform, dimension int) (*gozxing.BitMatrix, error) {
 	sampler := common.GridSampler_GetInstance()
 	return sampler.SampleGridWithTransform(image, dimension, dimension, transform)
 }

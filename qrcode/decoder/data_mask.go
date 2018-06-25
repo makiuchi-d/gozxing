@@ -1,7 +1,7 @@
 package decoder
 
 import (
-	"github.com/makiuchi-d/gozxing/common"
+	"github.com/makiuchi-d/gozxing"
 )
 
 var DataMaskValues = []DataMask{
@@ -88,7 +88,7 @@ type DataMask struct {
 	isMasked func(i, j int) bool
 }
 
-func (this DataMask) UnmaskBitMatrix(bits *common.BitMatrix, dimension int) {
+func (this DataMask) UnmaskBitMatrix(bits *gozxing.BitMatrix, dimension int) {
 	for i := 0; i < dimension; i++ {
 		for j := 0; j < dimension; j++ {
 			if this.isMasked(i, j) {

@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/common"
 )
 
 // formatinfo = 110100101110110 = 0x6976
@@ -35,19 +34,19 @@ var qrstr = "" +
 	"##############  ##  ######    ##  ##  ##  "
 
 func TestNewBitMatrixParser(t *testing.T) {
-	img, _ := common.NewSquareBitMatrix(20)
+	img, _ := gozxing.NewSquareBitMatrix(20)
 	_, e := NewBitMatrixParser(img)
 	if _, ok := e.(gozxing.FormatException); !ok {
 		t.Fatalf("NewBitMatrixParser(20x20) must be FormatException, %T", e)
 	}
 
-	img, _ = common.NewSquareBitMatrix(22)
+	img, _ = gozxing.NewSquareBitMatrix(22)
 	_, e = NewBitMatrixParser(img)
 	if _, ok := e.(gozxing.FormatException); !ok {
 		t.Fatalf("NewBitMatrixParser(22x22) must be FormatException, %T", e)
 	}
 
-	img, _ = common.NewSquareBitMatrix(21)
+	img, _ = gozxing.NewSquareBitMatrix(21)
 	p, e := NewBitMatrixParser(img)
 	if e != nil {
 		t.Fatalf("NewBitMatrixParser(21x21) returns error, %v", e)
@@ -67,7 +66,7 @@ func TestNewBitMatrixParser(t *testing.T) {
 }
 
 func TestBitMatrixParser_setMirror(t *testing.T) {
-	img, _ := common.NewSquareBitMatrix(21)
+	img, _ := gozxing.NewSquareBitMatrix(21)
 	p, _ := NewBitMatrixParser(img)
 
 	p.parsedVersion = &Version{}
@@ -91,7 +90,7 @@ func TestBitMatrixParser_setMirror(t *testing.T) {
 }
 
 func TestBitMatrixParser_copyBit(t *testing.T) {
-	img, _ := common.NewSquareBitMatrix(21)
+	img, _ := gozxing.NewSquareBitMatrix(21)
 	for i := 0; i < 21; i++ {
 		if i%2 == 0 {
 			img.Set(i, 10)
@@ -123,7 +122,7 @@ func TestBitMatrixParser_copyBit(t *testing.T) {
 }
 
 func TestBitMatrixParser_ReadFormatInformation(t *testing.T) {
-	img, _ := common.ParseStringToBitMatrix(qrstr, "##", "  ")
+	img, _ := gozxing.ParseStringToBitMatrix(qrstr, "##", "  ")
 	p, _ := NewBitMatrixParser(img)
 
 	info, e := p.ReadFormatInformation()
@@ -157,7 +156,7 @@ func TestBitMatrixParser_ReadFormatInformation(t *testing.T) {
 
 }
 
-func testBitMatrixParser_ReadVersion(t *testing.T, img *common.BitMatrix, expect_version int) {
+func testBitMatrixParser_ReadVersion(t *testing.T, img *gozxing.BitMatrix, expect_version int) {
 	p, _ := NewBitMatrixParser(img)
 	ver, e := p.ReadVersion()
 	if e != nil {
@@ -171,7 +170,7 @@ func testBitMatrixParser_ReadVersion(t *testing.T, img *common.BitMatrix, expect
 
 func TestBitMatrixParser_ReadVersion(t *testing.T) {
 
-	img, _ := common.ParseStringToBitMatrix(qrstr, "##", "  ")
+	img, _ := gozxing.ParseStringToBitMatrix(qrstr, "##", "  ")
 	p, _ := NewBitMatrixParser(img)
 	ver, e := p.ReadVersion()
 	if e != nil {
@@ -181,13 +180,13 @@ func TestBitMatrixParser_ReadVersion(t *testing.T) {
 		t.Fatalf("VersionNumber = %v, expect 1", r)
 	}
 
-	img, _ = common.NewSquareBitMatrix(41)
+	img, _ = gozxing.NewSquareBitMatrix(41)
 	testBitMatrixParser_ReadVersion(t, img, 6)
 
 	// write version bits on right-top
 	// ver17: 85x85 0x1145D = 010 001 010 001 011 101
 	dim := 85
-	img, _ = common.NewSquareBitMatrix(dim)
+	img, _ = gozxing.NewSquareBitMatrix(dim)
 	img.Set(dim-10, 5)
 	img.Set(dim-11, 4)
 	img.Set(dim-10, 3)
@@ -201,7 +200,7 @@ func TestBitMatrixParser_ReadVersion(t *testing.T) {
 	// write version bits on left-bottom
 	// ver31: 0x1F250 = 011 111 001 001 010 000
 	dim = 141
-	img, _ = common.NewSquareBitMatrix(dim)
+	img, _ = gozxing.NewSquareBitMatrix(dim)
 	img.Set(5, dim-10)
 	img.Set(5, dim-11)
 	img.Set(4, dim-9)
@@ -228,7 +227,7 @@ func TestBitMatrixParser_ReadVersion(t *testing.T) {
 }
 
 func TestBitMatrixParser_ReadCodewords(t *testing.T) {
-	img, _ := common.NewSquareBitMatrix(85)
+	img, _ := gozxing.NewSquareBitMatrix(85)
 	img.SetRegion(8, 0, 1, 85)
 	p, _ := NewBitMatrixParser(img)
 	_, e := p.ReadCodewords()
@@ -253,7 +252,7 @@ func TestBitMatrixParser_ReadCodewords(t *testing.T) {
 		t.Fatalf("ReadCodewords() must be FormatException, %T", e)
 	}
 
-	img, _ = common.ParseStringToBitMatrix(qrstr, "##", "  ")
+	img, _ = gozxing.ParseStringToBitMatrix(qrstr, "##", "  ")
 	p, _ = NewBitMatrixParser(img)
 	words, e := p.ReadCodewords()
 	if e != nil {
@@ -269,7 +268,7 @@ func TestBitMatrixParser_ReadCodewords(t *testing.T) {
 	}
 }
 
-func compareBitMatrix(t *testing.T, img, expect *common.BitMatrix) {
+func compareBitMatrix(t *testing.T, img, expect *gozxing.BitMatrix) {
 	if img.GetWidth() != expect.GetWidth() || img.GetHeight() != expect.GetHeight() {
 		t.Fatalf("BitMatrix size different, (%v, %v), expect (%v, %v)",
 			img.GetWidth(), img.GetHeight(), expect.GetWidth(), expect.GetHeight())
@@ -284,7 +283,7 @@ func compareBitMatrix(t *testing.T, img, expect *common.BitMatrix) {
 }
 
 func TestBitMatrixParser_Remask(t *testing.T) {
-	masked, _ := common.ParseStringToBitMatrix(""+
+	masked, _ := gozxing.ParseStringToBitMatrix(""+
 		"  ##  ##  ##    ########      ##  ##  ##  \n"+
 		"##    ########  ##  ##      ########    ##\n"+
 		"    ####  ##    ########    ##          ##\n"+
@@ -306,9 +305,9 @@ func TestBitMatrixParser_Remask(t *testing.T) {
 		"      ##        ####        ##            \n"+
 		"##    ########  ##    ##  ##########      \n"+
 		"  ######        ##            ####  ####  ", "##", "  ")
-	unmasked, _ := common.ParseStringToBitMatrix(qrstr, "##", "  ")
+	unmasked, _ := gozxing.ParseStringToBitMatrix(qrstr, "##", "  ")
 
-	img, _ := common.ParseStringToBitMatrix(qrstr, "##", "  ")
+	img, _ := gozxing.ParseStringToBitMatrix(qrstr, "##", "  ")
 	p, _ := NewBitMatrixParser(img)
 
 	p.Remask()
@@ -323,7 +322,7 @@ func TestBitMatrixParser_Remask(t *testing.T) {
 }
 
 func TestBitMatrixParser_Mirror(t *testing.T) {
-	mirrored, _ := common.ParseStringToBitMatrix(""+
+	mirrored, _ := gozxing.ParseStringToBitMatrix(""+
 		"##############  ##          ##############\n"+
 		"##          ##  ####        ##          ##\n"+
 		"##  ######  ##    ####      ##  ######  ##\n"+
@@ -345,8 +344,8 @@ func TestBitMatrixParser_Mirror(t *testing.T) {
 		"##  ######  ##  ##  ##    ####    ####    \n"+
 		"##          ##  ####  ##    ##    ##    ##\n"+
 		"##############    ######  ##    ######    ", "##", "  ")
-	unmirrored, _ := common.ParseStringToBitMatrix(qrstr, "##", "  ")
-	img, _ := common.ParseStringToBitMatrix(qrstr, "##", "  ")
+	unmirrored, _ := gozxing.ParseStringToBitMatrix(qrstr, "##", "  ")
+	img, _ := gozxing.ParseStringToBitMatrix(qrstr, "##", "  ")
 
 	p, _ := NewBitMatrixParser(img)
 

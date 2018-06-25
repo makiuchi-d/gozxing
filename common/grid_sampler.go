@@ -5,12 +5,12 @@ import (
 )
 
 type GridSampler interface {
-	SampleGrid(image *BitMatrix, dimensionX, dimensionY int,
+	SampleGrid(image *gozxing.BitMatrix, dimensionX, dimensionY int,
 		p1ToX, p1ToY, p2ToX, p2ToY, p3ToX, p3ToY, p4ToX, p4ToY float64,
-		p1FromX, p1FromY, p2FromX, p2FromY, p3FromX, p3FromY, p4FromX, p4FromY float64) (*BitMatrix, error)
+		p1FromX, p1FromY, p2FromX, p2FromY, p3FromX, p3FromY, p4FromX, p4FromY float64) (*gozxing.BitMatrix, error)
 
-	SampleGridWithTransform(image *BitMatrix,
-		dimensionX, dimensionY int, transform *PerspectiveTransform) (*BitMatrix, error)
+	SampleGridWithTransform(image *gozxing.BitMatrix,
+		dimensionX, dimensionY int, transform *PerspectiveTransform) (*gozxing.BitMatrix, error)
 }
 
 var gridSampler GridSampler = NewDefaultGridSampler()
@@ -23,7 +23,7 @@ func GridSampler_GetInstance() GridSampler {
 	return gridSampler
 }
 
-func GridSampler_checkAndNudgePoints(image *BitMatrix, points []float64) error {
+func GridSampler_checkAndNudgePoints(image *gozxing.BitMatrix, points []float64) error {
 	width := image.GetWidth()
 	height := image.GetHeight()
 	// Check and nudge points from start until we see some that are OK:

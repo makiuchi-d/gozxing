@@ -4,11 +4,10 @@ import (
 	"math"
 
 	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/common"
 )
 
 type AlignmentPatternFinder struct {
-	image                *common.BitMatrix
+	image                *gozxing.BitMatrix
 	possibleCenters      []*AlignmentPattern
 	startX               int
 	startY               int
@@ -19,7 +18,7 @@ type AlignmentPatternFinder struct {
 	resultPointCallback  gozxing.ResultPointCallback
 }
 
-func NewAlignmentPatternFinder(image *common.BitMatrix, startX, startY, width, height int, moduleSize float64, resultPointCallback gozxing.ResultPointCallback) *AlignmentPatternFinder {
+func NewAlignmentPatternFinder(image *gozxing.BitMatrix, startX, startY, width, height int, moduleSize float64, resultPointCallback gozxing.ResultPointCallback) *AlignmentPatternFinder {
 	return &AlignmentPatternFinder{
 		image:                image,
 		possibleCenters:      make([]*AlignmentPattern, 0),

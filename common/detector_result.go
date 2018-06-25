@@ -5,15 +5,15 @@ import (
 )
 
 type DetectorResult struct {
-	bits   *BitMatrix
+	bits   *gozxing.BitMatrix
 	points []gozxing.ResultPoint
 }
 
-func NewDetectorResult(bits *BitMatrix, points []gozxing.ResultPoint) *DetectorResult {
+func NewDetectorResult(bits *gozxing.BitMatrix, points []gozxing.ResultPoint) *DetectorResult {
 	return &DetectorResult{bits, points}
 }
 
-func (d *DetectorResult) GetBits() *BitMatrix {
+func (d *DetectorResult) GetBits() *gozxing.BitMatrix {
 	return d.bits
 }
 

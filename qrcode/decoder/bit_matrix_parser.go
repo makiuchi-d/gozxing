@@ -2,17 +2,16 @@ package decoder
 
 import (
 	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/common"
 )
 
 type BitMatrixParser struct {
-	bitMatrix        *common.BitMatrix
+	bitMatrix        *gozxing.BitMatrix
 	parsedVersion    *Version
 	parsedFormatInfo *FormatInformation
 	mirror           bool
 }
 
-func NewBitMatrixParser(bitMatrix *common.BitMatrix) (*BitMatrixParser, error) {
+func NewBitMatrixParser(bitMatrix *gozxing.BitMatrix) (*BitMatrixParser, error) {
 	dimension := bitMatrix.GetHeight()
 	if dimension < 21 || (dimension&0x03) != 1 {
 		return nil, gozxing.GetFormatExceptionInstance()

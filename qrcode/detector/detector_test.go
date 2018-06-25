@@ -6,28 +6,27 @@ import (
 	"testing"
 
 	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/common"
 )
 
-func makeAlignPattern(image *common.BitMatrix, x, y int) {
+func makeAlignPattern(image *gozxing.BitMatrix, x, y int) {
 	image.SetRegion(x-2, y-2, 5, 5)
 	unsetRegion(image, x-1, y-1, 3, 3)
 	image.Set(x, y)
 }
 
-func makeAlignPattern3(image *common.BitMatrix, x, y int) {
+func makeAlignPattern3(image *gozxing.BitMatrix, x, y int) {
 	image.SetRegion(x-7, y-7, 15, 15)
 	unsetRegion(image, x-4, y-4, 9, 9)
 	image.SetRegion(x-1, y-1, 3, 3)
 }
-func makePattern3(image *common.BitMatrix, x, y int) {
+func makePattern3(image *gozxing.BitMatrix, x, y int) {
 	image.SetRegion(x-10, y-10, 21, 21)
 	unsetRegion(image, x-7, y-7, 15, 15)
 	image.SetRegion(x-4, y-4, 9, 9)
 }
 
 func TestNewDetector(t *testing.T) {
-	image, _ := common.NewBitMatrix(10, 10)
+	image, _ := gozxing.NewBitMatrix(10, 10)
 	d := NewDetector(image)
 
 	if r := d.GetImage(); r != image {
@@ -40,7 +39,7 @@ func TestNewDetector(t *testing.T) {
 }
 
 func TestDetector_findAlingmentInReagion(t *testing.T) {
-	image, _ := common.NewBitMatrix(10, 10)
+	image, _ := gozxing.NewBitMatrix(10, 10)
 	d := NewDetector(image)
 
 	_, e := d.findAlignmentInRegion(5, 10, 10, 3)
@@ -48,14 +47,14 @@ func TestDetector_findAlingmentInReagion(t *testing.T) {
 		t.Fatalf("findAlignmentInRegion must be NotFoundException")
 	}
 
-	image, _ = common.NewBitMatrix(20, 10)
+	image, _ = gozxing.NewBitMatrix(20, 10)
 	d = NewDetector(image)
 	_, e = d.findAlignmentInRegion(5, 10, 10, 3)
 	if _, ok := e.(gozxing.NotFoundException); !ok {
 		t.Fatalf("findAlignmentInRegion must be NotFoundException")
 	}
 
-	image, _ = common.NewBitMatrix(40, 40)
+	image, _ = gozxing.NewBitMatrix(40, 40)
 	image.SetRegion(5, 5, 30, 30)
 
 	unsetRegion(image, 7, 7, 6, 6)
@@ -79,7 +78,7 @@ func TestDetector_findAlingmentInReagion(t *testing.T) {
 }
 
 func TestDetector_sizeOfBlackWhiteBlackRun(t *testing.T) {
-	image, _ := common.NewBitMatrix(20, 20)
+	image, _ := gozxing.NewBitMatrix(20, 20)
 	d := NewDetector(image)
 
 	s := d.sizeOfBlackWhiteBlackRun(5, 3, 18, 10)
@@ -110,7 +109,7 @@ func TestDetector_sizeOfBlackWhiteBlackRun(t *testing.T) {
 }
 
 func TestDetector_sizeOfBlackWhiteBlackRunBothWays(t *testing.T) {
-	image, _ := common.NewBitMatrix(30, 30)
+	image, _ := gozxing.NewBitMatrix(30, 30)
 	d := NewDetector(image)
 
 	image.SetRegion(16, 0, 3, 30)
@@ -154,7 +153,7 @@ func TestDetector_sizeOfBlackWhiteBlackRunBothWays(t *testing.T) {
 }
 
 func TestDetector_calculateModuleSizeOneWay(t *testing.T) {
-	image, _ := common.NewBitMatrix(100, 100)
+	image, _ := gozxing.NewBitMatrix(100, 100)
 	makePattern(image, 20, 20, 3)
 	makePattern(image, 80, 20, 3)
 	d := NewDetector(image)
@@ -184,7 +183,7 @@ func TestDetector_calculateModuleSizeOneWay(t *testing.T) {
 }
 
 func TestDetector_calculateModuleSize(t *testing.T) {
-	image, _ := common.NewBitMatrix(100, 100)
+	image, _ := gozxing.NewBitMatrix(100, 100)
 	makePattern(image, 20, 20, 4)
 	makePattern(image, 20, 80, 5)
 	makePattern(image, 80, 20, 3)
@@ -201,7 +200,7 @@ func TestDetector_calculateModuleSize(t *testing.T) {
 }
 
 func TestDetector_computeDimension(t *testing.T) {
-	image, _ := common.NewBitMatrix(100, 100)
+	image, _ := gozxing.NewBitMatrix(100, 100)
 	d := NewDetector(image)
 	topLeft := gozxing.NewResultPoint(20, 20)
 	topRight := gozxing.NewResultPoint(80, 20)
@@ -316,7 +315,7 @@ func TestDetector_createTransform(t *testing.T) {
 }
 
 func TestDetector_processFinderPatternInfo(t *testing.T) {
-	image, _ := common.NewBitMatrix(300, 300)
+	image, _ := gozxing.NewBitMatrix(300, 300)
 	d := NewDetector(image)
 
 	// too small patterns
@@ -458,7 +457,7 @@ func TestDetector_DetectWithHint(t *testing.T) {
 	hints[gozxing.DecodeHintType_NEED_RESULT_POINT_CALLBACK] = callback
 
 	// version3 pattern
-	image, _ := common.NewBitMatrix(45, 45)
+	image, _ := gozxing.NewBitMatrix(45, 45)
 	makePattern(image, 10+3, 10+3, 1)
 	makePattern(image, 10+3+22, 10+3, 1)
 	makePattern(image, 10+3, 10+3+22, 1)
@@ -502,7 +501,7 @@ func TestDetector_DetectWithHint(t *testing.T) {
 
 func TestDetector_DetectWithoutHint(t *testing.T) {
 
-	image, _ := common.NewBitMatrix(120, 120)
+	image, _ := gozxing.NewBitMatrix(120, 120)
 
 	d := NewDetector(image)
 	_, e := d.DetectWithoutHints()
@@ -576,7 +575,7 @@ func TestDetector_DetectWithoutHint(t *testing.T) {
 		"X           X                                                     \n" +
 		"X X X X X X X                                                     \n"
 
-	normalized, _ := common.ParseStringToBitMatrix(normalizedstr, "X ", "  ")
+	normalized, _ := gozxing.ParseStringToBitMatrix(normalizedstr, "X ", "  ")
 
 	if normalized.GetWidth() != bits.GetWidth() || normalized.GetHeight() != bits.GetHeight() {
 		t.Fatalf("bits = %vx%v, normalized = %vx%v",

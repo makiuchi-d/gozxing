@@ -5,7 +5,6 @@ import (
 	"math"
 
 	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/common"
 )
 
 type Version struct {
@@ -108,9 +107,9 @@ func Version_decodeVersionInformation(versionBits int) (*Version, error) {
 	return nil, errors.New("we didn't find a close enough match")
 }
 
-func (v *Version) buildFunctionPattern() (*common.BitMatrix, error) {
+func (v *Version) buildFunctionPattern() (*gozxing.BitMatrix, error) {
 	dimension := v.GetDimensionForVersion()
-	bitMatrix, e := common.NewSquareBitMatrix(dimension)
+	bitMatrix, e := gozxing.NewSquareBitMatrix(dimension)
 	if e != nil {
 		return nil, e
 	}

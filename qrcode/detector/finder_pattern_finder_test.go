@@ -6,17 +6,16 @@ import (
 	"testing"
 
 	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/common"
 )
 
-func makePattern(image *common.BitMatrix, x, y, m int) {
+func makePattern(image *gozxing.BitMatrix, x, y, m int) {
 	image.SetRegion(x-(3*m), y-(3*m), 7*m, 7*m)
 	unsetRegion(image, x-(2*m), y-(2*m), 5*m, 5*m)
 	image.SetRegion(x-m, y-m, 3*m, 3*m)
 }
 
 func TestNewFinderPatternFinder(t *testing.T) {
-	image, _ := common.NewBitMatrix(10, 10)
+	image, _ := gozxing.NewBitMatrix(10, 10)
 	f := NewFinderPatternFinder(image, nil)
 	if r := f.GetImage(); r != image {
 		t.Fatalf("GetImage ptr=%p, expect %p", r, image)
@@ -90,7 +89,7 @@ func TestFinderPatternFinder_ShiftCounts2(t *testing.T) {
 }
 
 func TestFinderPatternFinder_crossCheckDiagonal(t *testing.T) {
-	image, _ := common.NewBitMatrix(7, 7)
+	image, _ := gozxing.NewBitMatrix(7, 7)
 	f := NewFinderPatternFinder(image, nil)
 	if f.crossCheckDiagonal(3, 3) {
 		t.Fatalf("crossCheckDiagonal must return false")
@@ -127,7 +126,7 @@ func TestFinderPatternFinder_crossCheckDiagonal(t *testing.T) {
 }
 
 func TestFinderPatternFinder_CrossCheckVertical(t *testing.T) {
-	image, _ := common.NewBitMatrix(7, 7)
+	image, _ := gozxing.NewBitMatrix(7, 7)
 	f := NewFinderPatternFinder(image, nil)
 
 	for i := 0; i < 7; i++ {
@@ -199,7 +198,7 @@ func TestFinderPatternFinder_CrossCheckVertical(t *testing.T) {
 }
 
 func TestFinderPatternFinder_CrossCheckHorizontal(t *testing.T) {
-	image, _ := common.NewBitMatrix(7, 7)
+	image, _ := gozxing.NewBitMatrix(7, 7)
 	f := NewFinderPatternFinder(image, nil)
 
 	for i := 0; i < 7; i++ {
@@ -271,7 +270,7 @@ func TestFinderPatternFinder_CrossCheckHorizontal(t *testing.T) {
 }
 
 func TestFinderPatternFinder_HandlePossibleCenter(t *testing.T) {
-	image, _ := common.NewBitMatrix(20, 20)
+	image, _ := gozxing.NewBitMatrix(20, 20)
 
 	var calledPoint gozxing.ResultPoint
 	callback := func(point gozxing.ResultPoint) {
@@ -309,7 +308,7 @@ func TestFinderPatternFinder_HandlePossibleCenter(t *testing.T) {
 }
 
 func TestFinderPatternFinder_HandlePossibleCenterWithPureBarcode(t *testing.T) {
-	image, _ := common.NewBitMatrix(20, 20)
+	image, _ := gozxing.NewBitMatrix(20, 20)
 	f := NewFinderPatternFinder(image, nil)
 
 	makePattern(image, 5, 5, 1)
@@ -322,7 +321,7 @@ func TestFinderPatternFinder_HandlePossibleCenterWithPureBarcode(t *testing.T) {
 }
 
 func TestFinderPatternFinder_FindRowSkip(t *testing.T) {
-	image, _ := common.NewBitMatrix(20, 20)
+	image, _ := gozxing.NewBitMatrix(20, 20)
 	f := NewFinderPatternFinder(image, nil)
 
 	f.possibleCenters = append(f.possibleCenters, NewFinderPattern1(5, 5, 1))
@@ -348,7 +347,7 @@ func TestFinderPatternFinder_FindRowSkip(t *testing.T) {
 }
 
 func TestNewFinderPatternFinder_HaveMultiplyConfirmedCenters(t *testing.T) {
-	image, _ := common.NewBitMatrix(20, 20)
+	image, _ := gozxing.NewBitMatrix(20, 20)
 	f := NewFinderPatternFinder(image, nil)
 	if f.HaveMultiplyConfirmedCenters() {
 		t.Fatalf("HaveMultiplyConfirmedCenters must be false")
@@ -366,7 +365,7 @@ func TestNewFinderPatternFinder_HaveMultiplyConfirmedCenters(t *testing.T) {
 }
 
 func TestFinderPatternFinder_SelectBestPatterns(t *testing.T) {
-	image, _ := common.NewBitMatrix(50, 50)
+	image, _ := gozxing.NewBitMatrix(50, 50)
 	f := NewFinderPatternFinder(image, nil)
 
 	_, e := f.SelectBestPatterns()
@@ -426,7 +425,7 @@ func TestFinderPatternFinder_Find(t *testing.T) {
 		"                                                          \n" +
 		"                                                          \n" +
 		"                                                          \n"
-	image, _ := common.ParseStringToBitMatrix(s, "##", "  ")
+	image, _ := gozxing.ParseStringToBitMatrix(s, "##", "  ")
 
 	expect := FinderPatternInfo{
 		bottomLeft: NewFinderPattern(7.5, 20.5, 1, 2),
@@ -453,7 +452,7 @@ func TestFinderPatternFinder_Find(t *testing.T) {
 }
 
 func TestFinderPatternFinder_Find2(t *testing.T) {
-	image, _ := common.NewBitMatrix(40, 40)
+	image, _ := gozxing.NewBitMatrix(40, 40)
 	f := NewFinderPatternFinder(image, nil)
 
 	// nested

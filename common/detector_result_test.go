@@ -7,7 +7,7 @@ import (
 )
 
 func TestDetectorResult(t *testing.T) {
-	bits, _ := NewBitMatrix(10, 10)
+	bits, _ := gozxing.NewBitMatrix(10, 10)
 	points := make([]gozxing.ResultPoint, 5)
 
 	dr := NewDetectorResult(bits, points)

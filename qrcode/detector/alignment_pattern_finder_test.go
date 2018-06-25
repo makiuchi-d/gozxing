@@ -6,10 +6,9 @@ import (
 	"testing"
 
 	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/common"
 )
 
-func unsetRegion(image *common.BitMatrix, x, y, w, h int) {
+func unsetRegion(image *gozxing.BitMatrix, x, y, w, h int) {
 	for i := y; i < y+h; i++ {
 		for j := x; j < x+w; j++ {
 			image.Unset(j, i)
@@ -27,7 +26,7 @@ func TestAlignmentPatternFinder_centerFromEnd(t *testing.T) {
 }
 
 func TestAlignmentPatternFinder_foundPatternCross(t *testing.T) {
-	image, _ := common.NewBitMatrix(10, 10)
+	image, _ := gozxing.NewBitMatrix(10, 10)
 	f := NewAlignmentPatternFinder(image, 0, 0, 10, 10, 2, nil)
 
 	stateCount := []int{2, 2, 2}
@@ -42,7 +41,7 @@ func TestAlignmentPatternFinder_foundPatternCross(t *testing.T) {
 }
 
 func TestAlignmentPatternFinder_crossCheckVertical(t *testing.T) {
-	image, _ := common.NewBitMatrix(6, 6)
+	image, _ := gozxing.NewBitMatrix(6, 6)
 	image.SetRegion(0, 0, 6, 6)
 
 	f := NewAlignmentPatternFinder(image, 0, 0, 5, 5, 1, nil)
@@ -85,7 +84,7 @@ func TestAlignmentPatternFinder_crossCheckVertical(t *testing.T) {
 }
 
 func TestAlignmentPattern_handlePossibleCenter(t *testing.T) {
-	image, _ := common.NewBitMatrix(10, 10)
+	image, _ := gozxing.NewBitMatrix(10, 10)
 	image.SetRegion(0, 0, 10, 10)
 
 	var foundPoint *AlignmentPattern
@@ -143,7 +142,7 @@ func TestAlignmentPattern_handlePossibleCenter(t *testing.T) {
 }
 
 func TestAlignmentPatternFinder_Find(t *testing.T) {
-	image, _ := common.NewBitMatrix(30, 30)
+	image, _ := gozxing.NewBitMatrix(30, 30)
 
 	f := NewAlignmentPatternFinder(image, 0, 0, 0, 0, 1, nil)
 

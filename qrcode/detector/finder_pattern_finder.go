@@ -5,7 +5,6 @@ import (
 	"sort"
 
 	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/common"
 )
 
 const (
@@ -15,14 +14,14 @@ const (
 )
 
 type FinderPatternFinder struct {
-	image                *common.BitMatrix
+	image                *gozxing.BitMatrix
 	possibleCenters      []*FinderPattern
 	hasSkipped           bool
 	crossCheckStateCount []int
 	resultPointCallback  gozxing.ResultPointCallback
 }
 
-func NewFinderPatternFinder(image *common.BitMatrix, resultPointCallback gozxing.ResultPointCallback) *FinderPatternFinder {
+func NewFinderPatternFinder(image *gozxing.BitMatrix, resultPointCallback gozxing.ResultPointCallback) *FinderPatternFinder {
 	return &FinderPatternFinder{
 		image:                image,
 		possibleCenters:      make([]*FinderPattern, 0),
@@ -31,7 +30,7 @@ func NewFinderPatternFinder(image *common.BitMatrix, resultPointCallback gozxing
 	}
 }
 
-func (f *FinderPatternFinder) GetImage() *common.BitMatrix {
+func (f *FinderPatternFinder) GetImage() *gozxing.BitMatrix {
 	return f.image
 }
 

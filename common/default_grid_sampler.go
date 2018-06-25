@@ -10,9 +10,9 @@ func NewDefaultGridSampler() GridSampler {
 	return DefaultGridSampler{}
 }
 
-func (s DefaultGridSampler) SampleGrid(image *BitMatrix, dimensionX, dimensionY int,
+func (s DefaultGridSampler) SampleGrid(image *gozxing.BitMatrix, dimensionX, dimensionY int,
 	p1ToX, p1ToY, p2ToX, p2ToY, p3ToX, p3ToY, p4ToX, p4ToY float64,
-	p1FromX, p1FromY, p2FromX, p2FromY, p3FromX, p3FromY, p4FromX, p4FromY float64) (*BitMatrix, error) {
+	p1FromX, p1FromY, p2FromX, p2FromY, p3FromX, p3FromY, p4FromX, p4FromY float64) (*gozxing.BitMatrix, error) {
 
 	transform := PerspectiveTransform_QuadrilateralToQuadrilateral(
 		p1ToX, p1ToY, p2ToX, p2ToY, p3ToX, p3ToY, p4ToX, p4ToY,
@@ -21,13 +21,13 @@ func (s DefaultGridSampler) SampleGrid(image *BitMatrix, dimensionX, dimensionY 
 	return s.SampleGridWithTransform(image, dimensionX, dimensionY, transform)
 }
 
-func (s DefaultGridSampler) SampleGridWithTransform(image *BitMatrix,
-	dimensionX, dimensionY int, transform *PerspectiveTransform) (*BitMatrix, error) {
+func (s DefaultGridSampler) SampleGridWithTransform(image *gozxing.BitMatrix,
+	dimensionX, dimensionY int, transform *PerspectiveTransform) (*gozxing.BitMatrix, error) {
 
 	if dimensionX <= 0 || dimensionY <= 0 {
 		return nil, gozxing.GetNotFoundExceptionInstance()
 	}
-	bits, _ := NewBitMatrix(dimensionX, dimensionY) // always success
+	bits, _ := gozxing.NewBitMatrix(dimensionX, dimensionY) // always success
 	points := make([]float64, 2*dimensionX)
 	for y := 0; y < dimensionY; y++ {
 		max := len(points)

@@ -10,7 +10,7 @@ import (
 func TestDefaultGridSampler_SampleGrid(t *testing.T) {
 	var e error
 	s := NewDefaultGridSampler()
-	image, _ := NewBitMatrix(300, 300)
+	image, _ := gozxing.NewBitMatrix(300, 300)
 
 	_, e = s.SampleGrid(image, 0, 10,
 		0, 0, 0, 0, 0, 0, 0, 0,

@@ -7,7 +7,7 @@ import (
 	"github.com/makiuchi-d/gozxing/common"
 )
 
-func unsetRegion(image *common.BitMatrix, x, y, w, h int) {
+func unsetRegion(image *gozxing.BitMatrix, x, y, w, h int) {
 	for i := y; i < y+h; i++ {
 		for j := x; j < x+w; j++ {
 			image.Unset(j, i)
@@ -15,8 +15,8 @@ func unsetRegion(image *common.BitMatrix, x, y, w, h int) {
 	}
 }
 
-func mirror(src *common.BitMatrix) *common.BitMatrix {
-	dst, _ := common.NewBitMatrix(src.GetHeight(), src.GetWidth())
+func mirror(src *gozxing.BitMatrix) *gozxing.BitMatrix {
+	dst, _ := gozxing.NewBitMatrix(src.GetHeight(), src.GetWidth())
 	for j := 0; j < src.GetHeight(); j++ {
 		for i := 0; i < src.GetWidth(); i++ {
 			if src.Get(i, j) {
@@ -32,7 +32,7 @@ func TestDecoder_Decode(t *testing.T) {
 	var result *common.DecoderResult
 	var e error
 
-	bits, _ := common.ParseStringToBitMatrix(qrstr, "##", "  ")
+	bits, _ := gozxing.ParseStringToBitMatrix(qrstr, "##", "  ")
 	rbits := mirror(bits)
 
 	// normal qrcode
@@ -52,13 +52,13 @@ func TestDecoder_Decode(t *testing.T) {
 		t.Fatalf("Decoder result text=\"%v\", expect \"hello\"", r)
 	}
 
-	bits, _ = common.NewSquareBitMatrix(1)
+	bits, _ = gozxing.NewSquareBitMatrix(1)
 	_, e = decoder.Decode(bits, nil)
 	if _, ok := e.(gozxing.FormatException); !ok {
 		t.Fatalf("Decode must be FormatException, %T", e)
 	}
 
-	bits, _ = common.ParseStringToBitMatrix(qrstr, "##", "  ")
+	bits, _ = gozxing.ParseStringToBitMatrix(qrstr, "##", "  ")
 	for i := 0; i < 21; i++ {
 		bits.Unset(i, 8)
 	}
@@ -67,14 +67,14 @@ func TestDecoder_Decode(t *testing.T) {
 		t.Fatalf("Decode must be FormatException, %T", e)
 	}
 
-	bits, _ = common.ParseStringToBitMatrix(qrstr, "##", "  ")
+	bits, _ = gozxing.ParseStringToBitMatrix(qrstr, "##", "  ")
 	bits.SetRegion(10, 10, 10, 10)
 	_, e = decoder.Decode(bits, nil)
 	if _, ok := e.(gozxing.ChecksumException); !ok {
 		t.Fatalf("Decode must be ChecksumException, %T", e)
 	}
 
-	bits, _ = common.ParseStringToBitMatrix(qrstr, "##", "  ")
+	bits, _ = gozxing.ParseStringToBitMatrix(qrstr, "##", "  ")
 	result, e = decoder.DecodeWithoutHint(bits)
 	if e != nil {
 		t.Fatalf("DecodeWithoutHint returns error, %v", e)
@@ -86,7 +86,7 @@ func TestDecoder_Decode(t *testing.T) {
 
 func TestDecoder_DecodeBoolMap(t *testing.T) {
 	decoder := NewDecoder()
-	bits, _ := common.ParseStringToBitMatrix(qrstr, "##", "  ")
+	bits, _ := gozxing.ParseStringToBitMatrix(qrstr, "##", "  ")
 	w := bits.GetWidth()
 	h := bits.GetHeight()
 	boolmap := make([][]bool, h)
@@ -120,13 +120,13 @@ func TestDecoder_DecodeBoolMap(t *testing.T) {
 }
 
 func TestDecoder_decode(t *testing.T) {
-	var bits *common.BitMatrix
+	var bits *gozxing.BitMatrix
 	var parser *BitMatrixParser
 	var e error
 	decoder := NewDecoder()
 
 	// no version bits
-	bits, _ = common.NewSquareBitMatrix(45)
+	bits, _ = gozxing.NewSquareBitMatrix(45)
 	parser, _ = NewBitMatrixParser(bits)
 	_, e = decoder.decode(parser, nil)
 	if _, ok := e.(gozxing.FormatException); !ok {
@@ -134,7 +134,7 @@ func TestDecoder_decode(t *testing.T) {
 	}
 
 	// invalid format info
-	bits, _ = common.ParseStringToBitMatrix(qrstr, "##", "  ")
+	bits, _ = gozxing.ParseStringToBitMatrix(qrstr, "##", "  ")
 	for i := 0; i < 21; i++ {
 		bits.Unset(i, 8)
 	}
@@ -145,7 +145,7 @@ func TestDecoder_decode(t *testing.T) {
 	}
 
 	// too many errors
-	bits, _ = common.ParseStringToBitMatrix(qrstr, "##", "  ")
+	bits, _ = gozxing.ParseStringToBitMatrix(qrstr, "##", "  ")
 	bits.SetRegion(10, 10, 10, 10)
 	parser, _ = NewBitMatrixParser(bits)
 	_, e = decoder.decode(parser, nil)
@@ -153,7 +153,7 @@ func TestDecoder_decode(t *testing.T) {
 		t.Fatalf("decode must be ChecksumException, %T", e)
 	}
 
-	bits, _ = common.ParseStringToBitMatrix(qrstr, "##", "  ")
+	bits, _ = gozxing.ParseStringToBitMatrix(qrstr, "##", "  ")
 	parser, _ = NewBitMatrixParser(bits)
 	result, e := decoder.decode(parser, nil)
 	if e != nil {
