@@ -90,6 +90,9 @@ type croppableLS struct {
 	left, top, width, height int
 }
 
+func newCroppableLS(size int) LuminanceSource {
+	return &croppableLS{newTestLuminanceSource(size),0, 0, size, size}
+}
 func (this *croppableLS) GetWidth() int {
 	return this.width
 }
@@ -131,7 +134,7 @@ func (this *croppableLS) String() string {
 }
 
 func TestInvertedLuminanceSourceCrop(t *testing.T) {
-	s := NewInvertedLuminanceSource(&croppableLS{newTestLuminanceSource(16), 0, 0, 16, 16})
+	s := NewInvertedLuminanceSource(newCroppableLS(16))
 
 	if !s.IsCropSupported() {
 		t.Fatalf("IsCropSupported must be true")
