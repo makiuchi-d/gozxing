@@ -1,8 +1,10 @@
 package gozxing
 
+type BarcodeFormat int
+
 const (
 	/** Aztec 2D barcode format. */
-	BarcodeFormat_AZTEC = iota
+	BarcodeFormat_AZTEC = BarcodeFormat(iota)
 
 	/** CODABAR 1D format. */
 	BarcodeFormat_CODABAR
@@ -52,3 +54,44 @@ const (
 	/** UPC/EAN extension format. Not a stand-alone format. */
 	BarcodeFormat_UPC_EAN_EXTENSION
 )
+
+func (f BarcodeFormat) String() string {
+	switch f {
+	case BarcodeFormat_AZTEC:
+		return "AZTEC"
+	case BarcodeFormat_CODABAR:
+		return "CODABAR"
+	case BarcodeFormat_CODE_39:
+		return "CODE_39"
+	case BarcodeFormat_CODE_93:
+		return "CODE_93"
+	case BarcodeFormat_CODE_128:
+		return "CODE_128"
+	case BarcodeFormat_DATA_MATRIX:
+		return "DATA_MATRIX"
+	case BarcodeFormat_EAN_8:
+		return "EAN_8"
+	case BarcodeFormat_EAN_13:
+		return "EAN_13"
+	case BarcodeFormat_ITF:
+		return "ITF"
+	case BarcodeFormat_MAXICODE:
+		return "MAXICODE"
+	case BarcodeFormat_PDF_417:
+		return "PDF_417"
+	case BarcodeFormat_QR_CODE:
+		return "QR_CODE"
+	case BarcodeFormat_RSS_14:
+		return "RSS_14"
+	case BarcodeFormat_RSS_EXPANDED:
+		return "RSS_EXPANDED"
+	case BarcodeFormat_UPC_A:
+		return "UPC_A"
+	case BarcodeFormat_UPC_E:
+		return "UPC_E"
+	case BarcodeFormat_UPC_EAN_EXTENSION:
+		return "UPC_EAN_EXTENSION"
+	default:
+		return "unknown format"
+	}
+}
