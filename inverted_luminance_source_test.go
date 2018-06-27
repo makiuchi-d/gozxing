@@ -91,7 +91,7 @@ type croppableLS struct {
 }
 
 func newCroppableLS(size int) LuminanceSource {
-	return &croppableLS{newTestLuminanceSource(size),0, 0, size, size}
+	return &croppableLS{newTestLuminanceSource(size), 0, 0, size, size}
 }
 func (this *croppableLS) GetWidth() int {
 	return this.width
