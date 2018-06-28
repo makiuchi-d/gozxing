@@ -87,16 +87,16 @@ type LuminanceSource interface {
 }
 
 type LuminanceSourceBase struct {
-	width  int
-	height int
+	Width  int
+	Height int
 }
 
 func (this *LuminanceSourceBase) GetWidth() int {
-	return this.width
+	return this.Width
 }
 
 func (this *LuminanceSourceBase) GetHeight() int {
-	return this.height
+	return this.Height
 }
 
 func (this *LuminanceSourceBase) IsCropSupported() bool {
