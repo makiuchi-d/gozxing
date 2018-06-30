@@ -39,8 +39,8 @@ func TestErrorCorrectionLevel_String(t *testing.T) {
 	if s := ErrorCorrectionLevel_H.String(); s != "H" {
 		t.Fatalf("ErrorCorrectionLevel_H string is %v, expect H", s)
 	}
-	if s := ErrorCorrectionLevel(-1).String(); s != "error" {
-		t.Fatalf("invalid ErrorCorrectionLevel string must be \"error\", %v", s)
+	if s := ErrorCorrectionLevel(-1).String(); s != "" {
+		t.Fatalf("invalid ErrorCorrectionLevel string must be \"\", %v", s)
 	}
 
 }

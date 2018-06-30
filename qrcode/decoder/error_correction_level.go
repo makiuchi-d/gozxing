@@ -38,5 +38,5 @@ func (e ErrorCorrectionLevel) String() string {
 	case ErrorCorrectionLevel_Q:
 		return "Q"
 	}
-	return "error"
+	return ""
 }
