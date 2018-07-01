@@ -2,8 +2,8 @@ package qrcode
 
 import (
 	"image"
-	_ "image/png"
 	_ "image/jpeg"
+	_ "image/png"
 	"os"
 	"testing"
 
@@ -349,19 +349,19 @@ func TestQRCodeReader_DecodeImage(t *testing.T) {
 	result = testDecodeImage(t, file, "QR Code Symbol")
 	points := result.GetResultPoints()
 	// [0]: bottom-left; [1]: top-left; [2]: top-right
-	if points[0].GetX() <  points[1].GetX() - 10 || points[1].GetX() + 10 < points[0].GetX() {
+	if points[0].GetX() < points[1].GetX()-10 || points[1].GetX()+10 < points[0].GetX() {
 		t.Fatalf("ResultPoint BottomLeft.X != TopLeft.X")
 	}
-	if points[2].GetY() <  points[1].GetY() - 10 || points[1].GetY() + 10 < points[2].GetY() {
+	if points[2].GetY() < points[1].GetY()-10 || points[1].GetY()+10 < points[2].GetY() {
 		t.Fatalf("ResultPoint TopRight.Y != TopLeft.Y")
 	}
 	file = "testdata/version1_mirrored.png"
 	result = testDecodeImage(t, file, "QR Code Symbol")
 	points = result.GetResultPoints()
-	if points[0].GetX() <  points[1].GetX() - 10 || points[1].GetX() + 10 < points[0].GetX() {
+	if points[0].GetX() < points[1].GetX()-10 || points[1].GetX()+10 < points[0].GetX() {
 		t.Fatalf("ResultPoint BottomLeft.X != TopLeft.X")
 	}
-	if points[2].GetY() <  points[1].GetY() - 10 || points[1].GetY() + 10 < points[2].GetY() {
+	if points[2].GetY() < points[1].GetY()-10 || points[1].GetY()+10 < points[2].GetY() {
 		t.Fatalf("ResultPoint TopRight.Y != TopLeft.Y")
 	}
 
