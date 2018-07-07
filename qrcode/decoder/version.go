@@ -5,6 +5,7 @@ import (
 	"math"
 
 	"github.com/makiuchi-d/gozxing"
+	"strconv"
 )
 
 type Version struct {
@@ -178,8 +179,12 @@ func (e ECB) GetDataCodewords() int {
 	return e.dataCodewords
 }
 
-// public string toString()
-// private static Version[] buildVersions()
+func (this *Version) String() string {
+	if this == nil {
+		return ""
+	}
+	return strconv.Itoa(this.versionNumber)
+}
 
 var VERSIONS = []*Version{
 	NewVersion(1, []int{},

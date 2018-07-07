@@ -159,3 +159,14 @@ func TestDecodeVersionInformationUnmatch(t *testing.T) {
 		t.Fatalf("decodeVersionInformation(0) must be error")
 	}
 }
+
+func TestVersion_String(t *testing.T) {
+	v, _ := Version_decodeVersionInformation(0x0C763) // best: 0x0C762, versionNumber=12
+	if str := v.String(); str != "12" {
+		t.Fatalf("String = \"%v\", expect \"12\"", str)
+	}
+	v = nil
+	if str := v.String(); str != "" {
+		t.Fatalf("String = \"%v\", expect \"\"", str)
+	}
+}

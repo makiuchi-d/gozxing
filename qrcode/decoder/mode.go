@@ -71,3 +71,30 @@ func (this *Mode) GetCharacterCountBits(version *Version) int {
 func (this *Mode) GetBits() int {
 	return this.bits
 }
+
+func (this *Mode) String() string {
+	switch this {
+	case Mode_TERMINATOR:
+		return "TERMINATOR"
+	case Mode_NUMERIC:
+		return "NUMERIC"
+	case Mode_ALPHANUMERIC:
+		return "ALPHANUMERIC"
+	case Mode_STRUCTURED_APPEND:
+		return "STRUCTURED_APPEND"
+	case Mode_BYTE:
+		return "BYTE"
+	case Mode_ECI:
+		return "ECI"
+	case Mode_KANJI:
+		return "KANJI"
+	case Mode_FNC1_FIRST_POSITION:
+		return "FNC1_FIRST_POSITION"
+	case Mode_FNC1_SECOND_POSITION:
+		return "FNC1_SECOND_POSITION"
+	case Mode_HANZI:
+		return "HANZI"
+	default:
+		return ""
+	}
+}

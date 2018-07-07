@@ -78,3 +78,25 @@ func TestModeAlphaNumeric(t *testing.T) {
 		t.Fatalf("CharacterCountBits(ver=23) = %v, expect 13", r)
 	}
 }
+
+func testMode_String(t *testing.T, mode *Mode, expect string) {
+	str := mode.String()
+	if str != expect {
+		t.Fatalf("String = \"%v\", expect \"%v\"", str, expect)
+	}
+}
+
+func TestMode_String(t *testing.T) {
+	testMode_String(t, Mode_TERMINATOR, "TERMINATOR")
+	testMode_String(t, Mode_NUMERIC, "NUMERIC")
+	testMode_String(t, Mode_ALPHANUMERIC, "ALPHANUMERIC")
+	testMode_String(t, Mode_STRUCTURED_APPEND, "STRUCTURED_APPEND")
+	testMode_String(t, Mode_BYTE, "BYTE")
+	testMode_String(t, Mode_ECI, "ECI")
+	testMode_String(t, Mode_KANJI, "KANJI")
+	testMode_String(t, Mode_FNC1_FIRST_POSITION, "FNC1_FIRST_POSITION")
+	testMode_String(t, Mode_FNC1_SECOND_POSITION, "FNC1_SECOND_POSITION")
+	testMode_String(t, Mode_HANZI, "HANZI")
+
+	testMode_String(t, nil, "")
+}
