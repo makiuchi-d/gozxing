@@ -26,6 +26,21 @@ func TestErrorCorrectionLevel_ForBits(t *testing.T) {
 	testErrorCorrectionLevel_ForBits(t, 3, ErrorCorrectionLevel_Q)
 }
 
+func TestErrorCorrectionLevel_GetBits(t *testing.T) {
+	if r := ErrorCorrectionLevel_M.GetBits(); r != 0 {
+		t.Fatalf("M.GetBits = %v, expect 0", r)
+	}
+	if r := ErrorCorrectionLevel_L.GetBits(); r != 1 {
+		t.Fatalf("L.GetBits = %v, expect 1", r)
+	}
+	if r := ErrorCorrectionLevel_H.GetBits(); r != 2 {
+		t.Fatalf("H.GetBits = %v, expect 2", r)
+	}
+	if r := ErrorCorrectionLevel_Q.GetBits(); r != 3 {
+		t.Fatalf("Q.GetBits = %v, expect 3", r)
+	}
+}
+
 func TestErrorCorrectionLevel_String(t *testing.T) {
 	if s := ErrorCorrectionLevel_L.String(); s != "L" {
 		t.Fatalf("ErrorCorrectionLevel_L string is %v, expect L", s)
@@ -42,5 +57,4 @@ func TestErrorCorrectionLevel_String(t *testing.T) {
 	if s := ErrorCorrectionLevel(-1).String(); s != "" {
 		t.Fatalf("invalid ErrorCorrectionLevel string must be \"\", %v", s)
 	}
-
 }

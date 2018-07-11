@@ -27,6 +27,10 @@ func ErrorCorrectionLevel_ForBits(bits uint) (ErrorCorrectionLevel, error) {
 	return -1, errors.New("IllegalArgumentException")
 }
 
+func (e ErrorCorrectionLevel) GetBits() int {
+	return int(e)
+}
+
 func (e ErrorCorrectionLevel) String() string {
 	switch e {
 	case ErrorCorrectionLevel_M:

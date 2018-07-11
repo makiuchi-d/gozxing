@@ -162,7 +162,7 @@ func (b *BitArray) AppendBit(bit bool) {
 	b.size++
 }
 
-func (b *BitArray) AppendBits(value uint32, numBits int) error {
+func (b *BitArray) AppendBits(value int, numBits int) error {
 	if numBits < 0 || numBits > 32 {
 		return errors.New("IllegalArgumentException: Num bits must be between 0 and 32")
 	}
