@@ -78,7 +78,7 @@ func MaskUtil_applyMaskPenaltyRule3(matrix *ByteMatrix) int {
 	return numPenalties * maskUtilN3
 }
 
-func isWhiteHorizontal(rowArray []byte, from, to int) bool {
+func isWhiteHorizontal(rowArray []int8, from, to int) bool {
 	if from < 0 {
 		from = 0
 	}
@@ -93,7 +93,7 @@ func isWhiteHorizontal(rowArray []byte, from, to int) bool {
 	return true
 }
 
-func isWhiteVertical(array [][]byte, col, from, to int) bool {
+func isWhiteVertical(array [][]int8, col, from, to int) bool {
 	if from < 0 {
 		from = 0
 	}

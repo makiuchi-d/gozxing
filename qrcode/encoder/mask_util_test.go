@@ -96,7 +96,7 @@ func TestMaskUtil_applyMaskPenaltyRule3(t *testing.T) {
 }
 
 func TestMaskUtil_isWhiteHorizontal(t *testing.T) {
-	arr := []byte{0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0}
+	arr := []int8{0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0}
 
 	if r := isWhiteHorizontal(arr, -1, 4); r != true {
 		t.Fatalf("isWhiteHorizontal(-1,4) must be %v", !r)
@@ -116,7 +116,7 @@ func TestMaskUtil_isWhiteHorizontal(t *testing.T) {
 }
 
 func TestMaskUtil_isWhiteVertical(t *testing.T) {
-	arr := [][]byte{
+	arr := [][]int8{
 		{0, 0, 1},
 		{0, 0, 1},
 		{0, 0, 0},

@@ -15,7 +15,7 @@ func TestNewByteMatrix(t *testing.T) {
 		t.Fatalf("GetWidth = %v, expect 3", r)
 	}
 	arr := bm.GetArray()
-	expect := [][]byte{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}}
+	expect := [][]int8{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}}
 	if !reflect.DeepEqual(arr, expect) {
 		t.Fatalf("GetArr = %v, expect %v", arr, expect)
 	}
@@ -45,7 +45,7 @@ func TestByteMatrix_SetGet(t *testing.T) {
 	}
 
 	arr := bm.GetArray()
-	expect := [][]byte{{0, 0, 0}, {0, 1, 0}, {0, 0, 0}, {1, 0, 0}, {0, 0, 0}}
+	expect := [][]int8{{0, 0, 0}, {0, 1, 0}, {0, 0, 0}, {1, 0, 0}, {0, 0, 0}}
 	if !reflect.DeepEqual(arr, expect) {
 		t.Fatalf("GetArr = %v, expect %v", arr, expect)
 	}
@@ -56,7 +56,7 @@ func TestByteMatrix_Clear(t *testing.T) {
 
 	bm.Clear(1)
 	arr := bm.GetArray()
-	expect := [][]byte{{1, 1, 1}, {1, 1, 1}}
+	expect := [][]int8{{1, 1, 1}, {1, 1, 1}}
 	if !reflect.DeepEqual(arr, expect) {
 		t.Fatalf("GetArr = %v, expect %v", arr, expect)
 	}
