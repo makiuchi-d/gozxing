@@ -3,9 +3,10 @@ package encoder
 import (
 	"errors"
 	"fmt"
+	"math/bits"
+
 	"github.com/makiuchi-d/gozxing"
 	"github.com/makiuchi-d/gozxing/qrcode/decoder"
-	"math/bits"
 )
 
 var (

@@ -18,7 +18,6 @@ func MaskUtil_applyMaskPenaltyRule1(matrix *ByteMatrix) int {
 	return applyMaskPenaltyRule1Internal(matrix, true) + applyMaskPenaltyRule1Internal(matrix, false)
 }
 
-
 // MaskUtil_applyMaskPenaltyRule2 Apply mask penalty rule 2 and return the penalty.
 // Find 2x2 blocks with the same color and give penalty to them.
 // This is actually equivalent to the spec's rule, which is to find MxN blocks and give a penalty
