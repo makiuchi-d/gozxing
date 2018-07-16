@@ -233,7 +233,7 @@ func DecodedBitStreamParser_decodeByteSegment(bits *common.BitSource,
 	}
 
 	if encoding == "ASCII" || encoding == "UTF-8" {
-		// no necessary to convert.
+		// not necessary to convert.
 		result = append(result, readBytes...)
 	} else {
 		ianaEncoding, e := ianaindex.IANA.Encoding(encoding)

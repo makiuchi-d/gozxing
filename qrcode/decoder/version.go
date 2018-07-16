@@ -3,9 +3,9 @@ package decoder
 import (
 	"errors"
 	"math"
+	"strconv"
 
 	"github.com/makiuchi-d/gozxing"
-	"strconv"
 )
 
 type Version struct {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"strconv"
+	"unicode/utf8"
 
 	"golang.org/x/text/encoding/ianaindex"
 	"golang.org/x/text/encoding/japanese"
@@ -16,7 +17,7 @@ import (
 )
 
 const (
-	Encoder_DEFAULT_BYTE_MODE_ENCODING = "ISO-8859-1"
+	Encoder_DEFAULT_BYTE_MODE_ENCODING = "UTF-8" // original default is "ISO-8859-1"
 )
 
 var alphanumericTable = []int{
@@ -47,7 +48,14 @@ func Encoder_encode(content string, ecLevel decoder.ErrorCorrectionLevel, hints 
 	encoding := Encoder_DEFAULT_BYTE_MODE_ENCODING
 	encodingHint, hasEncodingHint := hints[gozxing.EncodeHintType_CHARACTER_SET]
 	if hasEncodingHint {
-		encoding = encodingHint.(string)
+		// normalize encoding name using CharcterSetECI
+		if enc, ok := encodingHint.(string); ok {
+			encoding = enc
+			eci := common.GetCharacterSetECIByName(encoding)
+			if eci != nil {
+				encoding = eci.Name()
+			}
+		}
 	}
 
 	// Pick an encoding mode appropriate for the content. Note that this will not attempt to use
@@ -124,6 +132,8 @@ func Encoder_encode(content string, ecLevel decoder.ErrorCorrectionLevel, hints 
 	numLetters := len(content)
 	if mode == decoder.Mode_BYTE {
 		numLetters = dataBits.GetSizeInBytes()
+	} else if mode == decoder.Mode_KANJI {
+		numLetters = utf8.RuneCountInString(content)
 	}
 
 	e = appendLengthInfo(numLetters, version, mode, headerAndDataBits)
@@ -368,10 +378,8 @@ func getNumDataBytesAndNumECBytesForBlockID(numTotalBytes, numDataBytes, numRSBl
 	}
 	// 196 = (13 + 26) * 4 + (14 + 26) * 1
 	if numTotalBytes !=
-		((numDataBytesInGroup1+numEcBytesInGroup1)*
-			numRsBlocksInGroup1)+
-			((numDataBytesInGroup2+numEcBytesInGroup2)*
-				numRsBlocksInGroup2) {
+		((numDataBytesInGroup1+numEcBytesInGroup1)*numRsBlocksInGroup1)+
+			((numDataBytesInGroup2+numEcBytesInGroup2)*numRsBlocksInGroup2) {
 		return 0, 0, gozxing.NewWriterException("Total bytes mismatch")
 	}
 
@@ -521,7 +529,7 @@ func appendNumericBytes(content string, bits *gozxing.BitArray) {
 			i += 3
 		} else if i+1 < length {
 			// Encode two numeric letters in seven bits.
-			num2 := int(content[i]) - '0'
+			num2 := int(content[i+1]) - '0'
 			_ = bits.AppendBits(num1*10+num2, 7)
 			i += 2
 		} else {
@@ -558,17 +566,10 @@ func appendAlphanumericBytes(content string, bits *gozxing.BitArray) error {
 }
 
 func append8BitBytes(content string, bits *gozxing.BitArray, encoding string) error {
-	// normalize encoding name using CharcterSetECI
-	eci := common.GetCharacterSetECIByName(encoding)
-	if eci == nil {
-		return gozxing.NewWriterExceptionWithError(
-			fmt.Errorf("Unsupported encoding: %v", encoding))
-	}
-
 	bytes := []byte(content)
 
-	if eci.Name() != "ASCII" {
-		enc, e := ianaindex.IANA.Encoding(eci.Name())
+	if encoding != "ASCII" {
+		enc, e := ianaindex.IANA.Encoding(encoding)
 		if e != nil {
 			return e
 		}

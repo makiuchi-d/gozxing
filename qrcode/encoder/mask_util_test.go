@@ -209,5 +209,4 @@ func TestMaskUtil_getDataMaskBit(t *testing.T) {
 	if _, e := MaskUtil_getDataMaskBit(8, 0, 0); e == nil {
 		t.Fatalf("getDataMaskBit(8,0,0) must be error")
 	}
-
 }
