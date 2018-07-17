@@ -2,6 +2,7 @@ package decoder
 
 import (
 	"errors"
+	"fmt"
 )
 
 type ErrorCorrectionLevel int
@@ -43,4 +44,19 @@ func (e ErrorCorrectionLevel) String() string {
 		return "Q"
 	}
 	return ""
+}
+
+func ErrorCorrectionLevel_ValueOf(s string) (ErrorCorrectionLevel, error) {
+	switch s {
+	case "M":
+		return ErrorCorrectionLevel_M, nil
+	case "L":
+		return ErrorCorrectionLevel_L, nil
+	case "H":
+		return ErrorCorrectionLevel_H, nil
+	case "Q":
+		return ErrorCorrectionLevel_Q, nil
+	default:
+		return -1, fmt.Errorf("IllegalArgumentException: ErrorCorrectionLevel %v", s)
+	}
 }

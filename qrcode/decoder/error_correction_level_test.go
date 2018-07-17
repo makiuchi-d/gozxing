@@ -58,3 +58,42 @@ func TestErrorCorrectionLevel_String(t *testing.T) {
 		t.Fatalf("invalid ErrorCorrectionLevel string must be \"\", %v", s)
 	}
 }
+
+func TestErrorCorrectionLevel_ValueOf(t *testing.T) {
+	ecl, e := ErrorCorrectionLevel_ValueOf("M")
+	if e != nil {
+		t.Fatalf("ValueOf(M) returns error, %v", e)
+	}
+	if ecl != ErrorCorrectionLevel_M {
+		t.Fatalf("ValueOf(M) = %v, expect M", ecl)
+	}
+
+	ecl, e = ErrorCorrectionLevel_ValueOf("L")
+	if e != nil {
+		t.Fatalf("ValueOf(L) returns error, %v", e)
+	}
+	if ecl != ErrorCorrectionLevel_L {
+		t.Fatalf("ValueOf(L) = %v, expect L", ecl)
+	}
+
+	ecl, e = ErrorCorrectionLevel_ValueOf("H")
+	if e != nil {
+		t.Fatalf("ValueOf(H) returns error, %v", e)
+	}
+	if ecl != ErrorCorrectionLevel_H {
+		t.Fatalf("ValueOf(H) = %v, expect H", ecl)
+	}
+
+	ecl, e = ErrorCorrectionLevel_ValueOf("Q")
+	if e != nil {
+		t.Fatalf("ValueOf(Q) returns error, %v", e)
+	}
+	if ecl != ErrorCorrectionLevel_Q {
+		t.Fatalf("ValueOf(Q) = %v, expect Q", ecl)
+	}
+
+	_, e = ErrorCorrectionLevel_ValueOf("A")
+	if e == nil {
+		t.Fatalf("ValueOf(A) must be error")
+	}
+}
