@@ -1,6 +1,7 @@
 package common
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/makiuchi-d/gozxing"
@@ -15,8 +16,11 @@ func newTestLuminanceSource(size int) *testLuminanceSource {
 		gozxing.LuminanceSourceBase{size, size},
 	}
 }
-func (this *testLuminanceSource) GetRow(y int, row []byte) []byte {
+func (this *testLuminanceSource) GetRow(y int, row []byte) ([]byte, error) {
 	width := this.GetWidth()
+	if y >= this.GetHeight() {
+		return row, fmt.Errorf("y(%d) >= height(%d)", y, this.GetHeight())
+	}
 	for i := 0; i < width; i++ {
 		if (y+i)%2 == 0 {
 			row[i] = 10 + byte(50*i/width)
@@ -24,7 +28,7 @@ func (this *testLuminanceSource) GetRow(y int, row []byte) []byte {
 			row[i] = 250 - byte(50*i/width)
 		}
 	}
-	return row
+	return row, nil
 }
 func (this *testLuminanceSource) GetMatrix() []byte {
 	width := this.GetWidth()
@@ -51,11 +55,11 @@ func newTestBlackSource(size int) *testBlackSource {
 		gozxing.LuminanceSourceBase{size, size},
 	}
 }
-func (this *testBlackSource) GetRow(y int, row []byte) []byte {
+func (this *testBlackSource) GetRow(y int, row []byte) ([]byte, error) {
 	for i := 0; i < this.GetWidth(); i++ {
 		row[i] = 0
 	}
-	return row
+	return row, nil
 }
 func (this *testBlackSource) GetMatrix() []byte {
 	size := this.GetWidth() * this.GetHeight()
@@ -106,6 +110,10 @@ func TestGlobalHistgramBinarizer_estimateBlackPoint(t *testing.T) {
 func TestGlobalHistgramBinarizer_GetBlackRow(t *testing.T) {
 	src := newTestLuminanceSource(16)
 	ghb := NewGlobalHistgramBinarizer(src)
+
+	if _, e := ghb.GetBlackRow(16, nil); e == nil {
+		t.Fatalf("GetBlackRow must be error")
+	}
 
 	r, e := ghb.GetBlackRow(1, nil)
 	if e != nil {

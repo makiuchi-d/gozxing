@@ -46,7 +46,10 @@ func (this *GlobalHistogramBinarizer) GetBlackRow(y int, row *gozxing.BitArray) 
 	}
 
 	this.initArrays(width)
-	localLuminances := source.GetRow(y, this.luminances)
+	localLuminances, e := source.GetRow(y, this.luminances)
+	if e != nil {
+		return nil, e
+	}
 	localBuckets := this.buckets
 	for x := 0; x < width; x++ {
 		localBuckets[(localLuminances[x]&0xff)>>LUMINANCE_SHIFT]++
@@ -94,7 +97,7 @@ func (this *GlobalHistogramBinarizer) GetBlackMatrix() (*gozxing.BitMatrix, erro
 	localBuckets := this.buckets
 	for y := 1; y < 5; y++ {
 		row := height * y / 5
-		localLuminances := source.GetRow(row, this.luminances)
+		localLuminances, _ := source.GetRow(row, this.luminances)
 		right := (width * 4) / 5
 		for x := width / 5; x < right; x++ {
 			pixel := localLuminances[x] & 0xff

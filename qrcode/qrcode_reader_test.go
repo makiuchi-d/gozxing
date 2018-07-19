@@ -1,6 +1,7 @@
 package qrcode
 
 import (
+	"fmt"
 	"image"
 	_ "image/jpeg"
 	_ "image/png"
@@ -22,7 +23,7 @@ func newTestBitMatrixSource(matrix *gozxing.BitMatrix) gozxing.LuminanceSource {
 		matrix,
 	}
 }
-func (this *testBitMatrixSource) GetRow(y int, row []byte) []byte {
+func (this *testBitMatrixSource) GetRow(y int, row []byte) ([]byte, error) {
 	for x := 0; x < this.matrix.GetWidth(); x++ {
 		if this.matrix.Get(x, y) {
 			row[x] = 0
@@ -30,7 +31,7 @@ func (this *testBitMatrixSource) GetRow(y int, row []byte) []byte {
 			row[x] = 255
 		}
 	}
-	return row
+	return row, nil
 }
 func (this *testBitMatrixSource) GetMatrix() []byte {
 	width := this.GetWidth()
@@ -277,12 +278,15 @@ func newTestImageSource(filename string) gozxing.LuminanceSource {
 		left,
 	}
 }
-func (this *testImageSource) GetRow(y int, row []byte) []byte {
+func (this *testImageSource) GetRow(y int, row []byte) ([]byte, error) {
+	if y >= this.GetHeight() {
+		return row, fmt.Errorf("y(%d) >= height(%d)", y, this.GetHeight())
+	}
 	for x := 0; x < this.GetWidth(); x++ {
 		r, g, b, _ := this.img.At(this.left+x, this.top+y).RGBA()
 		row[x] = byte((r + 2*g + b) * 255 / (4 * 0xffff))
 	}
-	return row
+	return row, nil
 }
 func (this *testImageSource) GetMatrix() []byte {
 	width := this.GetWidth()

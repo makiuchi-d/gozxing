@@ -17,7 +17,7 @@ type LuminanceSource interface {
 	 *            Always use the returned object, and ignore the .length of the array.
 	 * @return An array containing the luminance data.
 	 */
-	GetRow(y int, row []byte) []byte
+	GetRow(y int, row []byte) ([]byte, error)
 
 	/**
 	 * Fetches luminance data for the underlying bitmap. Values should be fetched using:
@@ -130,7 +130,7 @@ func LuminanceSourceString(this LuminanceSource) string {
 	result := make([]byte, 0, height*(width+1))
 
 	for y := 0; y < height; y++ {
-		row = this.GetRow(y, row)
+		row, _ = this.GetRow(y, row)
 		for x := 0; x < width; x++ {
 			luminance := row[x] & 0xFF
 			var c byte

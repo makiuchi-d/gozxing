@@ -19,7 +19,10 @@ func (this *testBinarizer) GetBlackRow(y int, row *BitArray) (*BitArray, error) 
 	} else {
 		row.Clear()
 	}
-	rawrow := this.source.GetRow(y, make([]byte, width))
+	rawrow, e := this.source.GetRow(y, make([]byte, width))
+	if e != nil {
+		return row, e
+	}
 	for i, v := range rawrow {
 		if v < 128 {
 			row.Set(i)

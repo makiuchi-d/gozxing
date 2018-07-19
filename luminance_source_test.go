@@ -1,6 +1,7 @@
 package gozxing
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -14,12 +15,15 @@ func newTestLuminanceSource(size int) *testLuminanceSource {
 	}
 }
 
-func (this *testLuminanceSource) GetRow(y int, row []byte) []byte {
+func (this *testLuminanceSource) GetRow(y int, row []byte) ([]byte, error) {
+	if y >= this.GetHeight() {
+		return row, fmt.Errorf("y(%d) >= height(%d)", y, this.GetHeight())
+	}
 	width := this.GetWidth()
 	for i := 0; i < width; i++ {
 		row[i] = byte(255 * i / (width - 1))
 	}
-	return row
+	return row, nil
 }
 
 func (this *testLuminanceSource) GetMatrix() []byte {

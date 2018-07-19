@@ -28,7 +28,12 @@ func TestInvertedLuminanceSource(t *testing.T) {
 		255, 238, 221, 204, 187, 170, 153, 136, 119, 102, 85, 68, 51, 34, 17, 0,
 	}
 
-	row := s.GetRow(1, make([]byte, 16))
+	_, e := s.GetRow(16, make([]byte, 16))
+	if e == nil {
+		t.Fatalf("GetRow must be error")
+	}
+
+	row, _ := s.GetRow(1, make([]byte, 16))
 	if !reflect.DeepEqual(row, expect[:16]) {
 		t.Fatalf("GetRow = %v, expect %v", row, expect[:16])
 	}
@@ -114,18 +119,22 @@ func (this *croppableLS) Crop(left, top, width, height int) (LuminanceSource, er
 		height,
 	}, nil
 }
-func (this *croppableLS) GetRow(y int, row []byte) []byte {
+func (this *croppableLS) GetRow(y int, row []byte) ([]byte, error) {
 	if len(row) < this.LuminanceSource.GetWidth() {
 		row = make([]byte, this.LuminanceSource.GetWidth())
 	}
-	row = this.LuminanceSource.GetRow(this.top+y, row)
-	return row[this.left : this.left+this.width]
+	row, e := this.LuminanceSource.GetRow(this.top+y, row)
+	if e != nil {
+		return row, e
+	}
+	return row[this.left : this.left+this.width], nil
 }
 func (this *croppableLS) GetMatrix() []byte {
 	matrix := make([]byte, 0, this.width*this.height)
 	row := make([]byte, this.width)
 	for y := 0; y < this.height; y++ {
-		matrix = append(matrix, this.GetRow(y, row)...)
+		row, _ = this.GetRow(y, row)
+		matrix = append(matrix, row...)
 	}
 	return matrix
 }
@@ -149,7 +158,7 @@ func TestInvertedLuminanceSourceCrop(t *testing.T) {
 		t.Fatalf("Croped size = %v,%v, expect 8,8", w, h)
 	}
 
-	row := c.GetRow(1, make([]byte, 16))
+	row, _ := c.GetRow(1, make([]byte, 16))
 	expect := []byte{170, 153, 136, 119, 102, 85, 68, 51}
 	if !reflect.DeepEqual(row, expect) {
 		t.Fatalf("Cropped row = %v, expect %v", row, expect)

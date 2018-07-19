@@ -8,13 +8,17 @@ func NewInvertedLuminanceSource(delegate LuminanceSource) LuminanceSource {
 	return &InvertedLuminanceSource{delegate}
 }
 
-func (this *InvertedLuminanceSource) GetRow(y int, row []byte) []byte {
-	row = this.LuminanceSource.GetRow(y, row)
+func (this *InvertedLuminanceSource) GetRow(y int, row []byte) ([]byte, error) {
+	var e error
+	row, e = this.LuminanceSource.GetRow(y, row)
+	if e != nil {
+		return row, e
+	}
 	width := this.GetWidth()
 	for i := 0; i < width; i++ {
 		row[i] = 255 - (row[i] & 0xff)
 	}
-	return row
+	return row, nil
 }
 
 func (this *InvertedLuminanceSource) GetMatrix() []byte {
