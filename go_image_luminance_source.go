@@ -6,17 +6,16 @@ import (
 
 func NewLuminanceSourceFromImage(img image.Image) LuminanceSource {
 	rect := img.Bounds()
-	top := rect.Min.Y
-	left := rect.Min.X
 	width := rect.Max.X - rect.Min.X
 	height := rect.Max.Y - rect.Min.Y
 
 	luminance := make([]byte, width*height)
-	for y := 0; y < height; y++ {
-		offset := y * width
-		for x := 0; x < width; x++ {
+	index := 0
+	for y := rect.Min.Y; y < rect.Max.Y; y++ {
+		for x := rect.Min.X; x < rect.Max.X; x++ {
 			r, g, b, _ := img.At(x, y).RGBA()
-			luminance[offset+x] = byte((r + 2*g + b) * 255 / (4 * 0xffff))
+			luminance[index] = byte((r + 2*g + b) * 255 / (4 * 0xffff))
+			index++
 		}
 	}
 
@@ -25,7 +24,7 @@ func NewLuminanceSourceFromImage(img image.Image) LuminanceSource {
 		luminance,
 		width,
 		height,
-		top,
-		left,
+		0,
+		0,
 	}
 }
