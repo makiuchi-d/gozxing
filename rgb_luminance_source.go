@@ -14,7 +14,7 @@ type RGBLuminanceSource struct {
 	top        int
 }
 
-func NewRGBLuminanceSource(width, height int, pixels []int) *RGBLuminanceSource {
+func NewRGBLuminanceSource(width, height int, pixels []int) LuminanceSource {
 	dataWidth := width
 	dataHeight := height
 	left := 0

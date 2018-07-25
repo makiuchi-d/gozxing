@@ -12,7 +12,7 @@ func makeRGBLSource(width, height int) *RGBLuminanceSource {
 			pixels[h*width+w] = wh2rgb(w, h, width, height)
 		}
 	}
-	return NewRGBLuminanceSource(width, height, pixels)
+	return NewRGBLuminanceSource(width, height, pixels).(*RGBLuminanceSource)
 }
 
 func wh2rgb(w, h, width, height int) int {
