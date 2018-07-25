@@ -7,18 +7,18 @@ import (
 
 func makeRGBLSource(width, height int) *RGBLuminanceSource {
 	pixels := make([]int, width*height)
-	for h := 0; h < height; h++ {
-		for w := 0; w < width; w++ {
-			pixels[h*width+w] = wh2rgb(w, h, width, height)
+	for y := 0; y < height; y++ {
+		for x := 0; x < width; x++ {
+			pixels[y*width+x] = xy2rgb(x, y, width, height)
 		}
 	}
 	return NewRGBLuminanceSource(width, height, pixels).(*RGBLuminanceSource)
 }
 
-func wh2rgb(w, h, width, height int) int {
-	r := (255 * w * 2 / (width - 1)) & 0xff
-	g := (255 * (w + h) / (width + height - 2)) & 0xff
-	b := (255 * h * 2 / (height - 1)) & 0xff
+func xy2rgb(x, y, width, height int) int {
+	r := (255 * x * 2 / (width - 1)) & 0xff
+	g := (255 * (x + y) / (width + height - 2)) & 0xff
+	b := (255 * y * 2 / (height - 1)) & 0xff
 	return (r << 16) + (g << 8) + b
 }
 
@@ -72,9 +72,9 @@ func TestRGBLuminanceSource_GetMatrix(t *testing.T) {
 		t.Fatalf("GetMatrix len=%d, expect %d", len(matrix), len(src.luminances))
 	}
 	for i := range matrix {
-		w := i % src.dataWidth
-		h := i / src.dataWidth
-		if exp := rgb2lumina(wh2rgb(w, h, 10, 10)); matrix[i] != exp {
+		x := i % src.dataWidth
+		y := i / src.dataWidth
+		if exp := rgb2lumina(xy2rgb(x, y, 10, 10)); matrix[i] != exp {
 			t.Fatalf("GetMatrix matrix[%v] = %v, expect %v", i, matrix[i], exp)
 		}
 	}
