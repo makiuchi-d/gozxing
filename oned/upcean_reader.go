@@ -53,9 +53,257 @@ func init() {
 	}
 }
 
-func UPCEANReader_findGuardPattern(row *gozxing.BitArray, rowOffset int, whiteFirst bool, pattern []int) ([]int, error) {
+type middleDecoder interface {
+	// getBarcodeFormat Get the format of this decoder.
+	// @return The 1D format.
+	getBarcodeFormat() gozxing.BarcodeFormat
+
+	// decodeMiddle Subclasses override this to decode the portion of a barcode between the start
+	// and end guard patterns.
+	//
+	// @param row row of black/white values to search
+	// @param startRange start/end offset of start guard pattern
+	// @param resultString {@link StringBuilder} to append decoded chars to
+	// @return horizontal offset of first pixel after the "middle" that was decoded
+	// @throws NotFoundException if decoding could not complete successfully
+	decodeMiddle(row *gozxing.BitArray, startRange []int, result []byte) (int, []byte, error)
+}
+
+type UPCEANReader OneDReader
+
+type upceanReader struct {
+	middleDecoder
+	decodeRowStringBuffer []byte
+	extensionReader       *UPCEANExtensionSupport
+}
+
+func NewUPCEANReader(middle middleDecoder) *UPCEANReader {
+	return &UPCEANReader{
+		&upceanReader{
+			middleDecoder:         middle,
+			decodeRowStringBuffer: make([]byte, 13),
+			extensionReader:       NewUPCEANExtensionSupport(),
+		},
+	}
+}
+
+func upceanReader_findStartGuardPattern(row *gozxing.BitArray) ([]int, error) {
+	foundStart := false
+	var startRange []int
+	nextStart := 0
+	counters := make([]int, len(UPCEANReader_START_END_PATTERN))
+	for !foundStart {
+		for i := range counters {
+			counters[i] = 0
+		}
+		var e error
+		startRange, e = upceanReader_findGuardPatternWithCounters(
+			row, nextStart, false, UPCEANReader_START_END_PATTERN, counters)
+		if e != nil {
+			return nil, e
+		}
+		start := startRange[0]
+		nextStart = startRange[1]
+		// Make sure there is a quiet zone at least as big as the start pattern before the barcode.
+		// If this check would run off the left edge of the image, do not accept this barcode,
+		// as it is very likely to be a false positive.
+		quietStart := start - (nextStart - start)
+		if quietStart >= 0 {
+			foundStart, _ = row.IsRange(quietStart, start, false)
+		}
+	}
+	return startRange, nil
+}
+
+func (this *upceanReader) decodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
+	start, e := upceanReader_findStartGuardPattern(row)
+	if e != nil {
+		return nil, e
+	}
+	return this.decodeRowWithStartRange(rowNumber, row, start, hints)
+}
+
+// decodeRowWithStartRange Like {@link #decodeRow(int, BitArray, Map)}, but
+// allows caller to inform method about where the UPC/EAN start pattern is
+// found. This allows this to be computed once and reused across many implementations.</p>
+//
+// @param rowNumber row index into the image
+// @param row encoding of the row of the barcode image
+// @param startGuardRange start/end column where the opening start pattern was found
+// @param hints optional hints that influence decoding
+// @return {@link Result} encapsulating the result of decoding a barcode in the row
+// @throws NotFoundException if no potential barcode is found
+// @throws ChecksumException if a potential barcode is found but does not pass its checksum
+// @throws FormatException if a potential barcode is found but format is invalid
+func (this *upceanReader) decodeRowWithStartRange(
+	rowNumber int, row *gozxing.BitArray, startGuardRange []int,
+	hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
+
+	var resultPointCallback gozxing.ResultPointCallback
+	if hint, ok := hints[gozxing.DecodeHintType_NEED_RESULT_POINT_CALLBACK]; ok {
+		resultPointCallback = hint.(gozxing.ResultPointCallback)
+	}
+	if resultPointCallback != nil {
+		resultPointCallback(gozxing.NewResultPoint(
+			float64(startGuardRange[0]+startGuardRange[1])/2.0, float64(rowNumber)))
+	}
+
+	result := this.decodeRowStringBuffer[:0]
+	endStart, result, e := this.decodeMiddle(row, startGuardRange, result)
+	if e != nil {
+		return nil, e
+	}
+
+	rowNumberf := float64(rowNumber)
+	if resultPointCallback != nil {
+		resultPointCallback(gozxing.NewResultPoint(float64(endStart), rowNumberf))
+	}
+
+	endRange, e := upceanReader_decodeEnd(row, endStart)
+	if e != nil {
+		return nil, e
+	}
+
+	if resultPointCallback != nil {
+		resultPointCallback(gozxing.NewResultPoint(
+			float64(endRange[0]+endRange[1])/2.0, rowNumberf))
+	}
+
+	// Make sure there is a quiet zone at least as big as the end pattern after the barcode. The
+	// spec might want more whitespace, but in practice this is the maximum we can count on.
+	end := endRange[1]
+	quietEnd := end + (end - endRange[0])
+	if quietEnd >= row.GetSize() {
+		return nil, gozxing.GetNotFoundExceptionInstance()
+	}
+	rowIsRange, _ := row.IsRange(end, quietEnd, false)
+	if !rowIsRange {
+		return nil, gozxing.GetNotFoundExceptionInstance()
+	}
+
+	this.decodeRowStringBuffer = result
+
+	resultString := string(result)
+	// UPC/EAN should never be less than 8 chars anyway
+	if len(resultString) < 8 {
+		return nil, gozxing.GetFormatExceptionInstance()
+	}
+	ok, e := upceanReader_checkChecksum(resultString)
+	if e != nil {
+		return nil, e
+	}
+	if !ok {
+		return nil, gozxing.GetChecksumExceptionInstance()
+	}
+
+	left := float64(startGuardRange[1]+startGuardRange[0]) / 2.0
+	right := float64(endRange[1]+endRange[0]) / 2.0
+	format := this.getBarcodeFormat()
+	decodeResult := gozxing.NewResult(
+		resultString,
+		nil, // no natural byte representation for these barcodes
+		[]gozxing.ResultPoint{
+			gozxing.NewResultPoint(left, float64(rowNumber)),
+			gozxing.NewResultPoint(right, float64(rowNumber)),
+		},
+		format)
+
+	extensionLength := 0
+
+	extensionResult, e := this.extensionReader.decodeRow(rowNumber, row, endRange[1])
+	if e == nil {
+		decodeResult.PutMetadata(gozxing.ResultMetadataType_UPC_EAN_EXTENSION, extensionResult.GetText())
+		decodeResult.PutAllMetadata(extensionResult.GetResultMetadata())
+		decodeResult.AddResultPoints(extensionResult.GetResultPoints())
+		extensionLength = len(extensionResult.GetText())
+	} else {
+		// ignore ReaderException
+		if _, ok := e.(gozxing.ReaderException); !ok {
+			return nil, e
+		}
+	}
+
+	if hint, ok := hints[gozxing.DecodeHintType_ALLOWED_EAN_EXTENSIONS]; ok {
+		allowedExtensions, ok := hint.([]int)
+		if ok {
+			valid := false
+			for _, length := range allowedExtensions {
+				if extensionLength == length {
+					valid = true
+					break
+				}
+			}
+			if !valid {
+				return nil, gozxing.GetNotFoundExceptionInstance()
+			}
+		}
+	}
+
+	if format == gozxing.BarcodeFormat_EAN_13 || format == gozxing.BarcodeFormat_UPC_A {
+		countryID := eanManufacturerOrgSupportLookupCountryIdentifier(resultString)
+		if countryID != "" {
+			decodeResult.PutMetadata(gozxing.ResultMetadataType_POSSIBLE_COUNTRY, countryID)
+		}
+	}
+
+	return decodeResult, nil
+}
+
+// checkChecksum Check checksum
+// @param s string of digits to check
+// @return {@link #checkStandardUPCEANChecksum(CharSequence)}
+// @throws FormatException if the string does not contain only digits
+func upceanReader_checkChecksum(s string) (bool, error) {
+	return upceanReader_checkStandardUPCEANChecksum(s)
+}
+
+// checkStandardUPCEANChecksum Computes the UPC/EAN checksum on a string of digits,
+// and reports whether the checksum is correct or not.
+//
+// @param s string of digits to check
+/// @return true iff string of digits passes the UPC/EAN checksum algorithm
+// @throws FormatException if the string does not contain only digits
+func upceanReader_checkStandardUPCEANChecksum(s string) (bool, error) {
+	length := len(s)
+	if length == 0 {
+		return false, nil
+	}
+	check := int(s[length-1] - '0')
+	sum, e := upceanReader_getStandardUPCEANChecksum(s[:length-1])
+	if e != nil {
+		return false, e
+	}
+	return sum == check, nil
+}
+
+func upceanReader_getStandardUPCEANChecksum(s string) (int, error) {
+	length := len(s)
+	sum := 0
+	for i := length - 1; i >= 0; i -= 2 {
+		digit := int(s[i] - '0')
+		if digit < 0 || digit > 9 {
+			return 0, gozxing.GetFormatExceptionInstance()
+		}
+		sum += digit
+	}
+	sum *= 3
+	for i := length - 2; i >= 0; i -= 2 {
+		digit := int(s[i] - '0')
+		if digit < 0 || digit > 9 {
+			return 0, gozxing.GetFormatExceptionInstance()
+		}
+		sum += digit
+	}
+	return (1000 - sum) % 10, nil
+}
+
+func upceanReader_decodeEnd(row *gozxing.BitArray, endStart int) ([]int, error) {
+	return upceanReader_findGuardPattern(row, endStart, false, UPCEANReader_START_END_PATTERN)
+}
+
+func upceanReader_findGuardPattern(row *gozxing.BitArray, rowOffset int, whiteFirst bool, pattern []int) ([]int, error) {
 	counters := make([]int, len(pattern))
-	return UPCEANReader_findGuardPatternWithCounters(row, rowOffset, whiteFirst, pattern, counters)
+	return upceanReader_findGuardPatternWithCounters(row, rowOffset, whiteFirst, pattern, counters)
 }
 
 // UPCEANReader_findGuardPatternWithCounters Find guard pattern
@@ -68,7 +316,7 @@ func UPCEANReader_findGuardPattern(row *gozxing.BitArray, rowOffset int, whiteFi
 // @param counters array of counters, as long as pattern, to re-use
 // @return start/end horizontal offset of guard pattern, as an array of two ints
 // @throws NotFoundException if pattern is not found
-func UPCEANReader_findGuardPatternWithCounters(
+func upceanReader_findGuardPatternWithCounters(
 	row *gozxing.BitArray, rowOffset int, whiteFirst bool, pattern, counters []int) ([]int, error) {
 
 	width := row.GetSize()
@@ -114,7 +362,7 @@ func UPCEANReader_findGuardPatternWithCounters(
 // be used
 // @return horizontal offset of first pixel beyond the decoded digit
 // @throws NotFoundException if digit cannot be decoded
-func UPCEANReader_decodeDigit(row *gozxing.BitArray, counters []int, rowOffset int, patterns [][]int) (int, error) {
+func upceanReader_decodeDigit(row *gozxing.BitArray, counters []int, rowOffset int, patterns [][]int) (int, error) {
 	e := recordPattern(row, rowOffset, counters)
 	if e != nil {
 		return 0, e
@@ -130,9 +378,8 @@ func UPCEANReader_decodeDigit(row *gozxing.BitArray, counters []int, rowOffset i
 			bestMatch = i
 		}
 	}
-	if bestMatch >= 0 {
-		return bestMatch, nil
-	} else {
+	if bestMatch < 0 {
 		return 0, gozxing.GetNotFoundExceptionInstance()
 	}
+	return bestMatch, nil
 }

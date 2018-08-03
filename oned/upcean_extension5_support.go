@@ -62,7 +62,7 @@ func (this *UPCEANExtension5Support) decodeMiddle(row *gozxing.BitArray, startRa
 	lgPatternFound := 0
 
 	for x := 0; x < 5 && rowOffset < end; x++ {
-		bestMatch, e := UPCEANReader_decodeDigit(row, counters, rowOffset, UPCEANReader_L_AND_G_PATTERNS)
+		bestMatch, e := upceanReader_decodeDigit(row, counters, rowOffset, UPCEANReader_L_AND_G_PATTERNS)
 		if e != nil {
 			return 0, e
 		}

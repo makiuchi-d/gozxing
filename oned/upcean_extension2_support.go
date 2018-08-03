@@ -57,7 +57,7 @@ func (this *UPCEANExtension2Support) decodeMiddle(row *gozxing.BitArray, startRa
 	checkParity := 0
 
 	for x := 0; x < 2 && rowOffset < end; x++ {
-		bestMatch, e := UPCEANReader_decodeDigit(row, counters, rowOffset, UPCEANReader_L_AND_G_PATTERNS)
+		bestMatch, e := upceanReader_decodeDigit(row, counters, rowOffset, UPCEANReader_L_AND_G_PATTERNS)
 		if e != nil {
 			return 0, e
 		}
