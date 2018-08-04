@@ -69,16 +69,14 @@ type middleDecoder interface {
 	decodeMiddle(row *gozxing.BitArray, startRange []int, result []byte) (int, []byte, error)
 }
 
-type UPCEANReader OneDReader
-
 type upceanReader struct {
 	middleDecoder
 	decodeRowStringBuffer []byte
 	extensionReader       *UPCEANExtensionSupport
 }
 
-func NewUPCEANReader(middle middleDecoder) *UPCEANReader {
-	return &UPCEANReader{
+func NewUPCEANReader(middle middleDecoder) *OneDReader {
+	return &OneDReader{
 		&upceanReader{
 			middleDecoder:         middle,
 			decodeRowStringBuffer: make([]byte, 13),

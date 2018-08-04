@@ -1,4 +1,4 @@
-# gozxing A Barcode Scaning/Encoding Library for Go
+# gozxing A Barcode Scaniing/Encoding Library for Go
 
 [![Build Status](https://travis-ci.org/makiuchi-d/gozxing.svg?branch=master)](https://travis-ci.org/makiuchi-d/gozxing)
 [![codecov](https://codecov.io/gh/makiuchi-d/gozxing/branch/master/graph/badge.svg)](https://codecov.io/gh/makiuchi-d/gozxing)
@@ -26,7 +26,7 @@ This project is a port of Zxing core library to pure Go.
 | UPC-A       |                    |                    |
 | UPC-E       |                    |                    |
 | EAN-8       |                    |                    |
-| EAN-13      |                    |                    |
+| EAN-13      | :heavy_check_mark: |                    |
 
 ### 1D industrial barcode
 
@@ -54,8 +54,8 @@ src := gozxing.NewLuminanceSourceFromImage(img)
 bmp, _ := gozxing.NewBinaryBitmap(common.NewHybridBinarizer(src))
 
 // decode image
-qrreader := qrcode.NewQRCodeReader()
-result, _ := qrreader.Decode(bmp, nil)
+qrReader := qrcode.NewQRCodeReader()
+result, _ := qrReader.Decode(bmp, nil)
 
 fmt.Println(result)
 ```
