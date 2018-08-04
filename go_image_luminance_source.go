@@ -1,8 +1,13 @@
 package gozxing
 
 import (
+	"errors"
 	"image"
 )
+
+type GoImageLuminanceSource struct {
+	*RGBLuminanceSource
+}
 
 func NewLuminanceSourceFromImage(img image.Image) LuminanceSource {
 	rect := img.Bounds()
@@ -19,12 +24,58 @@ func NewLuminanceSourceFromImage(img image.Image) LuminanceSource {
 		}
 	}
 
-	return &RGBLuminanceSource{
+	return &GoImageLuminanceSource{&RGBLuminanceSource{
 		LuminanceSourceBase{width, height},
 		luminance,
 		width,
 		height,
 		0,
 		0,
+	}}
+}
+
+func (this *GoImageLuminanceSource) Crop(left, top, width, height int) (LuminanceSource, error) {
+	cropped, e := this.RGBLuminanceSource.Crop(left, top, width, height)
+	if e != nil {
+		return nil, e
 	}
+	return &GoImageLuminanceSource{cropped.(*RGBLuminanceSource)}, nil
+}
+
+func (this *GoImageLuminanceSource) Invert() LuminanceSource {
+	return LuminanceSourceInvert(this)
+}
+
+func (this *GoImageLuminanceSource) IsRotateSupported() bool {
+	return true
+}
+
+func (this *GoImageLuminanceSource) RotateCounterClockwise() (LuminanceSource, error) {
+	width := this.GetWidth()
+	height := this.GetHeight()
+	top := this.top
+	left := this.left
+	dataWidth := this.dataWidth
+	oldLuminas := this.RGBLuminanceSource.luminances
+	newLuminas := make([]byte, width*height)
+
+	for j := 0; j < width; j++ {
+		x := left + width - 1 - j
+		for i := 0; i < height; i++ {
+			y := top + i
+			newLuminas[j*height+i] = oldLuminas[y*dataWidth+x]
+		}
+	}
+	return &GoImageLuminanceSource{&RGBLuminanceSource{
+		LuminanceSourceBase{height, width},
+		newLuminas,
+		height,
+		width,
+		0,
+		0,
+	}}, nil
+}
+
+func (this *GoImageLuminanceSource) RotateCounterClockwise45() (LuminanceSource, error) {
+	return nil, errors.New("RotateCounterClockwise45 is not implemented")
 }

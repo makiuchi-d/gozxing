@@ -183,8 +183,7 @@ func TestEan13Reader(t *testing.T) {
 	testFile(t, reader, "testdata/ean13/33.png", "9781558604971", nil)
 	// original zxing could't read too
 	// testFile(t, reader, "testdata/ean13/34.png", "9781558604971", harder)
-	// rotation support required
-	// testFile(t, reader, "testdata/ean13/35.png", "5030159003930", harder)
+	testFile(t, reader, "testdata/ean13/35.png", "5030159003930", harder)
 	// original zxing couldn't read too
 	// testFile(t, reader, "testdata/ean13/36.png", "5000213101025", harder)
 	testFile(t, reader, "testdata/ean13/37.png", "5000213002834", harder)
