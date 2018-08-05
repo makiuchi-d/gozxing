@@ -147,7 +147,7 @@ func TestEan13Reader_decodeMiddle(t *testing.T) {
 
 func TestEan13Reader(t *testing.T) {
 	// testdata from zxing core/src/test/resources/blackbox/ean13-1/
-	reader := NewEan13Reader()
+	reader := NewEAN13Reader()
 	harder := map[gozxing.DecodeHintType]interface{}{
 		gozxing.DecodeHintType_TRY_HARDER: true,
 	}
@@ -196,7 +196,7 @@ func TestEan13ReaderWithExtension(t *testing.T) {
 		gozxing.DecodeHintType_ALLOWED_EAN_EXTENSIONS: []int{2, 5},
 	}
 
-	reader := NewEan13Reader()
+	reader := NewEAN13Reader()
 	result, e := readFile(reader, "testdata/ean13/ean13-1.png", hints)
 	if e != nil {
 		t.Fatalf("read file failed, %v", e)

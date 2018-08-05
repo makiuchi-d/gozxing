@@ -41,7 +41,7 @@ type ean13Reader struct {
 	decodeMiddleCounters []int
 }
 
-func NewEan13Reader() *OneDReader {
+func NewEAN13Reader() *OneDReader {
 	return NewUPCEANReader(&ean13Reader{
 		decodeMiddleCounters: make([]int, 4),
 	})
