@@ -53,7 +53,7 @@ func init() {
 	}
 }
 
-type middleDecoder interface {
+type internalDecoder interface {
 	// getBarcodeFormat Get the format of this decoder.
 	// @return The 1D format.
 	getBarcodeFormat() gozxing.BarcodeFormat
@@ -67,18 +67,26 @@ type middleDecoder interface {
 	// @return horizontal offset of first pixel after the "middle" that was decoded
 	// @throws NotFoundException if decoding could not complete successfully
 	decodeMiddle(row *gozxing.BitArray, startRange []int, result []byte) (int, []byte, error)
+
+	decodeEnd(row *gozxing.BitArray, endStart int) ([]int, error)
+
+	// checkChecksum Check checksum
+	// @param s string of digits to check
+	// @return {@link #checkStandardUPCEANChecksum(CharSequence)}
+	// @throws FormatException if the string does not contain only digits
+	checkChecksum(s string) (bool, error)
 }
 
 type upceanReader struct {
-	middleDecoder
+	internalDecoder
 	decodeRowStringBuffer []byte
 	extensionReader       *UPCEANExtensionSupport
 }
 
-func NewUPCEANReader(middle middleDecoder) *OneDReader {
+func NewUPCEANReader(decoder internalDecoder) *OneDReader {
 	return &OneDReader{
 		&upceanReader{
-			middleDecoder:         middle,
+			internalDecoder:       decoder,
 			decodeRowStringBuffer: make([]byte, 13),
 			extensionReader:       NewUPCEANExtensionSupport(),
 		},
@@ -157,7 +165,7 @@ func (this *upceanReader) decodeRowWithStartRange(
 		resultPointCallback(gozxing.NewResultPoint(float64(endStart), rowNumberf))
 	}
 
-	endRange, e := upceanReader_decodeEnd(row, endStart)
+	endRange, e := this.decodeEnd(row, endStart)
 	if e != nil {
 		return nil, e
 	}
@@ -186,7 +194,7 @@ func (this *upceanReader) decodeRowWithStartRange(
 	if len(resultString) < 8 {
 		return nil, gozxing.GetFormatExceptionInstance()
 	}
-	ok, e := upceanReader_checkChecksum(resultString)
+	ok, e := this.checkChecksum(resultString)
 	if e != nil {
 		return nil, e
 	}

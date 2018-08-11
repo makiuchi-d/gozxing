@@ -55,7 +55,7 @@ func (this *testBitMatrixSource) String() string {
 }
 
 func TestNewQRCodeReader(t *testing.T) {
-	reader := NewQRCodeReader()
+	reader := NewQRCodeReader().(*QRCodeReader)
 	if reader.GetDecoder() == nil {
 		t.Fatalf("decoder must not be nil")
 	}
@@ -159,7 +159,7 @@ func TestQRCodeReader_DecodeBitMatrixSource(t *testing.T) {
 }
 
 func TestQRCodeReader_moduleSize(t *testing.T) {
-	reader := NewQRCodeReader()
+	reader := NewQRCodeReader().(*QRCodeReader)
 	matrix, _ := gozxing.ParseStringToBitMatrix(""+
 		"                 \n"+
 		" ##############  \n"+
@@ -194,7 +194,7 @@ func TestQRCodeReader_moduleSize(t *testing.T) {
 }
 
 func TestQRCodeReader_extractPureBits(t *testing.T) {
-	reader := NewQRCodeReader()
+	reader := NewQRCodeReader().(*QRCodeReader)
 	matrix, _ := gozxing.NewBitMatrix(32, 32)
 	var r *gozxing.BitMatrix
 	var e error

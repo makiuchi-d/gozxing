@@ -162,7 +162,7 @@ func TestOneDReader_doDecode(t *testing.T) {
 	src := newTestBitSource(1, "")
 	bmp, _ := gozxing.NewBinaryBitmap(common.NewGlobalHistgramBinarizer(src))
 
-	reader := NewEAN8Reader()
+	reader := NewEAN8Reader().(*OneDReader)
 
 	_, e := reader.doDecode(bmp, nil)
 	if e == nil {

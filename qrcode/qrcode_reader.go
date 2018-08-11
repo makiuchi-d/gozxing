@@ -12,7 +12,7 @@ type QRCodeReader struct {
 	decoder *decoder.Decoder
 }
 
-func NewQRCodeReader() *QRCodeReader {
+func NewQRCodeReader() gozxing.Reader {
 	return &QRCodeReader{
 		decoder.NewDecoder(),
 	}

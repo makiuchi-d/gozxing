@@ -86,7 +86,7 @@ func TestEan8Reader_decodeMiddle(t *testing.T) {
 
 func TestEAN8Reader(t *testing.T) {
 	// testdata from zxing core/src/test/resources/blackbox/ean8-1/
-	reader := NewEAN8Reader()
+	reader := NewEAN8Reader().(*OneDReader)
 
 	testFile(t, reader, "testdata/ean8/1.png", "48512343", nil)
 	testFile(t, reader, "testdata/ean8/2.png", "12345670", nil)

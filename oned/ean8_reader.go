@@ -8,7 +8,7 @@ type ean8Reader struct {
 	decodeMiddleCounters []int
 }
 
-func NewEAN8Reader() *OneDReader {
+func NewEAN8Reader() gozxing.Reader {
 	return NewUPCEANReader(&ean8Reader{
 		decodeMiddleCounters: make([]int, 4),
 	})
@@ -56,4 +56,12 @@ func (this *ean8Reader) decodeMiddle(row *gozxing.BitArray, startRange []int, re
 
 func (this *ean8Reader) getBarcodeFormat() gozxing.BarcodeFormat {
 	return gozxing.BarcodeFormat_EAN_8
+}
+
+func (this *ean8Reader) decodeEnd(row *gozxing.BitArray, endStart int) ([]int, error) {
+	return upceanReader_decodeEnd(row, endStart)
+}
+
+func (this *ean8Reader) checkChecksum(s string) (bool, error) {
+	return upceanReader_checkChecksum(s)
 }

@@ -149,6 +149,13 @@ func (t *testMiddleDecoder) getBarcodeFormat() gozxing.BarcodeFormat {
 	}
 	return gozxing.BarcodeFormat_EAN_8
 }
+func (this *testMiddleDecoder) decodeEnd(row *gozxing.BitArray, endStart int) ([]int, error) {
+	return upceanReader_decodeEnd(row, endStart)
+}
+func (this *testMiddleDecoder) checkChecksum(s string) (bool, error) {
+	return upceanReader_checkChecksum(s)
+}
+
 
 func TestUPCEANReader_decodeRow(t *testing.T) {
 

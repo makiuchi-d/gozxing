@@ -41,7 +41,7 @@ type ean13Reader struct {
 	decodeMiddleCounters []int
 }
 
-func NewEAN13Reader() *OneDReader {
+func NewEAN13Reader() gozxing.Reader {
 	return NewUPCEANReader(&ean13Reader{
 		decodeMiddleCounters: make([]int, 4),
 	})
@@ -118,4 +118,12 @@ func ean13Reader_determineFirstDigit(lgPatternFound int) (byte, error) {
 		}
 	}
 	return 0, gozxing.GetNotFoundExceptionInstance()
+}
+
+func (this *ean13Reader) decodeEnd(row *gozxing.BitArray, endStart int) ([]int, error) {
+	return upceanReader_decodeEnd(row, endStart)
+}
+
+func (this *ean13Reader) checkChecksum(s string) (bool, error) {
+	return upceanReader_checkChecksum(s)
 }
