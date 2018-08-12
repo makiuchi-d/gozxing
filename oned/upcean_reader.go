@@ -83,13 +83,11 @@ type upceanReader struct {
 	extensionReader       *UPCEANExtensionSupport
 }
 
-func NewUPCEANReader(decoder internalDecoder) *OneDReader {
-	return &OneDReader{
-		&upceanReader{
-			internalDecoder:       decoder,
-			decodeRowStringBuffer: make([]byte, 13),
-			extensionReader:       NewUPCEANExtensionSupport(),
-		},
+func NewUPCEANReader(decoder internalDecoder) *upceanReader {
+	return &upceanReader{
+		internalDecoder:       decoder,
+		decodeRowStringBuffer: make([]byte, 13),
+		extensionReader:       NewUPCEANExtensionSupport(),
 	}
 }
 

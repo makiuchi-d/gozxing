@@ -9,9 +9,9 @@ type ean8Reader struct {
 }
 
 func NewEAN8Reader() gozxing.Reader {
-	return NewUPCEANReader(&ean8Reader{
+	return NewOneDReader(NewUPCEANReader(&ean8Reader{
 		decodeMiddleCounters: make([]int, 4),
-	})
+	}))
 }
 
 func (this *ean8Reader) decodeMiddle(row *gozxing.BitArray, startRange []int, result []byte) (int, []byte, error) {

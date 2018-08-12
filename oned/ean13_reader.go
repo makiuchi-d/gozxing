@@ -42,9 +42,9 @@ type ean13Reader struct {
 }
 
 func NewEAN13Reader() gozxing.Reader {
-	return NewUPCEANReader(&ean13Reader{
+	return NewOneDReader(NewUPCEANReader(&ean13Reader{
 		decodeMiddleCounters: make([]int, 4),
-	})
+	}))
 }
 
 func (this *ean13Reader) decodeMiddle(row *gozxing.BitArray, startRange []int, resultString []byte) (int, []byte, error) {

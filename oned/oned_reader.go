@@ -24,6 +24,12 @@ type rowDecoder interface {
 	decodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error)
 }
 
+func NewOneDReader(decoder rowDecoder) *OneDReader {
+	return &OneDReader{
+		rowDecoder: decoder,
+	}
+}
+
 func (this *OneDReader) DecodeWithoutHints(image *gozxing.BinaryBitmap) (*gozxing.Result, error) {
 	return this.Decode(image, nil)
 }
