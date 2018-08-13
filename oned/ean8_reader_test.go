@@ -86,14 +86,15 @@ func TestEan8Reader_decodeMiddle(t *testing.T) {
 
 func TestEAN8Reader(t *testing.T) {
 	// testdata from zxing core/src/test/resources/blackbox/ean8-1/
-	reader := NewEAN8Reader().(*OneDReader)
+	reader := NewEAN8Reader()
+	format := gozxing.BarcodeFormat_EAN_8
 
-	testFile(t, reader, "testdata/ean8/1.png", "48512343", nil)
-	testFile(t, reader, "testdata/ean8/2.png", "12345670", nil)
-	testFile(t, reader, "testdata/ean8/3.png", "12345670", nil)
-	testFile(t, reader, "testdata/ean8/4.png", "67678983", nil)
-	testFile(t, reader, "testdata/ean8/5.png", "80674313", nil)
-	testFile(t, reader, "testdata/ean8/6.png", "59001270", nil)
-	testFile(t, reader, "testdata/ean8/7.png", "50487066", nil)
-	testFile(t, reader, "testdata/ean8/8.png", "55123457", nil)
+	testFile(t, reader, "testdata/ean8/1.png", "48512343", format, nil)
+	testFile(t, reader, "testdata/ean8/2.png", "12345670", format, nil)
+	testFile(t, reader, "testdata/ean8/3.png", "12345670", format, nil)
+	testFile(t, reader, "testdata/ean8/4.png", "67678983", format, nil)
+	testFile(t, reader, "testdata/ean8/5.png", "80674313", format, nil)
+	testFile(t, reader, "testdata/ean8/6.png", "59001270", format, nil)
+	testFile(t, reader, "testdata/ean8/7.png", "50487066", format, nil)
+	testFile(t, reader, "testdata/ean8/8.png", "55123457", format, nil)
 }

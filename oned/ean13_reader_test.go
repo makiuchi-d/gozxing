@@ -147,47 +147,48 @@ func TestEan13Reader_decodeMiddle(t *testing.T) {
 
 func TestEan13Reader(t *testing.T) {
 	// testdata from zxing core/src/test/resources/blackbox/ean13-1/
-	reader := NewEAN13Reader().(*OneDReader)
+	reader := NewEAN13Reader()
+	format := gozxing.BarcodeFormat_EAN_13
 	harder := map[gozxing.DecodeHintType]interface{}{
 		gozxing.DecodeHintType_TRY_HARDER: true,
 	}
 
-	testFile(t, reader, "testdata/ean13/1.png", "8413000065504", nil)
-	testFile(t, reader, "testdata/ean13/2.png", "8480010092271", nil)
-	testFile(t, reader, "testdata/ean13/3.png", "8480000823274", nil)
-	testFile(t, reader, "testdata/ean13/4.png", "5449000039231", nil)
-	testFile(t, reader, "testdata/ean13/5.png", "8410054010412", nil)
-	testFile(t, reader, "testdata/ean13/6.png", "8480010045062", nil)
-	testFile(t, reader, "testdata/ean13/7.png", "9788430532674", nil)
-	testFile(t, reader, "testdata/ean13/8.png", "8480017507990", nil)
-	testFile(t, reader, "testdata/ean13/9.png", "3166298099809", nil)
-	testFile(t, reader, "testdata/ean13/10.png", "8480010001136", nil)
-	testFile(t, reader, "testdata/ean13/12.png", "5201815331227", nil)
-	testFile(t, reader, "testdata/ean13/13.png", "8413600298517", nil)
-	testFile(t, reader, "testdata/ean13/14.png", "3560070169443", nil)
-	testFile(t, reader, "testdata/ean13/15.png", "4045787034318", nil)
-	testFile(t, reader, "testdata/ean13/18.png", "3086126100326", nil)
-	testFile(t, reader, "testdata/ean13/19.png", "4820024790635", nil)
-	testFile(t, reader, "testdata/ean13/20.png", "4000539017100", harder)
-	testFile(t, reader, "testdata/ean13/21.png", "7622200008018", nil)
-	testFile(t, reader, "testdata/ean13/22.png", "5603667020517", nil)
-	testFile(t, reader, "testdata/ean13/23.png", "7622400791949", nil)
-	testFile(t, reader, "testdata/ean13/24.png", "5709262942503", nil)
-	testFile(t, reader, "testdata/ean13/25.png", "9780140013993", nil)
-	testFile(t, reader, "testdata/ean13/26.png", "4901780188352", nil)
-	testFile(t, reader, "testdata/ean13/28.png", "9771699057002", nil)
-	testFile(t, reader, "testdata/ean13/29.png", "4007817327098", nil)
-	testFile(t, reader, "testdata/ean13/30.png", "5025121072311", nil)
-	testFile(t, reader, "testdata/ean13/31.png", "9780393058673", nil)
-	testFile(t, reader, "testdata/ean13/32.png", "9780393058673", nil)
-	testFile(t, reader, "testdata/ean13/33.png", "9781558604971", nil)
+	testFile(t, reader, "testdata/ean13/1.png", "8413000065504", format, nil)
+	testFile(t, reader, "testdata/ean13/2.png", "8480010092271", format, nil)
+	testFile(t, reader, "testdata/ean13/3.png", "8480000823274", format, nil)
+	testFile(t, reader, "testdata/ean13/4.png", "5449000039231", format, nil)
+	testFile(t, reader, "testdata/ean13/5.png", "8410054010412", format, nil)
+	testFile(t, reader, "testdata/ean13/6.png", "8480010045062", format, nil)
+	testFile(t, reader, "testdata/ean13/7.png", "9788430532674", format, nil)
+	testFile(t, reader, "testdata/ean13/8.png", "8480017507990", format, nil)
+	testFile(t, reader, "testdata/ean13/9.png", "3166298099809", format, nil)
+	testFile(t, reader, "testdata/ean13/10.png", "8480010001136", format, nil)
+	testFile(t, reader, "testdata/ean13/12.png", "5201815331227", format, nil)
+	testFile(t, reader, "testdata/ean13/13.png", "8413600298517", format, nil)
+	testFile(t, reader, "testdata/ean13/14.png", "3560070169443", format, nil)
+	testFile(t, reader, "testdata/ean13/15.png", "4045787034318", format, nil)
+	testFile(t, reader, "testdata/ean13/18.png", "3086126100326", format, nil)
+	testFile(t, reader, "testdata/ean13/19.png", "4820024790635", format, nil)
+	testFile(t, reader, "testdata/ean13/20.png", "4000539017100", format, harder)
+	testFile(t, reader, "testdata/ean13/21.png", "7622200008018", format, nil)
+	testFile(t, reader, "testdata/ean13/22.png", "5603667020517", format, nil)
+	testFile(t, reader, "testdata/ean13/23.png", "7622400791949", format, nil)
+	testFile(t, reader, "testdata/ean13/24.png", "5709262942503", format, nil)
+	testFile(t, reader, "testdata/ean13/25.png", "9780140013993", format, nil)
+	testFile(t, reader, "testdata/ean13/26.png", "4901780188352", format, nil)
+	testFile(t, reader, "testdata/ean13/28.png", "9771699057002", format, nil)
+	testFile(t, reader, "testdata/ean13/29.png", "4007817327098", format, nil)
+	testFile(t, reader, "testdata/ean13/30.png", "5025121072311", format, nil)
+	testFile(t, reader, "testdata/ean13/31.png", "9780393058673", format, nil)
+	testFile(t, reader, "testdata/ean13/32.png", "9780393058673", format, nil)
+	testFile(t, reader, "testdata/ean13/33.png", "9781558604971", format, nil)
 	// original zxing could't read too
-	// testFile(t, reader, "testdata/ean13/34.png", "9781558604971", harder)
-	testFile(t, reader, "testdata/ean13/35.png", "5030159003930", harder)
+	// testFile(t, reader, "testdata/ean13/34.png", "9781558604971", format, harder)
+	testFile(t, reader, "testdata/ean13/35.png", "5030159003930", format, harder)
 	// original zxing couldn't read too
-	// testFile(t, reader, "testdata/ean13/36.png", "5000213101025", harder)
-	testFile(t, reader, "testdata/ean13/37.png", "5000213002834", harder)
-	testFile(t, reader, "testdata/ean13/38.png", "9780201752847", harder)
+	// testFile(t, reader, "testdata/ean13/36.png", "5000213101025", format, harder)
+	testFile(t, reader, "testdata/ean13/37.png", "5000213002834", format, harder)
+	testFile(t, reader, "testdata/ean13/38.png", "9780201752847", format, harder)
 }
 
 func TestEan13ReaderWithExtension(t *testing.T) {
@@ -196,7 +197,7 @@ func TestEan13ReaderWithExtension(t *testing.T) {
 		gozxing.DecodeHintType_ALLOWED_EAN_EXTENSIONS: []int{2, 5},
 	}
 
-	reader := NewEAN13Reader().(*OneDReader)
+	reader := NewEAN13Reader()
 	result, e := readFile(reader, "testdata/ean13/ean13-1.png", hints)
 	if e != nil {
 		t.Fatalf("read file failed, %v", e)

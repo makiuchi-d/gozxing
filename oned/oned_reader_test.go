@@ -12,7 +12,7 @@ import (
 	"github.com/makiuchi-d/gozxing/common"
 )
 
-func readFile(reader *OneDReader, filename string, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
+func readFile(reader gozxing.Reader, filename string, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
 	file, e := os.Open(filename)
 	if e != nil {
 		return nil, e
@@ -30,13 +30,17 @@ func readFile(reader *OneDReader, filename string, hints map[gozxing.DecodeHintT
 	return reader.Decode(bmp, hints)
 }
 
-func testFile(t *testing.T, reader *OneDReader, file, expect string, hints map[gozxing.DecodeHintType]interface{}) {
+func testFile(t *testing.T, reader gozxing.Reader, file, expectText string,
+	expectFormat gozxing.BarcodeFormat, hints map[gozxing.DecodeHintType]interface{}) {
 	result, e := readFile(reader, file, hints)
 	if e != nil {
 		t.Fatalf("testFail(%v) readFile failed: %v", file, e)
 	}
-	if txt := result.GetText(); txt != expect {
-		t.Fatalf("testFile(%v) = %v, expect %v", file, txt, expect)
+	if txt := result.GetText(); txt != expectText {
+		t.Fatalf("testFile(%v) = %v, expect %v", file, txt, expectText)
+	}
+	if format := result.GetBarcodeFormat(); format != expectFormat {
+		t.Fatalf("testFile(%v) format = %v, expect %v", file, format, expectFormat)
 	}
 }
 

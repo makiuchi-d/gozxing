@@ -93,9 +93,10 @@ func TestConvertUPCEtoUPCA(t *testing.T) {
 
 func TestUPCEReader(t *testing.T) {
 	// testdata from zxing core/src/test/resources/blackbox/upce-1/
-	reader := NewUPCEReader().(*OneDReader)
+	reader := NewUPCEReader()
+	format := gozxing.BarcodeFormat_UPC_E
 
-	testFile(t, reader, "testdata/upce/1.png", "01234565", nil)
-	testFile(t, reader, "testdata/upce/2.png", "00123457", nil)
-	testFile(t, reader, "testdata/upce/4.png", "01234531", nil)
+	testFile(t, reader, "testdata/upce/1.png", "01234565", format, nil)
+	testFile(t, reader, "testdata/upce/2.png", "00123457", format, nil)
+	testFile(t, reader, "testdata/upce/4.png", "01234531", format, nil)
 }
