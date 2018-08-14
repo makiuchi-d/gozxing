@@ -58,6 +58,9 @@ func (this *OneDReader) Decode(
 	}
 
 	result, e = this.doDecode(rotatedImage, hints)
+	if e != nil {
+		return nil, e
+	}
 	// Record that we found it rotated 90 degrees CCW / 270 degrees CW
 	metadata := result.GetResultMetadata()
 	orientation := 270

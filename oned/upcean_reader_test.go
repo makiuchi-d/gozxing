@@ -156,7 +156,6 @@ func (this *testMiddleDecoder) checkChecksum(s string) (bool, error) {
 	return upceanReader_checkChecksum(s)
 }
 
-
 func TestUPCEANReader_decodeRow(t *testing.T) {
 
 	// no start guard
