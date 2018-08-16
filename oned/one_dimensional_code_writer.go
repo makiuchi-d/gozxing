@@ -19,7 +19,7 @@ type OneDimensionalCodeWriter struct {
 
 func NewOneDimensionalCodeWriter(enc encoder) *OneDimensionalCodeWriter {
 	return &OneDimensionalCodeWriter{
-		encoder: enc,
+		encoder:       enc,
 		defaultMargin: 10,
 	}
 }
@@ -93,6 +93,7 @@ func onedWriter_renderResult(code []bool, width, height, sidesMargin int) (*gozx
 	}
 	return output, nil
 }
+
 // onedWriter_appendPattern append pattern
 // @param target encode black/white pattern into this array
 // @param pos position to start encoding at in {@code target}
@@ -103,7 +104,7 @@ func onedWriter_appendPattern(target []bool, pos int, pattern []int, startColor 
 	color := startColor
 	numAdded := 0
 	for _, len := range pattern {
-		for j:=0; j< len; j++ {
+		for j := 0; j < len; j++ {
 			target[pos] = color
 			pos++
 		}
