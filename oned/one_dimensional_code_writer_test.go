@@ -1,6 +1,7 @@
 package oned
 
 import (
+	"errors"
 	"reflect"
 	"testing"
 
@@ -9,12 +10,19 @@ import (
 
 type dummyEncoder struct{}
 
-func (enc dummyEncoder) encodeString(contents string) []bool {
+func (dummyEncoder) encodeContents(contents string) ([]bool, error) {
 	code := make([]bool, 0)
 	for _, c := range contents {
+		if c != '1' && c != '0' {
+			return nil, errors.New("dummy encoder error")
+		}
 		code = append(code, c != '0')
 	}
-	return code
+	return code, nil
+}
+
+func (dummyEncoder) getFormat() gozxing.BarcodeFormat {
+	return gozxing.BarcodeFormat_UPC_A
 }
 
 func TestOnedWriter_renderResult(t *testing.T) {
@@ -47,7 +55,7 @@ func TestOnedWriter_renderResult(t *testing.T) {
 func TestOnedWriter_appendPattern(t *testing.T) {
 	target := make([]bool, 10)
 
-	numAdded, target := onedWriter_appendPattern(target, 3, []int{1, 2, 3}, true)
+	numAdded := onedWriter_appendPattern(target, 3, []int{1, 2, 3}, true)
 	if numAdded != 1+2+3 {
 		t.Fatalf("appendPattern numAdded = %v, expect %v", numAdded, 1+2+3)
 	}
@@ -62,12 +70,22 @@ func TestOnedWriter_appendPattern(t *testing.T) {
 func TestOnedWriter_encode(t *testing.T) {
 	writer := NewOneDimensionalCodeWriter(dummyEncoder{})
 
-	_, e := writer.EncodeWithoutHint("", gozxing.BarcodeFormat_UPC_A, 10, 1)
+	_, e := writer.EncodeWithoutHint("", gozxing.BarcodeFormat_EAN_13, 10, 1)
+	if e == nil {
+		t.Fatalf("Encode must be error")
+	}
+
+	_, e = writer.EncodeWithoutHint("", gozxing.BarcodeFormat_UPC_A, 10, 1)
 	if e == nil {
 		t.Fatalf("Encode must be error")
 	}
 
 	_, e = writer.EncodeWithoutHint("10110001", gozxing.BarcodeFormat_UPC_A, -1, -1)
+	if e == nil {
+		t.Fatalf("Encode must be error")
+	}
+
+	_, e = writer.EncodeWithoutHint("a", gozxing.BarcodeFormat_UPC_A, 1, 1)
 	if e == nil {
 		t.Fatalf("Encode must be error")
 	}

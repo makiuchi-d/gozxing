@@ -9,7 +9,8 @@ import (
 )
 
 type encoder interface {
-	encodeString(contents string) []bool
+	encodeContents(contents string) ([]bool, error)
+	getFormat() gozxing.BarcodeFormat
 }
 
 type OneDimensionalCodeWriter struct {
@@ -38,6 +39,10 @@ func (this *OneDimensionalCodeWriter) Encode(
 	contents string, format gozxing.BarcodeFormat, width, height int,
 	hints map[gozxing.EncodeHintType]interface{}) (*gozxing.BitMatrix, error) {
 
+	if f := this.getFormat(); format != f {
+		return nil, fmt.Errorf("IllegalArgumentException: Can only encode %v, but got %v", f, format)
+	}
+
 	if len(contents) == 0 {
 		return nil, errors.New("IllegalArgumentException: Found empty contents")
 	}
@@ -61,7 +66,10 @@ func (this *OneDimensionalCodeWriter) Encode(
 		}
 	}
 
-	code := this.encodeString(contents)
+	code, e := this.encodeContents(contents)
+	if e != nil {
+		return nil, e
+	}
 	return onedWriter_renderResult(code, width, height, sidesMargin)
 }
 
@@ -100,7 +108,7 @@ func onedWriter_renderResult(code []bool, width, height, sidesMargin int) (*gozx
 // @param pattern lengths of black/white runs to encode
 // @param startColor starting color - false for white, true for black
 // @return the number of elements added to target.
-func onedWriter_appendPattern(target []bool, pos int, pattern []int, startColor bool) (int, []bool) {
+func onedWriter_appendPattern(target []bool, pos int, pattern []int, startColor bool) int {
 	color := startColor
 	numAdded := 0
 	for _, len := range pattern {
@@ -111,5 +119,5 @@ func onedWriter_appendPattern(target []bool, pos int, pattern []int, startColor 
 		numAdded += len
 		color = !color
 	}
-	return numAdded, target
+	return numAdded
 }
