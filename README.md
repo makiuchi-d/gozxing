@@ -23,7 +23,7 @@ This project is a port of Zxing core library to pure Go.
 
 | Format      | Scanning           | Encoding           |
 |-------------|--------------------|--------------------|
-| UPC-A       | :heavy_check_mark: |                    |
+| UPC-A       | :heavy_check_mark: | :heavy_check_mark: |
 | UPC-E       | :heavy_check_mark: |                    |
 | EAN-8       | :heavy_check_mark: | :heavy_check_mark: |
 | EAN-13      | :heavy_check_mark: | :heavy_check_mark: |
