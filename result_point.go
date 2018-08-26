@@ -1,7 +1,7 @@
 package gozxing
 
 import (
-	"github.com/makiuchi-d/gozxing/common/detector"
+	"github.com/makiuchi-d/gozxing/common/util"
 )
 
 type ResultPoint interface {
@@ -62,7 +62,7 @@ func ResultPoint_OrderBestPatterns(pattern0, pattern1, pattern2 ResultPoint) (po
 }
 
 func ResultPoint_Distance(pattern1, pattern2 ResultPoint) float64 {
-	return detector.MathUtils_DistanceFloat(pattern1.GetX(), pattern1.GetY(), pattern2.GetX(), pattern2.GetY())
+	return util.MathUtils_DistanceFloat(pattern1.GetX(), pattern1.GetY(), pattern2.GetX(), pattern2.GetY())
 }
 
 func crossProductZ(pointA, pointB, pointC ResultPoint) float64 {

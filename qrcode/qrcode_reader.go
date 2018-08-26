@@ -3,7 +3,7 @@ package qrcode
 import (
 	"github.com/makiuchi-d/gozxing"
 	"github.com/makiuchi-d/gozxing/common"
-	commondetector "github.com/makiuchi-d/gozxing/common/detector"
+	"github.com/makiuchi-d/gozxing/common/util"
 	"github.com/makiuchi-d/gozxing/qrcode/decoder"
 	"github.com/makiuchi-d/gozxing/qrcode/detector"
 )
@@ -118,8 +118,8 @@ func (this *QRCodeReader) extractPureBits(image *gozxing.BitMatrix) (*gozxing.Bi
 		}
 	}
 
-	matrixWidth := commondetector.MathUtils_Round(float64(right-left+1) / moduleSize)
-	matrixHeight := commondetector.MathUtils_Round(float64(bottom-top+1) / moduleSize)
+	matrixWidth := util.MathUtils_Round(float64(right-left+1) / moduleSize)
+	matrixHeight := util.MathUtils_Round(float64(bottom-top+1) / moduleSize)
 	if matrixWidth <= 0 || matrixHeight <= 0 {
 		return nil, gozxing.GetNotFoundExceptionInstance()
 	}

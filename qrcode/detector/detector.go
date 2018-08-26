@@ -5,7 +5,7 @@ import (
 
 	"github.com/makiuchi-d/gozxing"
 	"github.com/makiuchi-d/gozxing/common"
-	commondetector "github.com/makiuchi-d/gozxing/common/detector"
+	"github.com/makiuchi-d/gozxing/common/util"
 	"github.com/makiuchi-d/gozxing/qrcode/decoder"
 )
 
@@ -151,8 +151,8 @@ func Detector_sampleGrid(image *gozxing.BitMatrix, transform *common.Perspective
 }
 
 func (this *Detector) computeDimension(topLeft, topRight, bottomLeft gozxing.ResultPoint, moduleSize float64) (int, error) {
-	tltrCentersDimension := commondetector.MathUtils_Round(gozxing.ResultPoint_Distance(topLeft, topRight) / moduleSize)
-	tlblCentersDimension := commondetector.MathUtils_Round(gozxing.ResultPoint_Distance(topLeft, bottomLeft) / moduleSize)
+	tltrCentersDimension := util.MathUtils_Round(gozxing.ResultPoint_Distance(topLeft, topRight) / moduleSize)
+	tlblCentersDimension := util.MathUtils_Round(gozxing.ResultPoint_Distance(topLeft, bottomLeft) / moduleSize)
 	dimension := ((tltrCentersDimension + tlblCentersDimension) / 2) + 7
 	switch dimension % 4 {
 	default: // 1? do nothing
@@ -273,7 +273,7 @@ func (this *Detector) sizeOfBlackWhiteBlackRun(fromX, fromY, toX, toY int) float
 		// color, advance to next state or end if we are in state 2 already
 		if (state == 1) == this.image.Get(realX, realY) {
 			if state == 2 {
-				return commondetector.MathUtils_DistanceInt(x, y, fromX, fromY)
+				return util.MathUtils_DistanceInt(x, y, fromX, fromY)
 			}
 			state++
 		}
@@ -291,7 +291,7 @@ func (this *Detector) sizeOfBlackWhiteBlackRun(fromX, fromY, toX, toY int) float
 	// is "white" so this last point at (toX+xStep,toY) is the right ending. This is really a
 	// small approximation; (toX+xStep,toY+yStep) might be really correct. Ignore this.
 	if state == 2 {
-		return commondetector.MathUtils_DistanceInt(toX+xstep, toY, fromX, fromY)
+		return util.MathUtils_DistanceInt(toX+xstep, toY, fromX, fromY)
 	}
 	// else we didn't find even black-white-black; no estimate is really possible
 	return math.NaN()
