@@ -54,6 +54,10 @@ func (ean13Encoder) encodeContents(contents string) ([]bool, error) {
 			"Requested contents should be 12 or 13 digits long, but got %v", length)
 	}
 
+	if e := onedWriter_checkNumeric(contents); e != nil {
+		return nil, e
+	}
+
 	firstDigit := contents[0] - '0'
 	parities := ean13Reader_FIRST_DIGIT_ENCODINGS[firstDigit]
 	result := make([]bool, ean13Writer_CODE_WIDTH)

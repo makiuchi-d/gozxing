@@ -48,6 +48,10 @@ func (upcEEncoder) encodeContents(contents string) ([]bool, error) {
 			"Requested contents should be 8 digits long, but got %v", length)
 	}
 
+	if e := onedWriter_checkNumeric(contents); e != nil {
+		return nil, e
+	}
+
 	firstDigit := contents[0] - '0'
 	if firstDigit != 0 && firstDigit != 1 {
 		return nil, fmt.Errorf("IllegalArgumentException: Number system must be 0 or 1")

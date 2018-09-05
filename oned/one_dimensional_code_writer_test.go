@@ -52,6 +52,18 @@ func TestOnedWriter_renderResult(t *testing.T) {
 	}
 }
 
+func TestOnedWriter_checkNumeric(t *testing.T) {
+	e := onedWriter_checkNumeric("1234567890")
+	if e != nil {
+		t.Fatalf("onedWriter_checkNumeric returns error, %v", e)
+	}
+
+	e = onedWriter_checkNumeric("1234a56789")
+	if e == nil {
+		t.Fatalf("onedWriter_checkNumeric must be error")
+	}
+}
+
 func TestOnedWriter_appendPattern(t *testing.T) {
 	target := make([]bool, 10)
 

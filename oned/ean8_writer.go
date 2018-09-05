@@ -52,6 +52,10 @@ func (ean8Encoder) encodeContents(contents string) ([]bool, error) {
 			"Requested contents should be 8 digits long, but got %v", length)
 	}
 
+	if e := onedWriter_checkNumeric(contents); e != nil {
+		return nil, e
+	}
+
 	result := make([]bool, ean8Writer_CODE_WIDTH)
 	pos := 0
 

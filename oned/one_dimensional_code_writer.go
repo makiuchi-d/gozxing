@@ -102,6 +102,16 @@ func onedWriter_renderResult(code []bool, width, height, sidesMargin int) (*gozx
 	return output, nil
 }
 
+// onedWriter_checkNumeric returns IllegalArgumentException if input contains characters other than digits 0-9.
+func onedWriter_checkNumeric(contents string) error {
+	for _, c := range contents {
+		if c < '0' || c > '9' {
+			return errors.New("IllegalArgumentException: Input should only contain digits 0-9")
+		}
+	}
+	return nil
+}
+
 // onedWriter_appendPattern append pattern
 // @param target encode black/white pattern into this array
 // @param pos position to start encoding at in {@code target}

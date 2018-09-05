@@ -72,6 +72,10 @@ func TestEAN8Writer_encodeContents(t *testing.T) {
 func TestEAN8Writer(t *testing.T) {
 	writer := NewEAN8Writer()
 
+	if _, e := writer.Encode("96385abc", gozxing.BarcodeFormat_EAN_8, 0, 0, nil); e == nil {
+		t.Fatalf("Encode must be error")
+	}
+
 	expect, _ := gozxing.ParseStringToBitMatrix(""+
 		"    # #  ##  #  #  ## #### # #   ## # # #  ### # #    #   #  ###  # # #     \n"+
 		"    # #  ##  #  #  ## #### # #   ## # # #  ### # #    #   #  ###  # # #     \n"+

@@ -75,6 +75,10 @@ func TestUPCEWriter_encodeContents(t *testing.T) {
 func TestUPCEWriter(t *testing.T) {
 	writer := NewUPCEWriter()
 
+	if _, e := writer.Encode("05096abc", gozxing.BarcodeFormat_UPC_E, 0, 0, nil); e == nil {
+		t.Fatalf("Encode must be error")
+	}
+
 	expect, _ := gozxing.ParseStringToBitMatrix(""+
 		"    # #  #  ## #### # #   ## ###  #    # #  #   # # # #     \n"+
 		"    # #  #  ## #### # #   ## ###  #    # #  #   # # # #     \n"+
