@@ -52,7 +52,7 @@ func (b *BitArray) GetNextSet(from int) int {
 	}
 	bitsOffset := from / 32
 	currentBits := b.bits[bitsOffset]
-	currentBits &= ^((1 << uint(from%32)) - 1)
+	currentBits &= -(1 << uint(from&0x1F))
 	for currentBits == 0 {
 		bitsOffset++
 		if bitsOffset == len(b.bits) {
@@ -73,7 +73,7 @@ func (b *BitArray) GetNextUnset(from int) int {
 	}
 	bitsOffset := from / 32
 	currentBits := ^b.bits[bitsOffset]
-	currentBits &= ^((1 << uint(from%32)) - 1)
+	currentBits &= -(1 << uint(from&0x1F))
 	for currentBits == 0 {
 		bitsOffset++
 		if bitsOffset == len(b.bits) {

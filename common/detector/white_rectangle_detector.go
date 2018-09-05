@@ -70,7 +70,6 @@ func (this *WhiteRectangleDetector) Detect() ([]gozxing.ResultPoint, error) {
 	down := this.downInit
 	sizeExceeded := false
 	aBlackPointFoundOnBorder := true
-	atLeastOneBlackPointFoundOnBorder := false
 
 	atLeastOneBlackPointFoundOnRight := false
 	atLeastOneBlackPointFoundOnBottom := false
@@ -161,13 +160,9 @@ func (this *WhiteRectangleDetector) Detect() ([]gozxing.ResultPoint, error) {
 			break
 		}
 
-		if aBlackPointFoundOnBorder {
-			atLeastOneBlackPointFoundOnBorder = true
-		}
-
 	}
 
-	if !sizeExceeded && atLeastOneBlackPointFoundOnBorder {
+	if !sizeExceeded {
 
 		maxSize := right - left
 
