@@ -8,7 +8,6 @@ import (
 
 	"golang.org/x/text/encoding/ianaindex"
 	"golang.org/x/text/encoding/japanese"
-	"golang.org/x/text/transform"
 
 	"github.com/makiuchi-d/gozxing"
 	"github.com/makiuchi-d/gozxing/common"
@@ -247,7 +246,7 @@ func chooseMode(content, encoding string) *decoder.Mode {
 
 func isOnlyDoubleByteKanji(content string) bool {
 	enc := japanese.ShiftJIS.NewEncoder()
-	bytes, _, e := transform.Bytes(enc, []byte(content))
+	bytes, e := enc.Bytes([]byte(content))
 	if e != nil {
 		return false
 	}
@@ -573,7 +572,7 @@ func append8BitBytes(content string, bits *gozxing.BitArray, encoding string) er
 		if e != nil {
 			return e
 		}
-		bytes, _, e = transform.Bytes(enc.NewEncoder(), []byte(content))
+		bytes, e = enc.NewEncoder().Bytes([]byte(content))
 		if e != nil {
 			return gozxing.NewWriterExceptionWithError(e)
 		}
@@ -587,7 +586,7 @@ func append8BitBytes(content string, bits *gozxing.BitArray, encoding string) er
 
 func appendKanjiBytes(content string, bits *gozxing.BitArray) error {
 	enc := japanese.ShiftJIS.NewEncoder()
-	bytes, _, e := transform.Bytes(enc, []byte(content))
+	bytes, e := enc.Bytes([]byte(content))
 	if e != nil {
 		return gozxing.NewWriterExceptionWithError(e)
 	}
