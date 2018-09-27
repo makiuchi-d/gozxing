@@ -11,7 +11,7 @@ func testVersion(t *testing.T, row, col int,
 	verNum, symbolRow, symbolCol, dataRegionRow, dataRegionCol, totalCW int,
 	ecCW int, ecbs []ECB, str string) {
 
-	v, e := Version_getVersionForDimensions(row, col)
+	v, e := getVersionForDimensions(row, col)
 	if e != nil {
 		t.Fatalf("getVersionForDimensions(%v, %v) returns error, %v", row, col, e)
 	}
@@ -48,17 +48,17 @@ func testVersion(t *testing.T, row, col int,
 }
 
 func TestVersion(t *testing.T) {
-	_, e := Version_getVersionForDimensions(11, 10)
+	_, e := getVersionForDimensions(11, 10)
 	if _, ok := e.(gozxing.FormatException); !ok {
 		t.Fatalf("getVersionForDimensions(11, 10) must be FormatException, %T", e)
 	}
 
-	_, e = Version_getVersionForDimensions(10, 11)
+	_, e = getVersionForDimensions(10, 11)
 	if _, ok := e.(gozxing.FormatException); !ok {
 		t.Fatalf("getVersionForDimensions(10, 11) must be FormatException, %T", e)
 	}
 
-	_, e = Version_getVersionForDimensions(146, 146)
+	_, e = getVersionForDimensions(146, 146)
 	if _, ok := e.(gozxing.FormatException); !ok {
 		t.Fatalf("getVersionForDimensions(146, 146) must be FormatException, %T", e)
 	}

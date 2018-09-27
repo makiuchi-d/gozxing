@@ -5,7 +5,7 @@ import (
 )
 
 func TestGetDataBlocks(t *testing.T) {
-	version, _ := Version_getVersionForDimensions(10, 10)
+	version, _ := getVersionForDimensions(10, 10)
 	rawCW := make([]byte, version.getTotalCodewords()+10)
 	_, e := DataBlocks_getDataBlocks(rawCW, version)
 	if e == nil {
@@ -13,7 +13,7 @@ func TestGetDataBlocks(t *testing.T) {
 	}
 
 	// version 1
-	version, _ = Version_getVersionForDimensions(10, 10)
+	version, _ = getVersionForDimensions(10, 10)
 	rawCW = make([]byte, version.getTotalCodewords())
 	dbs, e := DataBlocks_getDataBlocks(rawCW, version)
 	if e != nil {
@@ -32,7 +32,7 @@ func TestGetDataBlocks(t *testing.T) {
 	}
 
 	// version 15
-	version, _ = Version_getVersionForDimensions(52, 52)
+	version, _ = getVersionForDimensions(52, 52)
 	rawCW = make([]byte, version.getTotalCodewords())
 	dbs, e = DataBlocks_getDataBlocks(rawCW, version)
 	if e != nil {
@@ -51,7 +51,7 @@ func TestGetDataBlocks(t *testing.T) {
 	}
 
 	// version 24 (special version)
-	version, _ = Version_getVersionForDimensions(144, 144)
+	version, _ = getVersionForDimensions(144, 144)
 	rawCW = make([]byte, version.getTotalCodewords())
 	dbs, e = DataBlocks_getDataBlocks(rawCW, version)
 	if e != nil {
