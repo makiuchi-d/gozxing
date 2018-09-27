@@ -49,7 +49,7 @@ func (ean8Encoder) encodeContents(contents string) ([]bool, error) {
 		break
 	default:
 		return nil, fmt.Errorf("IllegalArgumentException: "+
-			"Requested contents should be 8 digits long, but got %v", length)
+			"Requested contents should be 7 or 8 digits long, but got %v", length)
 	}
 
 	if e := onedWriter_checkNumeric(contents); e != nil {
