@@ -1,58 +1,11 @@
 package qrcode
 
 import (
-	"fmt"
-	"image"
-	_ "image/jpeg"
-	_ "image/png"
-	"os"
 	"testing"
 
 	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/common"
+	"github.com/makiuchi-d/gozxing/testutil"
 )
-
-type testBitMatrixSource struct {
-	gozxing.LuminanceSourceBase
-	matrix *gozxing.BitMatrix
-}
-
-func newTestBitMatrixSource(matrix *gozxing.BitMatrix) gozxing.LuminanceSource {
-	return &testBitMatrixSource{
-		gozxing.LuminanceSourceBase{matrix.GetWidth(), matrix.GetHeight()},
-		matrix,
-	}
-}
-func (this *testBitMatrixSource) GetRow(y int, row []byte) ([]byte, error) {
-	for x := 0; x < this.matrix.GetWidth(); x++ {
-		if this.matrix.Get(x, y) {
-			row[x] = 0
-		} else {
-			row[x] = 255
-		}
-	}
-	return row, nil
-}
-func (this *testBitMatrixSource) GetMatrix() []byte {
-	width := this.GetWidth()
-	height := this.GetHeight()
-	matrix := make([]byte, width*height)
-	for y := 0; y < height; y++ {
-		offset := y * width
-		for x := 0; x < width; x++ {
-			if !this.matrix.Get(x, y) {
-				matrix[offset+x] = 255
-			}
-		}
-	}
-	return matrix
-}
-func (this *testBitMatrixSource) Invert() gozxing.LuminanceSource {
-	return gozxing.LuminanceSourceInvert(this)
-}
-func (this *testBitMatrixSource) String() string {
-	return gozxing.LuminanceSourceString(this)
-}
 
 func TestNewQRCodeReader(t *testing.T) {
 	reader := NewQRCodeReader().(*QRCodeReader)
@@ -64,7 +17,6 @@ func TestNewQRCodeReader(t *testing.T) {
 func TestQRCodeReader_DecodeBitMatrixSource(t *testing.T) {
 	reader := NewQRCodeReader()
 	var matrix *gozxing.BitMatrix
-	var src gozxing.LuminanceSource
 	var bmp *gozxing.BinaryBitmap
 	var e error
 
@@ -103,8 +55,7 @@ func TestQRCodeReader_DecodeBitMatrixSource(t *testing.T) {
 
 	// fail GetBitMatrixMatrix
 	matrix, _ = gozxing.NewSquareBitMatrix(1)
-	src = newTestBitMatrixSource(matrix)
-	bmp, _ = gozxing.NewBinaryBitmap(common.NewGlobalHistgramBinarizer(src))
+	bmp = testutil.NewBinaryBitmapFromBitMatrix(matrix)
 	_, e = reader.DecodeWithoutHints(bmp)
 	if _, ok := e.(gozxing.NotFoundException); !ok {
 		t.Fatalf("Decode must be NotFoundException, %T", e)
@@ -112,8 +63,7 @@ func TestQRCodeReader_DecodeBitMatrixSource(t *testing.T) {
 
 	// fail Detect
 	matrix, _ = gozxing.NewSquareBitMatrix(50)
-	src = newTestBitMatrixSource(matrix)
-	bmp, _ = gozxing.NewBinaryBitmap(common.NewGlobalHistgramBinarizer(src))
+	bmp = testutil.NewBinaryBitmapFromBitMatrix(matrix)
 	_, e = reader.DecodeWithoutHints(bmp)
 	if _, ok := e.(gozxing.NotFoundException); !ok {
 		t.Fatalf("Decode must be NotFoundException, %T", e)
@@ -126,8 +76,7 @@ func TestQRCodeReader_DecodeBitMatrixSource(t *testing.T) {
 	// fail checksum
 	matrix, _ = gozxing.ParseStringToBitMatrix(qrstr, "##", "  ")
 	matrix.SetRegion(15, 15, 10, 10)
-	src = newTestBitMatrixSource(matrix)
-	bmp, _ = gozxing.NewBinaryBitmap(common.NewGlobalHistgramBinarizer(src))
+	bmp = testutil.NewBinaryBitmapFromBitMatrix(matrix)
 	_, e = reader.DecodeWithoutHints(bmp)
 	if _, ok := e.(gozxing.ChecksumException); !ok {
 		t.Fatalf("Decode must be ChecksumException, %T", e)
@@ -139,8 +88,7 @@ func TestQRCodeReader_DecodeBitMatrixSource(t *testing.T) {
 
 	// success
 	matrix, _ = gozxing.ParseStringToBitMatrix(qrstr, "##", "  ")
-	src = newTestBitMatrixSource(matrix)
-	bmp, _ = gozxing.NewBinaryBitmap(common.NewGlobalHistgramBinarizer(src))
+	bmp = testutil.NewBinaryBitmapFromBitMatrix(matrix)
 	textexpect := "hello\n"
 	r, e := reader.DecodeWithoutHints(bmp)
 	if e != nil {
@@ -256,61 +204,8 @@ func TestQRCodeReader_Reset(t *testing.T) {
 	reader.Reset() // this method do nothing
 }
 
-type testImageSource struct {
-	gozxing.LuminanceSourceBase
-	img       image.Image
-	top, left int
-}
-
-func newTestImageSource(filename string) gozxing.LuminanceSource {
-	file, _ := os.Open(filename)
-	defer file.Close()
-	img, _, _ := image.Decode(file)
-	rect := img.Bounds()
-	top := rect.Min.Y
-	left := rect.Min.X
-	width := rect.Max.X - rect.Min.X
-	height := rect.Max.Y - rect.Min.Y
-	return &testImageSource{
-		gozxing.LuminanceSourceBase{width, height},
-		img,
-		top,
-		left,
-	}
-}
-func (this *testImageSource) GetRow(y int, row []byte) ([]byte, error) {
-	if y >= this.GetHeight() {
-		return row, fmt.Errorf("y(%d) >= height(%d)", y, this.GetHeight())
-	}
-	for x := 0; x < this.GetWidth(); x++ {
-		r, g, b, _ := this.img.At(this.left+x, this.top+y).RGBA()
-		row[x] = byte((r + 2*g + b) * 255 / (4 * 0xffff))
-	}
-	return row, nil
-}
-func (this *testImageSource) GetMatrix() []byte {
-	width := this.GetWidth()
-	height := this.GetHeight()
-	matrix := make([]byte, width*height)
-	for y := 0; y < height; y++ {
-		offset := y * width
-		for x := 0; x < width; x++ {
-			r, g, b, _ := this.img.At(this.left+x, this.top+y).RGBA()
-			matrix[offset+x] = byte((r + 2*g + b) * 255 / (4 * 0xffff))
-		}
-	}
-	return matrix
-}
-func (this *testImageSource) Invert() gozxing.LuminanceSource {
-	return gozxing.LuminanceSourceInvert(this)
-}
-func (this *testImageSource) String() string {
-	return gozxing.LuminanceSourceString(this)
-}
-
 func testDecodeImage(t *testing.T, file, expect string) *gozxing.Result {
-	src := newTestImageSource(file)
-	bmp, _ := gozxing.NewBinaryBitmap(common.NewGlobalHistgramBinarizer(src))
+	bmp := testutil.NewBinaryBitmapFromFile(file)
 	r, e := NewQRCodeReader().Decode(bmp, nil)
 	if e != nil {
 		t.Fatalf("Decode(%s) returns error, %v", file, e)
