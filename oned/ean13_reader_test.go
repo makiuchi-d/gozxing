@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/makiuchi-d/gozxing"
+	"github.com/makiuchi-d/gozxing/testutil"
 )
 
 func testEan13Reader_determineFirstDigit(t *testing.T, p int, expect byte) {
@@ -198,7 +199,8 @@ func TestEan13ReaderWithExtension(t *testing.T) {
 	}
 
 	reader := NewEAN13Reader()
-	result, e := readFile(reader, "testdata/ean13/ean13-1.png", hints)
+	bmp := testutil.NewBinaryBitmapFromFile("testdata/ean13/ean13-1.png")
+	result, e := reader.Decode(bmp, hints)
 	if e != nil {
 		t.Fatalf("read file failed, %v", e)
 	}

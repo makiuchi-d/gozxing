@@ -2,39 +2,20 @@ package oned
 
 import (
 	"fmt"
-	"image"
-	_ "image/png"
-	"os"
 	"reflect"
 	"testing"
 
 	"github.com/makiuchi-d/gozxing"
 	"github.com/makiuchi-d/gozxing/common"
+	"github.com/makiuchi-d/gozxing/testutil"
 )
-
-func readFile(reader gozxing.Reader, filename string, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
-	file, e := os.Open(filename)
-	if e != nil {
-		return nil, e
-	}
-	img, _, e := image.Decode(file)
-	if e != nil {
-		return nil, e
-	}
-	src := gozxing.NewLuminanceSourceFromImage(img)
-	bmp, _ := gozxing.NewBinaryBitmap(common.NewHybridBinarizer(src))
-	if e != nil {
-		return nil, e
-	}
-
-	return reader.Decode(bmp, hints)
-}
 
 func testFile(t *testing.T, reader gozxing.Reader, file, expectText string,
 	expectFormat gozxing.BarcodeFormat, hints map[gozxing.DecodeHintType]interface{}) {
-	result, e := readFile(reader, file, hints)
+	bmp := testutil.NewBinaryBitmapFromFile(file)
+	result, e := reader.Decode(bmp, hints)
 	if e != nil {
-		t.Fatalf("testFail(%v) readFile failed: %v", file, e)
+		t.Fatalf("testFail(%v) reader.Decode failed: %v", file, e)
 	}
 	if txt := result.GetText(); txt != expectText {
 		t.Fatalf("testFile(%v) = %v, expect %v", file, txt, expectText)

@@ -1,13 +1,10 @@
 package oned
 
 import (
-	"image"
-	_ "image/png"
-	"os"
 	"testing"
 
 	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/common"
+	"github.com/makiuchi-d/gozxing/testutil"
 )
 
 func TestUPCAReader_decodeRow(t *testing.T) {
@@ -53,10 +50,7 @@ func TestUPCAReader_decodeRow(t *testing.T) {
 }
 
 func TestUPCAReader_DecodeWithoutHint(t *testing.T) {
-	file, _ := os.Open("testdata/upca/2.png")
-	img, _, _ := image.Decode(file)
-	src := gozxing.NewLuminanceSourceFromImage(img)
-	bmp, _ := gozxing.NewBinaryBitmap(common.NewHybridBinarizer(src))
+	bmp := testutil.NewBinaryBitmapFromFile("testdata/upca/2.png")
 
 	result, e := NewUPCAReader().DecodeWithoutHints(bmp)
 	if e != nil {
@@ -79,7 +73,8 @@ func TestUPCAReader(t *testing.T) {
 	}
 
 	// original zxing could't read too.
-	_, e := readFile(reader, "testdata/upca/1.png", harder)
+	bmp := testutil.NewBinaryBitmapFromFile("testdata/upca/1.png")
+	_, e := reader.Decode(bmp, harder)
 	if _, ok := e.(gozxing.NotFoundException); !ok {
 		t.Fatalf("Decode \"testdata/upca/1.png\" must be NotFoundException, %T", e)
 	}
