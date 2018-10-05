@@ -12,7 +12,7 @@ import (
 
 func NewBinaryBitmapFromBitMatrix(matrix *gozxing.BitMatrix) *gozxing.BinaryBitmap {
 	src := newTestBitMatrixSource(matrix)
-	binarizer := common.NewGlobalHistgramBinarizer(src)
+	binarizer := common.NewHybridBinarizer(src)
 	bmp, _ := gozxing.NewBinaryBitmap(binarizer)
 	return bmp
 }
@@ -21,7 +21,7 @@ func NewBinaryBitmapFromFile(filename string) *gozxing.BinaryBitmap {
 	file, _ := os.Open(filename)
 	img, _, _ := image.Decode(file)
 	src := gozxing.NewLuminanceSourceFromImage(img)
-	binarizer := common.NewGlobalHistgramBinarizer(src)
+	binarizer := common.NewHybridBinarizer(src)
 	bmp, _ := gozxing.NewBinaryBitmap(binarizer)
 	return bmp
 }

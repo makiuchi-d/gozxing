@@ -51,6 +51,16 @@ func TestDecode(t *testing.T) {
 		t.Fatalf("Decode text = \"%v\", expect \"%v\"", s, expect)
 	}
 
+	// error collection
+	bits.SetRegion(3, 3, 5, 5)
+	r, e = d.Decode(bits)
+	if e != nil {
+		t.Fatalf("Decode returns error, %v", e)
+	}
+	if s := r.GetText(); s != expect {
+		t.Fatalf("Decode text = \"%v\", expect \"%v\"", s, expect)
+	}
+
 	// checksum exception
 	bits.SetRegion(3, 3, 10, 10)
 	r, e = d.Decode(bits)

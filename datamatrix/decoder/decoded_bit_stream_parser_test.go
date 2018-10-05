@@ -6,7 +6,6 @@ import (
 
 	"github.com/makiuchi-d/gozxing"
 	"github.com/makiuchi-d/gozxing/common"
-	//	"golang.org/x/text/encoding/charmap"
 )
 
 func testUnrandomize255State(t *testing.T, randomized, codewordPosition, expect int) {
