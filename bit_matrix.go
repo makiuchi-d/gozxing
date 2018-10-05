@@ -105,6 +105,9 @@ func ParseStringToBitMatrix(stringRepresentation, setString, unsetString string)
 
 func (b *BitMatrix) Get(x, y int) bool {
 	offset := (y * b.rowSize) + (x / 32)
+	if offset < 0 {
+		return false
+	}
 	return ((b.bits[offset] >> uint(x%32)) & 1) != 0
 }
 
