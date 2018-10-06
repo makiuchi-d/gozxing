@@ -10,6 +10,20 @@ import (
 	"github.com/makiuchi-d/gozxing/common"
 )
 
+func ExpandBitMatrix(src *gozxing.BitMatrix, factor int) *gozxing.BitMatrix {
+	dst, _ := gozxing.NewBitMatrix(src.GetWidth() * factor, src.GetHeight() * factor)
+	for j := 0; j < src.GetHeight(); j++ {
+		y := j * factor
+		for i := 0; i < src.GetWidth(); i++ {
+			x := i * factor
+			if src.Get(i, j) {
+				dst.SetRegion(x, y, factor, factor)
+			}
+		}
+	}
+	return dst
+}
+
 func NewBinaryBitmapFromBitMatrix(matrix *gozxing.BitMatrix) *gozxing.BinaryBitmap {
 	src := newTestBitMatrixSource(matrix)
 	binarizer := common.NewHybridBinarizer(src)
