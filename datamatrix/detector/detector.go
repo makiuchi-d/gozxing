@@ -1,13 +1,9 @@
 package detector
 
 import (
-	"fmt"
-	"sort"
-
 	"github.com/makiuchi-d/gozxing"
 	"github.com/makiuchi-d/gozxing/common"
 	cdetector "github.com/makiuchi-d/gozxing/common/detector"
-	"github.com/makiuchi-d/gozxing/common/util"
 )
 
 type Detector struct {
@@ -34,266 +30,258 @@ func (this *Detector) Detect() (*common.DetectorResult, error) {
 	if e != nil {
 		return nil, e
 	}
-	pointA := cornerPoints[0]
-	pointB := cornerPoints[1]
-	pointC := cornerPoints[2]
-	pointD := cornerPoints[3]
 
-	// Point A and D are across the diagonal from one another,
-	// as are B and C. Figure out which are the solid black lines
-	// by counting transitions
-	transitions := make([]*ResultPointsAndTransitions, 4)
-	transitions[0] = this.transitionsBetween(pointA, pointB)
-	transitions[1] = this.transitionsBetween(pointA, pointC)
-	transitions[2] = this.transitionsBetween(pointB, pointD)
-	transitions[3] = this.transitionsBetween(pointC, pointD)
-	sort.Slice(transitions, func(a, b int) bool {
-		return ResultPointsAndTransitionsComparator(transitions[a], transitions[b])
-	})
-
-	// Sort by number of transitions. First two will be the two solid sides; last two
-	// will be the two alternating black/white sides
-	lSideOne := transitions[0]
-	lSideTwo := transitions[1]
-
-	// Figure out which point is their intersection by tallying up the number of times we see the
-	// endpoints in the four endpoints. One will show up twice.
-	pointCount := make(map[gozxing.ResultPoint]int)
-	pointCount = increment(pointCount, lSideOne.getFrom())
-	pointCount = increment(pointCount, lSideOne.getTo())
-	pointCount = increment(pointCount, lSideTwo.getFrom())
-	pointCount = increment(pointCount, lSideTwo.getTo())
-
-	var maybeTopLeft gozxing.ResultPoint
-	var bottomLeft gozxing.ResultPoint
-	var maybeBottomRight gozxing.ResultPoint
-	for point, value := range pointCount {
-		if value == 2 {
-			bottomLeft = point // this is definitely the bottom left, then -- end of two L sides
-		} else {
-			// Otherwise it's either top left or bottom right -- just assign the two arbitrarily now
-			if maybeTopLeft == nil {
-				maybeTopLeft = point
-			} else {
-				maybeBottomRight = point
-			}
-		}
-	}
-
-	if maybeTopLeft == nil || bottomLeft == nil || maybeBottomRight == nil {
+	points := this.detectSolid1(cornerPoints)
+	points = this.detectSolid2(points)
+	points[3] = this.correctTopRight(points)
+	if points[3] == nil {
 		return nil, gozxing.GetNotFoundExceptionInstance()
 	}
+	points = this.shiftToModuleCenter(points)
 
-	// Bottom left is correct but top left and bottom right might be switched
+	topLeft := points[0]
+	bottomLeft := points[1]
+	bottomRight := points[2]
+	topRight := points[3]
 
-	// Use the dot product trick to sort them out
-
-	// Now we know which is which:
-	bottomRight, bottomLeft, topLeft := gozxing.ResultPoint_OrderBestPatterns(maybeTopLeft, bottomLeft, maybeBottomRight)
-	// Which point didn't we find in relation to the "L" sides? that's the top right corner
-	var topRight gozxing.ResultPoint
-	if _, ok := pointCount[pointA]; !ok {
-		topRight = pointA
-	} else if _, ok := pointCount[pointB]; !ok {
-		topRight = pointB
-	} else if _, ok := pointCount[pointC]; !ok {
-		topRight = pointC
-	} else {
-		topRight = pointD
-	}
-
-	// Next determine the dimension by tracing along the top or right side and counting black/white
-	// transitions. Since we start inside a black module, we should see a number of transitions
-	// equal to 1 less than the code dimension. Well, actually 2 less, because we are going to
-	// end on a black module:
-
-	// The top right point is actually the corner of a module, which is one of the two black modules
-	// adjacent to the white module at the top right. Tracing to that corner from either the top left
-	// or bottom right should work here.
-
-	dimensionTop := this.transitionsBetween(topLeft, topRight).getTransitions()
-	dimensionRight := this.transitionsBetween(bottomRight, topRight).getTransitions()
-
+	dimensionTop := this.transitionsBetween(topLeft, topRight) + 1
+	dimensionRight := this.transitionsBetween(bottomRight, topRight) + 1
 	if (dimensionTop & 0x01) == 1 {
-		// it can't be odd, so, round... up?
-		dimensionTop++
+		dimensionTop += 1
 	}
-	dimensionTop += 2
-
 	if (dimensionRight & 0x01) == 1 {
-		// it can't be odd, so, round... up?
-		dimensionRight++
+		dimensionRight += 1
 	}
-	dimensionRight += 2
 
-	var bits *gozxing.BitMatrix
-	var correctedTopRight gozxing.ResultPoint
-
-	// Rectangular symbols are 6x16, 6x28, 10x24, 10x32, 14x32, or 14x44. If one dimension is more
-	// than twice the other, it's certainly rectangular, but to cut a bit more slack we accept it as
-	// rectangular if the bigger side is at least 7/4 times the other:
-	if 4*dimensionTop >= 7*dimensionRight || 4*dimensionRight >= 7*dimensionTop {
-		// The matrix is rectangular
-
-		correctedTopRight = this.correctTopRightRectangular(
-			bottomLeft, bottomRight, topLeft, topRight, dimensionTop, dimensionRight)
-		if correctedTopRight == nil {
-			correctedTopRight = topRight
-		}
-
-		dimensionTop = this.transitionsBetween(topLeft, correctedTopRight).getTransitions()
-		dimensionRight = this.transitionsBetween(bottomRight, correctedTopRight).getTransitions()
-
-		if (dimensionTop & 0x01) == 1 {
-			// it can't be odd, so, round... up?
-			dimensionTop++
-		}
-
-		if (dimensionRight & 0x01) == 1 {
-			// it can't be odd, so, round... up?
-			dimensionRight++
-		}
-
-		bits, e = sampleGrid(
-			this.image, topLeft, bottomLeft, bottomRight, correctedTopRight, dimensionTop, dimensionRight)
-		if e != nil {
-			return nil, e
-		}
-
-	} else {
+	if 4*dimensionTop < 7*dimensionRight && 4*dimensionRight < 7*dimensionTop {
 		// The matrix is square
-
-		dimension := min(dimensionRight, dimensionTop)
-		// correct top right point to match the white module
-		correctedTopRight = this.correctTopRight(bottomLeft, bottomRight, topLeft, topRight, dimension)
-		if correctedTopRight == nil {
-			correctedTopRight = topRight
-		}
-
-		// Redetermine the dimension using the corrected top right point
-		dimensionCorrected := max(
-			this.transitionsBetween(topLeft, correctedTopRight).getTransitions(),
-			this.transitionsBetween(bottomRight, correctedTopRight).getTransitions())
-		dimensionCorrected++
-		if (dimensionCorrected & 0x01) == 1 {
-			dimensionCorrected++
-		}
-
-		bits, e = sampleGrid(
-			this.image,
-			topLeft,
-			bottomLeft,
-			bottomRight,
-			correctedTopRight,
-			dimensionCorrected,
-			dimensionCorrected)
-		if e != nil {
-			return nil, e
-		}
+		dimensionTop = max(dimensionTop, dimensionRight)
+		dimensionRight = dimensionTop
 	}
 
-	return common.NewDetectorResult(bits, []gozxing.ResultPoint{topLeft, bottomLeft, bottomRight, correctedTopRight}), nil
+	bits, e := sampleGrid(
+		this.image,
+		topLeft,
+		bottomLeft,
+		bottomRight,
+		topRight,
+		dimensionTop,
+		dimensionRight)
+	if e != nil {
+		return nil, e
+	}
+
+	return common.NewDetectorResult(bits, []gozxing.ResultPoint{topLeft, bottomLeft, bottomRight, topRight}), nil
 }
 
-// correctTopRightRectangular  Calculates the position of the white top right module
-// using the output of the rectangle detector for a rectangular matrix
-func (this *Detector) correctTopRightRectangular(
-	bottomLeft, bottomRight, topLeft, topRight gozxing.ResultPoint,
-	dimensionTop, dimensionRight int) gozxing.ResultPoint {
+func shiftPoint(point, to gozxing.ResultPoint, div int) gozxing.ResultPoint {
+	x := (to.GetX() - point.GetX()) / float64(div+1)
+	y := (to.GetY() - point.GetY()) / float64(div+1)
+	return gozxing.NewResultPoint(point.GetX()+x, point.GetY()+y)
+}
 
-	corr := float64(distance(bottomLeft, bottomRight)) / float64(dimensionTop)
-	norm := float64(distance(topLeft, topRight))
-	cos := (topRight.GetX() - topLeft.GetX()) / norm
-	sin := (topRight.GetY() - topLeft.GetY()) / norm
+func moveAway(point gozxing.ResultPoint, fromX, fromY float64) gozxing.ResultPoint {
+	x := point.GetX()
+	y := point.GetY()
 
-	c1 := gozxing.NewResultPoint(topRight.GetX()+corr*cos, topRight.GetY()+corr*sin)
+	if x < fromX {
+		x -= 1
+	} else {
+		x += 1
+	}
 
-	corr = float64(distance(bottomLeft, topLeft)) / float64(dimensionRight)
-	norm = float64(distance(bottomRight, topRight))
-	cos = (topRight.GetX() - bottomRight.GetX()) / norm
-	sin = (topRight.GetY() - bottomRight.GetY()) / norm
+	if y < fromY {
+		y -= 1
+	} else {
+		y += 1
+	}
 
-	c2 := gozxing.NewResultPoint(topRight.GetX()+corr*cos, topRight.GetY()+corr*sin)
+	return gozxing.NewResultPoint(x, y)
+}
 
-	if !this.isValid(c1) {
-		if this.isValid(c2) {
-			return c2
+// detectSolid1 Detect a solid side which has minimum transition.
+func (this *Detector) detectSolid1(cornerPoints []gozxing.ResultPoint) []gozxing.ResultPoint {
+	// 0  2
+	// 1  3
+	pointA := cornerPoints[0]
+	pointB := cornerPoints[1]
+	pointC := cornerPoints[3]
+	pointD := cornerPoints[2]
+
+	trAB := this.transitionsBetween(pointA, pointB)
+	trBC := this.transitionsBetween(pointB, pointC)
+	trCD := this.transitionsBetween(pointC, pointD)
+	trDA := this.transitionsBetween(pointD, pointA)
+
+	// 0..3
+	// :  :
+	// 1--2
+	min := trAB
+	points := []gozxing.ResultPoint{pointD, pointA, pointB, pointC}
+	if min > trBC {
+		min = trBC
+		points[0] = pointA
+		points[1] = pointB
+		points[2] = pointC
+		points[3] = pointD
+	}
+	if min > trCD {
+		min = trCD
+		points[0] = pointB
+		points[1] = pointC
+		points[2] = pointD
+		points[3] = pointA
+	}
+	if min > trDA {
+		points[0] = pointC
+		points[1] = pointD
+		points[2] = pointA
+		points[3] = pointB
+	}
+
+	return points
+}
+
+// detectSolid2 Detect a second solid side next to first solid side.
+func (this *Detector) detectSolid2(points []gozxing.ResultPoint) []gozxing.ResultPoint {
+	// A..D
+	// :  :
+	// B--C
+	pointA := points[0]
+	pointB := points[1]
+	pointC := points[2]
+	pointD := points[3]
+
+	// Transition detection on the edge is not stable.
+	// To safely detect, shift the points to the module center.
+	tr := this.transitionsBetween(pointA, pointD)
+	pointBs := shiftPoint(pointB, pointC, (tr+1)*4)
+	pointCs := shiftPoint(pointC, pointB, (tr+1)*4)
+	trBA := this.transitionsBetween(pointBs, pointA)
+	trCD := this.transitionsBetween(pointCs, pointD)
+
+	// 0..3
+	// |  :
+	// 1--2
+	if trBA < trCD {
+		// solid sides: A-B-C
+		points[0] = pointA
+		points[1] = pointB
+		points[2] = pointC
+		points[3] = pointD
+	} else {
+		// solid sides: B-C-D
+		points[0] = pointB
+		points[1] = pointC
+		points[2] = pointD
+		points[3] = pointA
+	}
+
+	return points
+}
+
+// correctTopRight Calculates the corner position of the white top right module.
+func (this *Detector) correctTopRight(points []gozxing.ResultPoint) gozxing.ResultPoint {
+	// A..D
+	// |  :
+	// B--C
+	pointA := points[0]
+	pointB := points[1]
+	pointC := points[2]
+	pointD := points[3]
+
+	// shift points for safe transition detection.
+	trTop := this.transitionsBetween(pointA, pointD)
+	trRight := this.transitionsBetween(pointB, pointD)
+	pointAs := shiftPoint(pointA, pointB, (trRight+1)*4)
+	pointCs := shiftPoint(pointC, pointB, (trTop+1)*4)
+
+	trTop = this.transitionsBetween(pointAs, pointD)
+	trRight = this.transitionsBetween(pointCs, pointD)
+
+	candidate1 := gozxing.NewResultPoint(
+		pointD.GetX()+(pointC.GetX()-pointB.GetX())/float64(trTop+1),
+		pointD.GetY()+(pointC.GetY()-pointB.GetY())/float64(trTop+1))
+	candidate2 := gozxing.NewResultPoint(
+		pointD.GetX()+(pointA.GetX()-pointB.GetX())/float64(trRight+1),
+		pointD.GetY()+(pointA.GetY()-pointB.GetY())/float64(trRight+1))
+
+	if !this.isValid(candidate1) {
+		if this.isValid(candidate2) {
+			return candidate2
 		}
 		return nil
 	}
-	if !this.isValid(c2) {
-		return c1
+	if !this.isValid(candidate2) {
+		return candidate1
 	}
 
-	l1 := abs(dimensionTop-this.transitionsBetween(topLeft, c1).getTransitions()) +
-		abs(dimensionRight-this.transitionsBetween(bottomRight, c1).getTransitions())
-	l2 := abs(dimensionTop-this.transitionsBetween(topLeft, c2).getTransitions()) +
-		abs(dimensionRight-this.transitionsBetween(bottomRight, c2).getTransitions())
+	sumc1 := this.transitionsBetween(pointAs, candidate1) + this.transitionsBetween(pointCs, candidate1)
+	sumc2 := this.transitionsBetween(pointAs, candidate2) + this.transitionsBetween(pointCs, candidate2)
 
-	if l1 <= l2 {
-		return c1
+	if sumc1 > sumc2 {
+		return candidate1
+	} else {
+		return candidate2
 	}
-
-	return c2
 }
 
-// correctTopRight Calculates the position of the white top right module
-// using the output of the rectangle detector for a square matrix
-func (this *Detector) correctTopRight(bottomLeft, bottomRight, topLeft, topRight gozxing.ResultPoint, dimension int) gozxing.ResultPoint {
+// shiftToModuleCenter Shift the edge points to the module center.
+func (this *Detector) shiftToModuleCenter(points []gozxing.ResultPoint) []gozxing.ResultPoint {
+	// A..D
+	// |  :
+	// B--C
+	pointA := points[0]
+	pointB := points[1]
+	pointC := points[2]
+	pointD := points[3]
 
-	corr := float64(distance(bottomLeft, bottomRight)) / float64(dimension)
-	norm := float64(distance(topLeft, topRight))
-	cos := (topRight.GetX() - topLeft.GetX()) / norm
-	sin := (topRight.GetY() - topLeft.GetY()) / norm
+	// calculate pseudo dimensions
+	dimH := this.transitionsBetween(pointA, pointD) + 1
+	dimV := this.transitionsBetween(pointC, pointD) + 1
 
-	c1 := gozxing.NewResultPoint(topRight.GetX()+corr*cos, topRight.GetY()+corr*sin)
+	// shift points for safe dimension detection
+	pointAs := shiftPoint(pointA, pointB, dimV*4)
+	pointCs := shiftPoint(pointC, pointB, dimH*4)
 
-	corr = float64(distance(bottomLeft, topLeft)) / float64(dimension)
-	norm = float64(distance(bottomRight, topRight))
-	cos = (topRight.GetX() - bottomRight.GetX()) / norm
-	sin = (topRight.GetY() - bottomRight.GetY()) / norm
-
-	c2 := gozxing.NewResultPoint(topRight.GetX()+corr*cos, topRight.GetY()+corr*sin)
-
-	if !this.isValid(c1) {
-		if this.isValid(c2) {
-			return c2
-		}
-		return nil
+	//  calculate more precise dimensions
+	dimH = this.transitionsBetween(pointAs, pointD) + 1
+	dimV = this.transitionsBetween(pointCs, pointD) + 1
+	if (dimH & 0x01) == 1 {
+		dimH += 1
 	}
-	if !this.isValid(c2) {
-		return c1
+	if (dimV & 0x01) == 1 {
+		dimV += 1
 	}
 
-	l1 := abs(this.transitionsBetween(topLeft, c1).getTransitions() -
-		this.transitionsBetween(bottomRight, c1).getTransitions())
-	l2 := abs(this.transitionsBetween(topLeft, c2).getTransitions() -
-		this.transitionsBetween(bottomRight, c2).getTransitions())
+	// WhiteRectangleDetector returns points inside of the rectangle.
+	// I want points on the edges.
+	centerX := (pointA.GetX() + pointB.GetX() + pointC.GetX() + pointD.GetX()) / 4
+	centerY := (pointA.GetY() + pointB.GetY() + pointC.GetY() + pointD.GetY()) / 4
+	pointA = moveAway(pointA, centerX, centerY)
+	pointB = moveAway(pointB, centerX, centerY)
+	pointC = moveAway(pointC, centerX, centerY)
+	pointD = moveAway(pointD, centerX, centerY)
 
-	if l1 <= l2 {
-		return c1
-	}
-	return c2
+	var pointBs gozxing.ResultPoint
+	var pointDs gozxing.ResultPoint
+
+	// shift points to the center of each modules
+	pointAs = shiftPoint(pointA, pointB, dimV*4)
+	pointAs = shiftPoint(pointAs, pointD, dimH*4)
+	pointBs = shiftPoint(pointB, pointA, dimV*4)
+	pointBs = shiftPoint(pointBs, pointC, dimH*4)
+	pointCs = shiftPoint(pointC, pointD, dimV*4)
+	pointCs = shiftPoint(pointCs, pointB, dimH*4)
+	pointDs = shiftPoint(pointD, pointC, dimV*4)
+	pointDs = shiftPoint(pointDs, pointA, dimH*4)
+
+	return []gozxing.ResultPoint{pointAs, pointBs, pointCs, pointDs}
 }
 
 func (this *Detector) isValid(p gozxing.ResultPoint) bool {
 	return p.GetX() >= 0 && p.GetX() < float64(this.image.GetWidth()) &&
 		p.GetY() > 0 && p.GetY() < float64(this.image.GetHeight())
-}
-
-func distance(a, b gozxing.ResultPoint) int {
-	return util.MathUtils_Round(gozxing.ResultPoint_Distance(a, b))
-}
-
-// increment Increments the Integer associated with a key by one.
-func increment(table map[gozxing.ResultPoint]int, key gozxing.ResultPoint) map[gozxing.ResultPoint]int {
-	value, ok := table[key]
-	if !ok {
-		table[key] = 1
-	} else {
-		table[key] = value + 1
-	}
-	return table
 }
 
 func sampleGrid(image *gozxing.BitMatrix,
@@ -326,7 +314,7 @@ func sampleGrid(image *gozxing.BitMatrix,
 
 // transitionsBetween Counts the number of black/white transitions between two points,
 // using something like Bresenham's algorithm.
-func (this *Detector) transitionsBetween(from, to gozxing.ResultPoint) *ResultPointsAndTransitions {
+func (this *Detector) transitionsBetween(from, to gozxing.ResultPoint) int {
 	// See QR Code Detector, sizeOfBlackWhiteBlackRun()
 	fromX := int(from.GetX())
 	fromY := int(from.GetY())
@@ -376,39 +364,7 @@ func (this *Detector) transitionsBetween(from, to gozxing.ResultPoint) *ResultPo
 			error -= dx
 		}
 	}
-	return NewResultPointsAndTransitions(from, to, transitions)
-}
-
-// ResultPointsAndTransitions Simply encapsulates two points and a number of transitions between them.
-type ResultPointsAndTransitions struct {
-	from        gozxing.ResultPoint
-	to          gozxing.ResultPoint
-	transitions int
-}
-
-func NewResultPointsAndTransitions(from, to gozxing.ResultPoint, transitions int) *ResultPointsAndTransitions {
-	return &ResultPointsAndTransitions{from, to, transitions}
-}
-
-func (this *ResultPointsAndTransitions) getFrom() gozxing.ResultPoint {
-	return this.from
-}
-
-func (this *ResultPointsAndTransitions) getTo() gozxing.ResultPoint {
-	return this.to
-}
-
-func (this *ResultPointsAndTransitions) getTransitions() int {
-	return this.transitions
-}
-
-func (this *ResultPointsAndTransitions) String() string {
-	return fmt.Sprintf("%v/%v/%v", this.from, this.to, this.transitions)
-}
-
-// ResultPointsAndTransitionsComparator Orders ResultPointsAndTransitions by number of transitions, ascending.
-func ResultPointsAndTransitionsComparator(o1, o2 *ResultPointsAndTransitions) bool {
-	return o1.getTransitions() < o2.getTransitions()
+	return transitions
 }
 
 func abs(a int) int {
@@ -416,13 +372,6 @@ func abs(a int) int {
 		return -a
 	}
 	return a
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
 }
 
 func max(a, b int) int {
