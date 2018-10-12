@@ -1,5 +1,11 @@
 package encoder
 
+import (
+	"fmt"
+
+	"github.com/makiuchi-d/gozxing"
+)
+
 // Symbol info table for DataMatrix.
 
 var symbols = []*SymbolInfo{
@@ -75,6 +81,93 @@ func NewSymbolInfoRS(rectangular bool, dataCapacity, errorCodewords,
 	}
 }
 
+// public static SymbolInfo lookup(int dataCodewords)
+// public static SymbolInfo lookup(int dataCodewords, SymbolShapeHint shape)
+// public static SymbolInfo lookup(int dataCodewords, boolean allowRectangular, boolean fail)
+// private static SymbolInfo lookup(int dataCodewords, SymbolShapeHint shape, boolean fail)
+
+func SymbolInfo_Lookup(dataCodewords int, shape SymbolShapeHint,
+	minSize, maxSize *gozxing.Dimension, fail bool) (*SymbolInfo, error) {
+
+	for _, symbol := range symbols {
+		if shape == SymbolShapeHint_FORCE_SQUARE && symbol.rectangular {
+			continue
+		}
+		if shape == SymbolShapeHint_FORCE_RECTANGLE && !symbol.rectangular {
+			continue
+		}
+		if minSize != nil &&
+			(symbol.GetSymbolWidth() < minSize.GetWidth() ||
+				symbol.GetSymbolHeight() < minSize.GetHeight()) {
+			continue
+		}
+		if maxSize != nil &&
+			(symbol.GetSymbolWidth() > maxSize.GetWidth() ||
+				symbol.GetSymbolHeight() > maxSize.GetHeight()) {
+			continue
+		}
+		if dataCodewords <= symbol.dataCapacity {
+			return symbol, nil
+		}
+	}
+	if fail {
+		return nil, fmt.Errorf("IllegalArgumentException: "+
+			"Can't find a symbol arrangement that matches the message. Data codewords: %d",
+			dataCodewords)
+	}
+	return nil, nil
+}
+
+func (this *SymbolInfo) getHorizontalDataRegions() int {
+	switch this.dataRegions {
+	case 1:
+		return 1
+	case 2, 4:
+		return 2
+	case 16:
+		return 4
+	case 36:
+		return 6
+	default:
+		return 0 // Cannot handle this number of data regions
+	}
+}
+
+func (this *SymbolInfo) getVerticalDataRegions() int {
+	switch this.dataRegions {
+	case 1, 2:
+		return 1
+	case 4:
+		return 2
+	case 16:
+		return 4
+	case 36:
+		return 6
+	default:
+		return 0 // Cannot handle this number of data regions
+	}
+}
+
+func (this *SymbolInfo) GetSymbolDataWidth() int {
+	return this.getHorizontalDataRegions() * this.matrixWidth
+}
+
+func (this *SymbolInfo) GetSymbolDataHeight() int {
+	return this.getVerticalDataRegions() * this.matrixHeight
+}
+
+func (this *SymbolInfo) GetSymbolWidth() int {
+	return this.GetSymbolDataWidth() + (this.getHorizontalDataRegions() * 2)
+}
+
+func (this *SymbolInfo) GetSymbolHeight() int {
+	return this.GetSymbolDataHeight() + (this.getVerticalDataRegions() * 2)
+}
+
+func (this *SymbolInfo) GetCodewordCount() int {
+	return this.dataCapacity + this.errorCodewords
+}
+
 func (this *SymbolInfo) GetInterleavedBlockCount() int {
 	return this.funcGetInterleavedBlockCount(this)
 }
@@ -83,10 +176,35 @@ func defaultGetInterleavedBlockCount(this *SymbolInfo) int {
 	return this.dataCapacity / this.rsBlockData
 }
 
+func (this *SymbolInfo) GetDataCapacity() int {
+	return this.dataCapacity
+}
+
+func (this *SymbolInfo) GetErrorCodewords() int {
+	return this.errorCodewords
+}
+
 func (this *SymbolInfo) GetDataLengthForInterleavedBlock(index int) int {
 	return this.funcGetDataLengthForInterleavedBlock(this, index)
 }
 
 func defaultGetDataLengthForInterleavedBlock(this *SymbolInfo, index int) int {
 	return this.rsBlockData
+}
+
+func (this *SymbolInfo) GetErrorLengthForInterleavedBlock(index int) int {
+	return this.rsBlockError
+}
+
+func (this *SymbolInfo) String() string {
+	shape := "Square"
+	if this.rectangular {
+		shape = "Rectangular"
+	}
+	return fmt.Sprintf(
+		"%s Symbpl: data region %dx%d, symbol size %dx%d, symbol data size %dx%d, codewords %d+%d",
+		shape, this.matrixWidth, this.matrixHeight,
+		this.GetSymbolWidth(), this.GetSymbolHeight(),
+		this.GetSymbolDataWidth(), this.GetSymbolDataHeight(),
+		this.dataCapacity, this.errorCodewords)
 }

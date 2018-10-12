@@ -37,7 +37,7 @@ func TestDimension_Equals(t *testing.T) {
 		t.Fatalf("%v not equals %v", d1, d2)
 	}
 
-	d2, _ = NewDimension(10,20)
+	d2, _ = NewDimension(10, 20)
 	if !d1.Equals(d2) {
 		t.Fatalf("%v equals %v", d1, d2)
 	}
