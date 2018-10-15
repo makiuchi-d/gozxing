@@ -185,7 +185,7 @@ func TestHighLevelEncoder_lookAheadTest(t *testing.T) {
 		t.Fatalf("lookAheadTest = %v, expect %v", r, expect)
 	}
 
-	msg = []byte{0xff,0xff,0xff,0xff}
+	msg = []byte{0xff, 0xff, 0xff, 0xff}
 	pos = 1
 	mode = HighLevelEncoder_ASCII_ENCODATION
 	expect = HighLevelEncoder_BASE256_ENCODATION
@@ -233,7 +233,7 @@ func TestHighLevelEncoder_lookAheadTest(t *testing.T) {
 		t.Fatalf("lookAheadTest = %v, expect %v", r, expect)
 	}
 
-	msg = []byte{0xff,0xff,0xff,0xff,0xff,0xff,0xff}
+	msg = []byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 	pos = 1
 	mode = HighLevelEncoder_ASCII_ENCODATION
 	expect = HighLevelEncoder_BASE256_ENCODATION
