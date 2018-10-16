@@ -68,8 +68,8 @@ func (this *EncoderContext) GetCodewords() []byte {
 	return this.codewords
 }
 
-func (this *EncoderContext) WriteCodewords(codewords string) {
-	this.codewords = append(this.codewords, []byte(codewords)...)
+func (this *EncoderContext) WriteCodewords(codewords []byte) {
+	this.codewords = append(this.codewords, codewords...)
 }
 
 func (this *EncoderContext) WriteCodeword(codeword byte) {

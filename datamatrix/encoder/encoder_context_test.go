@@ -37,7 +37,7 @@ func TestEncoderContext_Codewords(t *testing.T) {
 		t.Fatalf("GetCodewords = %v, expect []", r)
 	}
 
-	ctx.WriteCodewords("abc")
+	ctx.WriteCodewords([]byte("abc"))
 	if r := ctx.GetCodewords(); !reflect.DeepEqual(r, []byte("abc")) {
 		t.Fatalf("GetCodewords = %v, expect [97 98 99]", r)
 	}
@@ -101,7 +101,7 @@ func TestEncoderContext_CharCount(t *testing.T) {
 
 func TestEncoderContext_SymbolInfo(t *testing.T) {
 	ctx, _ := NewEncoderContext("abcdefg")
-	ctx.WriteCodewords("abcdefg")
+	ctx.WriteCodewords([]byte("abcdefg"))
 
 	if si := ctx.GetSymbolInfo(); si != nil {
 		t.Fatalf("GetSymbolInfo must be nil, %v", si)
