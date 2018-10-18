@@ -5,15 +5,19 @@ import (
 )
 
 type C40Encoder struct {
-	encodeChar func(byte, []byte) (int, []byte)
+	encodingMode int
+	encodeChar   func(byte, []byte) (int, []byte)
 }
 
 func NewC40Encoder() Encoder {
-	return &C40Encoder{c40EncodeChar}
+	return &C40Encoder{
+		HighLevelEncoder_C40_ENCODATION,
+		c40EncodeChar,
+	}
 }
 
 func (this *C40Encoder) getEncodingMode() int {
-	return HighLevelEncoder_C40_ENCODATION
+	return this.encodingMode
 }
 
 func (this *C40Encoder) encode(context *EncoderContext) error {
