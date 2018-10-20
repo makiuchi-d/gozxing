@@ -3,6 +3,8 @@ package encoder
 import (
 	"reflect"
 	"testing"
+
+	"github.com/makiuchi-d/gozxing"
 )
 
 func TestRandomize253State(t *testing.T) {
@@ -295,5 +297,48 @@ func TestHighLevelEncoder_lookAheadTest(t *testing.T) {
 	expect = HighLevelEncoder_C40_ENCODATION
 	if r := HighLevelEncoder_lookAheadTest(msg, pos, mode); r != expect {
 		t.Fatalf("lookAheadTest = %v, expect %v", r, expect)
+	}
+}
+
+func TestEncodeHighLevel(t *testing.T) {
+	shape := SymbolShapeHint_FORCE_NONE
+
+	str := string(make([]byte, 1559))
+	_, e := EncodeHighLevel(str, shape, nil, nil)
+	if e == nil {
+		t.Fatalf("EncodeHighLevel must be error")
+	}
+
+	str = " 0A 0A 0A 0A000000"
+	expect := []byte{
+		230, 19, 111, 19, 111, 19, 111, 19, 111, 254, 130, 130, 130, 129, 87, 237, 133, 28,
+	}
+	min, _ := gozxing.NewDimension(16, 16)
+	b, e := EncodeHighLevel(str, shape, min, nil)
+	if e != nil {
+		t.Fatalf("EncodeHighLevel returns error: %v", e)
+	}
+	if !reflect.DeepEqual(b, expect) {
+		t.Fatalf("EncodeHighLevel = %v, expect %v", b, expect)
+	}
+
+	str = "[)>\u001E05\u001Daaaaaa\u001E\u0004"
+	b, e = EncodeHighLevel(str, shape, nil, nil)
+	expect = []byte{236, 239, 89, 191, 89, 191, 254, 129}
+	if e != nil {
+		t.Fatalf("EncodeHighLevel returns error: %v", e)
+	}
+	if !reflect.DeepEqual(b, expect) {
+		t.Fatalf("EncodeHighLevel = %v, expect %v", b, expect)
+	}
+
+	str = "[)>\u001E06\u001Daaaaaa\u001E\u0004"
+	b, e = EncodeHighLevel(str, shape, nil, nil)
+	expect = []byte{237, 239, 89, 191, 89, 191, 254, 129}
+	if e != nil {
+		t.Fatalf("EncodeHighLevel returns error: %v", e)
+	}
+	if !reflect.DeepEqual(b, expect) {
+		t.Fatalf("EncodeHighLevel = %v, expect %v", b, expect)
 	}
 }

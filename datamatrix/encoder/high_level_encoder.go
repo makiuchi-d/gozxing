@@ -3,6 +3,7 @@ package encoder
 import (
 	"fmt"
 	"math"
+	"strings"
 
 	"github.com/makiuchi-d/gozxing"
 )
@@ -94,7 +95,7 @@ func randomize253State(ch byte, codewordPosition int) byte {
 	return byte(tempVariable - 254)
 }
 
-// EncodeHightLevel Performs message encoding of a DataMatrix message using the
+// EncodeHighLevel Performs message encoding of a DataMatrix message using the
 // algorithm described in annex P of ISO/IEC 16022:2000(E).
 //
 // @param msg     the message
@@ -104,9 +105,61 @@ func randomize253State(ch byte, codewordPosition int) byte {
 // @param maxSize the maximum symbol size constraint or null for no constraint
 // @return the encoded message (the char values range from 0 to 255)
 //
-func EncodeHightLevel(msg string, shape SymbolShapeHint, minSize, maxSize *gozxing.Dimension) (string, error) {
-	// TODO: implement
-	return "", nil
+func EncodeHighLevel(msg string, shape SymbolShapeHint, minSize, maxSize *gozxing.Dimension) ([]byte, error) {
+	//the codewords 0..255 are encoded as Unicode characters
+	encoders := []Encoder{
+		NewASCIIEncoder(), NewC40Encoder(), NewTextEncoder(),
+		NewX12Encoder(), NewEdifactEncoder(), NewBase256Encoder(),
+	}
+
+	context, _ := NewEncoderContext(msg)
+	context.SetSymbolShape(shape)
+	context.SetSizeConstraints(minSize, maxSize)
+
+	if strings.HasPrefix(msg, HighLevelEncoder_MACRO_05_HEADER) &&
+		strings.HasSuffix(msg, HighLevelEncoder_MACRO_TRAILER) {
+		context.WriteCodeword(HighLevelEncoder_MACRO_05)
+		context.SetSkipAtEnd(2)
+		context.pos += len(HighLevelEncoder_MACRO_05_HEADER)
+	} else if strings.HasPrefix(msg, HighLevelEncoder_MACRO_06_HEADER) &&
+		strings.HasSuffix(msg, HighLevelEncoder_MACRO_TRAILER) {
+		context.WriteCodeword(HighLevelEncoder_MACRO_06)
+		context.SetSkipAtEnd(2)
+		context.pos += len(HighLevelEncoder_MACRO_06_HEADER)
+	}
+
+	encodingMode := HighLevelEncoder_ASCII_ENCODATION //Default mode
+	for context.HasMoreCharacters() {
+		encoders[encodingMode].encode(context)
+		if context.GetNewEncoding() >= 0 {
+			encodingMode = context.GetNewEncoding()
+			context.ResetEncoderSignal()
+		}
+	}
+	length := context.GetCodewordCount()
+	e := context.UpdateSymbolInfo()
+	if e != nil {
+		return nil, e
+	}
+
+	capacity := context.GetSymbolInfo().GetDataCapacity()
+	if length < capacity &&
+		encodingMode != HighLevelEncoder_ASCII_ENCODATION &&
+		encodingMode != HighLevelEncoder_BASE256_ENCODATION &&
+		encodingMode != HighLevelEncoder_EDIFACT_ENCODATION {
+		context.WriteCodeword(0xfe) //Unlatch (254)
+	}
+	//Padding
+	codewords := context.GetCodewords()
+	if len(codewords) < capacity {
+		codewords = append(codewords, HighLevelEncoder_PAD)
+	}
+	for len(codewords) < capacity {
+		codewords = append(codewords, randomize253State(HighLevelEncoder_PAD, len(codewords)+1))
+	}
+	context.codewords = codewords
+
+	return context.GetCodewords(), nil
 }
 
 func HighLevelEncoder_lookAheadTest(msg []byte, startpos, currentMode int) int {
