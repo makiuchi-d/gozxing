@@ -3,6 +3,8 @@ package encoder
 import (
 	"reflect"
 	"testing"
+
+	"github.com/makiuchi-d/gozxing"
 )
 
 func TestC40Encoder_getEncodingMode(t *testing.T) {
@@ -114,9 +116,17 @@ func TestC40Encoder_encode(t *testing.T) {
 	enc := NewC40Encoder()
 
 	ctx, _ := NewEncoderContext("0A 0A 0A 0A 0A")
+	dim, _ := gozxing.NewDimension(10, 10)
+	ctx.SetSizeConstraints(dim, dim)
+	e := enc.encode(ctx)
+	if e == nil {
+		t.Fatalf("encode must be error")
+	}
+
+	ctx, _ = NewEncoderContext("0A 0A 0A 0A 0A")
 	ctx.SignalEncoderChange(HighLevelEncoder_C40_ENCODATION)
 	expect := []byte{27, 52, 27, 52, 27, 52, 27, 52, 254}
-	e := enc.encode(ctx)
+	e = enc.encode(ctx)
 	if e != nil {
 		t.Fatalf("encode returns error: %v", e)
 	}

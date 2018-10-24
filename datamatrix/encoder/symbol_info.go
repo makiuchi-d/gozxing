@@ -184,6 +184,14 @@ func (this *SymbolInfo) GetErrorCodewords() int {
 	return this.errorCodewords
 }
 
+func (this *SymbolInfo) GetMatrixWidth() int {
+	return this.matrixWidth
+}
+
+func (this *SymbolInfo) GetMatrixHeight() int {
+	return this.matrixHeight
+}
+
 func (this *SymbolInfo) GetDataLengthForInterleavedBlock(index int) int {
 	return this.funcGetDataLengthForInterleavedBlock(this, index)
 }

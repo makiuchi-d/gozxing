@@ -33,7 +33,10 @@ func (this *C40Encoder) encode(context *EncoderContext) error {
 		unwritten := (len(buffer) / 3) * 2
 
 		curCodewordCount := context.GetCodewordCount() + unwritten
-		context.UpdateSymbolInfoByLength(curCodewordCount)
+		e := context.UpdateSymbolInfoByLength(curCodewordCount)
+		if e != nil {
+			return e
+		}
 		available := context.GetSymbolInfo().GetDataCapacity() - curCodewordCount
 
 		if !context.HasMoreCharacters() {

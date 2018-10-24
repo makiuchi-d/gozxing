@@ -32,6 +32,12 @@ func TestSymbolInfo(t *testing.T) {
 	if r := s.GetErrorCodewords(); r != 5 {
 		t.Fatalf("GetErrorCodewords = %v, expect 5", r)
 	}
+	if r := s.GetMatrixWidth(); r != 8 {
+		t.Fatalf("GetMatrixWidth = %v, expect 8", r)
+	}
+	if r := s.GetMatrixHeight(); r != 8 {
+		t.Fatalf("GetMatrixHeight = %v, expect 8", r)
+	}
 	if r := s.GetDataLengthForInterleavedBlock(0); r != 3 {
 		t.Fatalf("GetDataLengthForInterleavedBlock = %v, expect 3", r)
 	}
@@ -64,6 +70,12 @@ func TestSymbolInfo(t *testing.T) {
 	if r := s.GetErrorCodewords(); r != 7 {
 		t.Fatalf("GetErrorCodewords = %v, expect 7", r)
 	}
+	if r := s.GetMatrixWidth(); r != 16 {
+		t.Fatalf("GetMatrixWidth = %v, expect 16", r)
+	}
+	if r := s.GetMatrixHeight(); r != 6 {
+		t.Fatalf("GetMatrixHeight = %v, expect 6", r)
+	}
 	if r := s.GetDataLengthForInterleavedBlock(0); r != 5 {
 		t.Fatalf("GetDataLengthForInterleavedBlock = %v, expect 5", r)
 	}
@@ -95,6 +107,12 @@ func TestSymbolInfo(t *testing.T) {
 	}
 	if r := s.GetErrorCodewords(); r != 84 {
 		t.Fatalf("GetErrorCodewords = %v, expect 84", r)
+	}
+	if r := s.GetMatrixWidth(); r != 24 {
+		t.Fatalf("GetMatrixWidth = %v, expect 24", r)
+	}
+	if r := s.GetMatrixHeight(); r != 24 {
+		t.Fatalf("GetMatrixHeight = %v, expect 24", r)
 	}
 	if r := s.GetDataLengthForInterleavedBlock(0); r != 102 {
 		t.Fatalf("GetDataLengthForInterleavedBlock = %v, expect 102", r)
