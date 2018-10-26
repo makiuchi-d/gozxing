@@ -123,6 +123,11 @@ func TestBitMatrix_GetSetFlip(t *testing.T) {
 	testBitMatrixGet(t, b, 6, 6, true)
 	b.Flip(6, 6)
 	testBitMatrixGet(t, b, 6, 6, false)
+
+	testBitMatrixGet(t, b, -1, 0, false)
+	testBitMatrixGet(t, b, 0, -1, false)
+	testBitMatrixGet(t, b, 7, 0, false)
+	testBitMatrixGet(t, b, 0, 7, false)
 }
 
 func TestBitMatrix_Xor(t *testing.T) {
