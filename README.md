@@ -40,6 +40,19 @@ This project is a port of Zxing core library to pure Go.
 | RSS-14       |                    |                    |
 | RSS-Expanded |                    |                    |
 
+### Special reader/writer
+
+| Reader/Writer                | Porting status     |
+|------------------------------|--------------------|
+| MultiFormatReader            |                    |
+| MultiFormatWriter            |                    |
+| ByQuadrantReader             |                    |
+| GenericMultipleBarcodeReader |                    |
+| QRCodeMultiReader            |                    |
+| MultiFormatUPCEANReader      |                    |
+| MultiFormatOneDReader        |                    |
+| OneDimensionalCodeWriter     |                    |
+
 ## Usage Examples
 
 ### Scanning QR code
