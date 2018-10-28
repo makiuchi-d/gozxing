@@ -1,22 +1,20 @@
-package common
+package gozxing
 
 import (
 	"fmt"
 	"testing"
-
-	"github.com/makiuchi-d/gozxing"
 )
 
-type testLuminanceSource struct {
-	gozxing.LuminanceSourceBase
+type testLuminanceSource2 struct {
+	LuminanceSourceBase
 }
 
-func newTestLuminanceSource(size int) *testLuminanceSource {
-	return &testLuminanceSource{
-		gozxing.LuminanceSourceBase{size, size},
+func newTestLuminanceSource2(size int) *testLuminanceSource2 {
+	return &testLuminanceSource2{
+		LuminanceSourceBase{size, size},
 	}
 }
-func (this *testLuminanceSource) GetRow(y int, row []byte) ([]byte, error) {
+func (this *testLuminanceSource2) GetRow(y int, row []byte) ([]byte, error) {
 	width := this.GetWidth()
 	if y >= this.GetHeight() {
 		return row, fmt.Errorf("y(%d) >= height(%d)", y, this.GetHeight())
@@ -30,7 +28,7 @@ func (this *testLuminanceSource) GetRow(y int, row []byte) ([]byte, error) {
 	}
 	return row, nil
 }
-func (this *testLuminanceSource) GetMatrix() []byte {
+func (this *testLuminanceSource2) GetMatrix() []byte {
 	width := this.GetWidth()
 	height := this.GetHeight()
 	matrix := make([]byte, width*height)
@@ -39,20 +37,20 @@ func (this *testLuminanceSource) GetMatrix() []byte {
 	}
 	return matrix
 }
-func (this *testLuminanceSource) Invert() gozxing.LuminanceSource {
-	return gozxing.LuminanceSourceInvert(this)
+func (this *testLuminanceSource2) Invert() LuminanceSource {
+	return LuminanceSourceInvert(this)
 }
-func (this *testLuminanceSource) String() string {
-	return gozxing.LuminanceSourceString(this)
+func (this *testLuminanceSource2) String() string {
+	return LuminanceSourceString(this)
 }
 
 type testBlackSource struct {
-	gozxing.LuminanceSourceBase
+	LuminanceSourceBase
 }
 
 func newTestBlackSource(size int) *testBlackSource {
 	return &testBlackSource{
-		gozxing.LuminanceSourceBase{size, size},
+		LuminanceSourceBase{size, size},
 	}
 }
 func (this *testBlackSource) GetRow(y int, row []byte) ([]byte, error) {
@@ -66,16 +64,16 @@ func (this *testBlackSource) GetMatrix() []byte {
 	matrix := make([]byte, size)
 	return matrix
 }
-func (this *testBlackSource) Invert() gozxing.LuminanceSource {
-	return gozxing.LuminanceSourceInvert(this)
+func (this *testBlackSource) Invert() LuminanceSource {
+	return LuminanceSourceInvert(this)
 }
 func (this *testBlackSource) String() string {
-	return gozxing.LuminanceSourceString(this)
+	return LuminanceSourceString(this)
 }
 
 func TestGlobalHistgramBinarizer(t *testing.T) {
 	size := 32
-	src := newTestLuminanceSource(size)
+	src := newTestLuminanceSource2(size)
 	ghb := NewGlobalHistgramBinarizer(src)
 
 	if s := ghb.GetLuminanceSource(); s != src {
@@ -92,7 +90,7 @@ func TestGlobalHistgramBinarizer_estimateBlackPoint(t *testing.T) {
 	// single peak
 	buckets := []int{0, 0, 0, 15, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 	_, e := g.estimateBlackPoint(buckets)
-	if _, ok := e.(gozxing.NotFoundException); !ok {
+	if _, ok := e.(NotFoundException); !ok {
 		t.Fatalf("estimateBlackPoint must be NotFoundException, %T", e)
 	}
 
@@ -108,7 +106,7 @@ func TestGlobalHistgramBinarizer_estimateBlackPoint(t *testing.T) {
 }
 
 func TestGlobalHistgramBinarizer_GetBlackRow(t *testing.T) {
-	src := newTestLuminanceSource(16)
+	src := newTestLuminanceSource2(16)
 	ghb := NewGlobalHistgramBinarizer(src)
 
 	if _, e := ghb.GetBlackRow(16, nil); e == nil {
@@ -127,12 +125,12 @@ func TestGlobalHistgramBinarizer_GetBlackRow(t *testing.T) {
 	// white image
 	ghb = ghb.CreateBinarizer(newTestBlackSource(16))
 	_, e = ghb.GetBlackRow(0, r)
-	if _, ok := e.(gozxing.NotFoundException); !ok {
+	if _, ok := e.(NotFoundException); !ok {
 		t.Fatalf("GetBlackRow must be NotFoundException, %T", e)
 	}
 
 	// small image
-	ghb = ghb.CreateBinarizer(newTestLuminanceSource(2))
+	ghb = ghb.CreateBinarizer(newTestLuminanceSource2(2))
 	r, e = ghb.GetBlackRow(0, nil)
 	if e != nil {
 		t.Fatalf("GetBlackRow returns error, %v", e)
@@ -144,7 +142,7 @@ func TestGlobalHistgramBinarizer_GetBlackRow(t *testing.T) {
 }
 
 func TestGlobalHistgramBinarizer_GetBlackMatrix(t *testing.T) {
-	ghb := NewGlobalHistgramBinarizer(newTestLuminanceSource(0))
+	ghb := NewGlobalHistgramBinarizer(newTestLuminanceSource2(0))
 	_, e := ghb.GetBlackMatrix()
 	if e == nil {
 		t.Fatalf("GetBlackMatrix must be error")
@@ -152,11 +150,11 @@ func TestGlobalHistgramBinarizer_GetBlackMatrix(t *testing.T) {
 
 	ghb = NewGlobalHistgramBinarizer(newTestBlackSource(16))
 	_, e = ghb.GetBlackMatrix()
-	if _, ok := e.(gozxing.NotFoundException); !ok {
+	if _, ok := e.(NotFoundException); !ok {
 		t.Fatalf("GetBlackMatrix must be NotFoundException, %T", e)
 	}
 
-	src := newTestLuminanceSource(16)
+	src := newTestLuminanceSource2(16)
 	rawmatrix := src.GetMatrix()
 	ghb = NewGlobalHistgramBinarizer(src)
 	m, e := ghb.GetBlackMatrix()

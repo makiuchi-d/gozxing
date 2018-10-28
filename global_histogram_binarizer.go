@@ -1,8 +1,4 @@
-package common
-
-import (
-	"github.com/makiuchi-d/gozxing"
-)
+package gozxing
 
 const (
 	LUMINANCE_BITS    = 5
@@ -11,12 +7,12 @@ const (
 )
 
 type GlobalHistogramBinarizer struct {
-	source     gozxing.LuminanceSource
+	source     LuminanceSource
 	luminances []byte
 	buckets    []int
 }
 
-func NewGlobalHistgramBinarizer(source gozxing.LuminanceSource) gozxing.Binarizer {
+func NewGlobalHistgramBinarizer(source LuminanceSource) Binarizer {
 	return &GlobalHistogramBinarizer{
 		source:     source,
 		luminances: []byte{},
@@ -24,7 +20,7 @@ func NewGlobalHistgramBinarizer(source gozxing.LuminanceSource) gozxing.Binarize
 	}
 }
 
-func (this *GlobalHistogramBinarizer) GetLuminanceSource() gozxing.LuminanceSource {
+func (this *GlobalHistogramBinarizer) GetLuminanceSource() LuminanceSource {
 	return this.source
 }
 
@@ -36,11 +32,11 @@ func (this *GlobalHistogramBinarizer) GetHeight() int {
 	return this.source.GetHeight()
 }
 
-func (this *GlobalHistogramBinarizer) GetBlackRow(y int, row *gozxing.BitArray) (*gozxing.BitArray, error) {
+func (this *GlobalHistogramBinarizer) GetBlackRow(y int, row *BitArray) (*BitArray, error) {
 	source := this.GetLuminanceSource()
 	width := source.GetWidth()
 	if row == nil || row.GetSize() < width {
-		row = gozxing.NewBitArray(width)
+		row = NewBitArray(width)
 	} else {
 		row.Clear()
 	}
@@ -82,11 +78,11 @@ func (this *GlobalHistogramBinarizer) GetBlackRow(y int, row *gozxing.BitArray) 
 	return row, nil
 }
 
-func (this *GlobalHistogramBinarizer) GetBlackMatrix() (*gozxing.BitMatrix, error) {
+func (this *GlobalHistogramBinarizer) GetBlackMatrix() (*BitMatrix, error) {
 	source := this.GetLuminanceSource()
 	width := source.GetWidth()
 	height := source.GetHeight()
-	matrix, e := gozxing.NewBitMatrix(width, height)
+	matrix, e := NewBitMatrix(width, height)
 	if e != nil {
 		return nil, e
 	}
@@ -126,7 +122,7 @@ func (this *GlobalHistogramBinarizer) GetBlackMatrix() (*gozxing.BitMatrix, erro
 	return matrix, nil
 }
 
-func (this *GlobalHistogramBinarizer) CreateBinarizer(source gozxing.LuminanceSource) gozxing.Binarizer {
+func (this *GlobalHistogramBinarizer) CreateBinarizer(source LuminanceSource) Binarizer {
 	return NewGlobalHistgramBinarizer(source)
 }
 
@@ -176,7 +172,7 @@ func (this *GlobalHistogramBinarizer) estimateBlackPoint(buckets []int) (int, er
 	// If there is too little contrast in the image to pick a meaningful black point, throw rather
 	// than waste time trying to decode the image, and risk false positives.
 	if secondPeak-firstPeak <= numBuckets/16 {
-		return 0, gozxing.GetNotFoundExceptionInstance()
+		return 0, GetNotFoundExceptionInstance()
 	}
 
 	// Find a valley between them that is low and closer to the white peak.

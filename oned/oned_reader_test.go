@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/common"
 	"github.com/makiuchi-d/gozxing/testutil"
 )
 
@@ -145,7 +144,7 @@ func (this *testBitSource) String() string {
 
 func TestOneDReader_doDecode(t *testing.T) {
 	src := newTestBitSource(1, "")
-	bmp, _ := gozxing.NewBinaryBitmap(common.NewGlobalHistgramBinarizer(src))
+	bmp, _ := gozxing.NewBinaryBitmap(gozxing.NewGlobalHistgramBinarizer(src))
 
 	reader := NewEAN8Reader().(*OneDReader)
 
@@ -155,7 +154,7 @@ func TestOneDReader_doDecode(t *testing.T) {
 	}
 
 	src = newTestBitSource(1, "0000")
-	bmp, _ = gozxing.NewBinaryBitmap(common.NewGlobalHistgramBinarizer(src))
+	bmp, _ = gozxing.NewBinaryBitmap(gozxing.NewGlobalHistgramBinarizer(src))
 	_, e = reader.doDecode(bmp, nil)
 	if e == nil {
 		t.Fatalf("doDecode must be error")
@@ -172,7 +171,7 @@ func TestOneDReader_doDecode(t *testing.T) {
 	// upside down of "12345670"
 	src = newTestBitSource(10,
 		"000010101001110010001000010101110010101011000101011110110010010011001010000")
-	bmp, _ = gozxing.NewBinaryBitmap(common.NewGlobalHistgramBinarizer(src))
+	bmp, _ = gozxing.NewBinaryBitmap(gozxing.NewGlobalHistgramBinarizer(src))
 	r, e := reader.doDecode(bmp, hints)
 	if e != nil {
 		t.Fatalf("doDecode returns error, %v", e)
@@ -205,14 +204,14 @@ func TestOneDReader_DecodeFail(t *testing.T) {
 	reader := NewEAN8Reader()
 
 	src := newTestBitSource(1, "")
-	bmp, _ := gozxing.NewBinaryBitmap(common.NewGlobalHistgramBinarizer(src))
+	bmp, _ := gozxing.NewBinaryBitmap(gozxing.NewGlobalHistgramBinarizer(src))
 	_, e := reader.DecodeWithoutHints(bmp)
 	if e == nil {
 		t.Fatalf("Decode must be error")
 	}
 
 	src = newTestBitSource(1, "01010")
-	bmp, _ = gozxing.NewBinaryBitmap(common.NewGlobalHistgramBinarizer(src))
+	bmp, _ = gozxing.NewBinaryBitmap(gozxing.NewGlobalHistgramBinarizer(src))
 	hints := map[gozxing.DecodeHintType]interface{}{
 		gozxing.DecodeHintType_TRY_HARDER: true,
 	}
@@ -222,7 +221,7 @@ func TestOneDReader_DecodeFail(t *testing.T) {
 	}
 
 	src = &testUnrotatableBitSource{src.(*testBitSource)}
-	bmp, _ = gozxing.NewBinaryBitmap(common.NewGlobalHistgramBinarizer(src))
+	bmp, _ = gozxing.NewBinaryBitmap(gozxing.NewGlobalHistgramBinarizer(src))
 	_, e = reader.Decode(bmp, hints)
 	if e == nil {
 		t.Fatalf("Decode must be error")

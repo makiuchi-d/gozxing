@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/common"
 )
 
 func ExpandBitMatrix(src *gozxing.BitMatrix, factor int) *gozxing.BitMatrix {
@@ -26,7 +25,7 @@ func ExpandBitMatrix(src *gozxing.BitMatrix, factor int) *gozxing.BitMatrix {
 
 func NewBinaryBitmapFromBitMatrix(matrix *gozxing.BitMatrix) *gozxing.BinaryBitmap {
 	src := newTestBitMatrixSource(matrix)
-	binarizer := common.NewHybridBinarizer(src)
+	binarizer := gozxing.NewHybridBinarizer(src)
 	bmp, _ := gozxing.NewBinaryBitmap(binarizer)
 	return bmp
 }
@@ -35,7 +34,7 @@ func NewBinaryBitmapFromFile(filename string) *gozxing.BinaryBitmap {
 	file, _ := os.Open(filename)
 	img, _, _ := image.Decode(file)
 	src := gozxing.NewLuminanceSourceFromImage(img)
-	binarizer := common.NewHybridBinarizer(src)
+	binarizer := gozxing.NewHybridBinarizer(src)
 	bmp, _ := gozxing.NewBinaryBitmap(binarizer)
 	return bmp
 }

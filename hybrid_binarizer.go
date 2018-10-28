@@ -1,8 +1,4 @@
-package common
-
-import (
-	"github.com/makiuchi-d/gozxing"
-)
+package gozxing
 
 const (
 	BLOCK_SIZE_POWER  = 3
@@ -14,17 +10,17 @@ const (
 
 type HybridBinarizer struct {
 	*GlobalHistogramBinarizer
-	matrix *gozxing.BitMatrix
+	matrix *BitMatrix
 }
 
-func NewHybridBinarizer(source gozxing.LuminanceSource) gozxing.Binarizer {
+func NewHybridBinarizer(source LuminanceSource) Binarizer {
 	return &HybridBinarizer{
 		NewGlobalHistgramBinarizer(source).(*GlobalHistogramBinarizer),
 		nil,
 	}
 }
 
-func (this *HybridBinarizer) GetBlackMatrix() (*gozxing.BitMatrix, error) {
+func (this *HybridBinarizer) GetBlackMatrix() (*BitMatrix, error) {
 	if this.matrix != nil {
 		return this.matrix, nil
 	}
@@ -43,7 +39,7 @@ func (this *HybridBinarizer) GetBlackMatrix() (*gozxing.BitMatrix, error) {
 		}
 		blackPoints := this.calculateBlackPoints(luminances, subWidth, subHeight, width, height)
 
-		newMatrix, _ := gozxing.NewBitMatrix(width, height)
+		newMatrix, _ := NewBitMatrix(width, height)
 		this.calculateThresholdForBlock(luminances, subWidth, subHeight, width, height, blackPoints, newMatrix)
 		this.matrix = newMatrix
 	} else {
@@ -57,12 +53,12 @@ func (this *HybridBinarizer) GetBlackMatrix() (*gozxing.BitMatrix, error) {
 	return this.matrix, nil
 }
 
-func (this *HybridBinarizer) CreateBinarizer(source gozxing.LuminanceSource) gozxing.Binarizer {
+func (this *HybridBinarizer) CreateBinarizer(source LuminanceSource) Binarizer {
 	return NewHybridBinarizer(source)
 }
 
 func (this *HybridBinarizer) calculateThresholdForBlock(
-	luminances []byte, subWidth, subHeight, width, height int, blackPoints [][]int, matrix *gozxing.BitMatrix) {
+	luminances []byte, subWidth, subHeight, width, height int, blackPoints [][]int, matrix *BitMatrix) {
 	maxYOffset := height - BLOCK_SIZE
 	maxXOffset := width - BLOCK_SIZE
 	for y := 0; y < subHeight; y++ {
@@ -98,7 +94,7 @@ func (this *HybridBinarizer) cap(value, min, max int) int {
 	return value
 }
 
-func (this *HybridBinarizer) thresholdBlock(luminances []byte, xoffset, yoffset, threshold, stride int, matrix *gozxing.BitMatrix) {
+func (this *HybridBinarizer) thresholdBlock(luminances []byte, xoffset, yoffset, threshold, stride int, matrix *BitMatrix) {
 	for y, offset := 0, yoffset*stride+xoffset; y < BLOCK_SIZE; y, offset = y+1, offset+stride {
 		for x := 0; x < BLOCK_SIZE; x++ {
 			// Comparison needs to be <= so that black == 0 pixels are black even if the threshold is 0.

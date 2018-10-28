@@ -1,10 +1,8 @@
-package common
+package gozxing
 
 import (
 	"reflect"
 	"testing"
-
-	"github.com/makiuchi-d/gozxing"
 )
 
 var luminancesSize = 31
@@ -43,7 +41,7 @@ var luminances = []byte{
 }
 
 func TestHybridBinarizer(t *testing.T) {
-	src := newTestLuminanceSource(63)
+	src := newTestLuminanceSource2(63)
 	b := NewHybridBinarizer(src)
 
 	m, e := b.GetBlackMatrix()
@@ -71,7 +69,7 @@ func TestHybridBinarizer(t *testing.T) {
 		}
 	}
 
-	b = b.CreateBinarizer(newTestLuminanceSource(39))
+	b = b.CreateBinarizer(newTestLuminanceSource2(39))
 	m, e = b.GetBlackMatrix()
 	if e != nil {
 		t.Fatalf("GetBlackMatrix returns error, %v", e)
@@ -87,7 +85,7 @@ func TestHybridBinarizer(t *testing.T) {
 
 	b = b.CreateBinarizer(newTestBlackSource(39))
 	m, e = b.GetBlackMatrix()
-	if _, ok := e.(gozxing.NotFoundException); !ok {
+	if _, ok := e.(NotFoundException); !ok {
 		t.Fatalf("GetBlackMatrix must be NotFoundException, %T", e)
 	}
 }
