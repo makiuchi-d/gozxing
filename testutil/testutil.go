@@ -33,9 +33,7 @@ func NewBinaryBitmapFromBitMatrix(matrix *gozxing.BitMatrix) *gozxing.BinaryBitm
 func NewBinaryBitmapFromFile(filename string) *gozxing.BinaryBitmap {
 	file, _ := os.Open(filename)
 	img, _, _ := image.Decode(file)
-	src := gozxing.NewLuminanceSourceFromImage(img)
-	binarizer := gozxing.NewHybridBinarizer(src)
-	bmp, _ := gozxing.NewBinaryBitmap(binarizer)
+	bmp, _ := gozxing.NewBinaryBitmapFromImage(img)
 	return bmp
 }
 

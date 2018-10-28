@@ -63,8 +63,7 @@ file, _ := os.Open("qrcode.jpg")
 img, _, _ := image.Decode(file)
 
 // prepare binary bitmap
-src := gozxing.NewLuminanceSourceFromImage(img)
-bmp, _ := gozxing.NewBinaryBitmap(common.NewHybridBinarizer(src))
+bmp, _ := gozxing.NewBinaryBitmapFromImage(img)
 
 // decode image
 qrReader := qrcode.NewQRCodeReader()

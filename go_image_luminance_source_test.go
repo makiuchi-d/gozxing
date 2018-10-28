@@ -30,6 +30,17 @@ func newTestImage(w, h int) *testImage {
 	return &testImage{image.Rect(0, 0, w, h)}
 }
 
+func TestNewBinaryBitmapFromImage(t *testing.T) {
+	img := newTestImage(15, 10)
+	bmp, e := NewBinaryBitmapFromImage(img)
+	if e != nil {
+		t.Fatalf("NewBinaryBitmapFromImage returns error: %v", e)
+	}
+	if w, h := bmp.GetWidth(), bmp.GetHeight(); w != 15 || h != 10 {
+		t.Fatalf("NewBinaryBitmapFromImage = %vx%v, expect 15x10", w, h)
+	}
+}
+
 func TestNewLuminanceSourceFromImage(t *testing.T) {
 	img := newTestImage(10, 10)
 	src := NewLuminanceSourceFromImage(img)
@@ -120,5 +131,15 @@ func TestGoImageLuminanceSource_RotateCounterClockwise(t *testing.T) {
 				t.Fatalf("matrix[%v,%v] = %v, expect %v", x, y, lumina, expect)
 			}
 		}
+	}
+}
+
+func TestGoImageLuminanceSource_RotateCounterClockwise45(t *testing.T) {
+	img := newTestImage(10, 10)
+	src := NewLuminanceSourceFromImage(img)
+
+	_, e := src.RotateCounterClockwise45()
+	if e == nil {
+		t.Fatalf("RotateCounterClockwise45 must be error")
 	}
 }

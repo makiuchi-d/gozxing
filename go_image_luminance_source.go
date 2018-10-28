@@ -5,6 +5,11 @@ import (
 	"image"
 )
 
+func NewBinaryBitmapFromImage(img image.Image) (*BinaryBitmap, error) {
+	src := NewLuminanceSourceFromImage(img)
+	return NewBinaryBitmap(NewHybridBinarizer(src))
+}
+
 type GoImageLuminanceSource struct {
 	*RGBLuminanceSource
 }
