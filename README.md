@@ -58,17 +58,31 @@ This project is a port of Zxing core library to pure Go.
 ### Scanning QR code
 
 ```Go
-// open and decode image file
-file, _ := os.Open("qrcode.jpg")
-img, _, _ := image.Decode(file)
+package main
 
-// prepare binary bitmap
-bmp, _ := gozxing.NewBinaryBitmapFromImage(img)
+import (
+	"fmt"
+	"image"
+	_ "image/jpeg"
+	"os"
 
-// decode image
-qrReader := qrcode.NewQRCodeReader()
-result, _ := qrReader.Decode(bmp, nil)
+	"github.com/makiuchi-d/gozxing"
+	"github.com/makiuchi-d/gozxing/qrcode"
+)
 
-fmt.Println(result)
+func main() {
+	// open and decode image file
+	file, _ := os.Open("qrcode.jpg")
+	img, _, _ := image.Decode(file)
+
+	// prepare BinaryBitmap
+	bmp, _ := gozxing.NewBinaryBitmapFromImage(img)
+
+	// decode image
+	qrReader := qrcode.NewQRCodeReader()
+	result, _ := qrReader.Decode(bmp, nil)
+
+	fmt.Println(result)
+}
 ```
 
