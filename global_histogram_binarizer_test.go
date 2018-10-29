@@ -1,74 +1,26 @@
 package gozxing
 
 import (
-	"fmt"
 	"testing"
 )
 
-type testLuminanceSource2 struct {
-	LuminanceSourceBase
-}
-
-func newTestLuminanceSource2(size int) *testLuminanceSource2 {
-	return &testLuminanceSource2{
+func newTestLuminanceSource2(size int) LuminanceSource {
+	return &testLuminanceSource{
 		LuminanceSourceBase{size, size},
+		func(x, y int) byte {
+			if (y+x)%2 == 0 {
+				return 10 + byte(50*x/size)
+			}
+			return 250 - byte(50*x/size)
+		},
 	}
-}
-func (this *testLuminanceSource2) GetRow(y int, row []byte) ([]byte, error) {
-	width := this.GetWidth()
-	if y >= this.GetHeight() {
-		return row, fmt.Errorf("y(%d) >= height(%d)", y, this.GetHeight())
-	}
-	for i := 0; i < width; i++ {
-		if (y+i)%2 == 0 {
-			row[i] = 10 + byte(50*i/width)
-		} else {
-			row[i] = 250 - byte(50*i/width)
-		}
-	}
-	return row, nil
-}
-func (this *testLuminanceSource2) GetMatrix() []byte {
-	width := this.GetWidth()
-	height := this.GetHeight()
-	matrix := make([]byte, width*height)
-	for y := 0; y < height; y++ {
-		this.GetRow(y, matrix[width*y:])
-	}
-	return matrix
-}
-func (this *testLuminanceSource2) Invert() LuminanceSource {
-	return LuminanceSourceInvert(this)
-}
-func (this *testLuminanceSource2) String() string {
-	return LuminanceSourceString(this)
 }
 
-type testBlackSource struct {
-	LuminanceSourceBase
-}
-
-func newTestBlackSource(size int) *testBlackSource {
-	return &testBlackSource{
+func newTestBlackSource(size int) LuminanceSource {
+	return &testLuminanceSource{
 		LuminanceSourceBase{size, size},
+		func(x, y int) byte { return 0 },
 	}
-}
-func (this *testBlackSource) GetRow(y int, row []byte) ([]byte, error) {
-	for i := 0; i < this.GetWidth(); i++ {
-		row[i] = 0
-	}
-	return row, nil
-}
-func (this *testBlackSource) GetMatrix() []byte {
-	size := this.GetWidth() * this.GetHeight()
-	matrix := make([]byte, size)
-	return matrix
-}
-func (this *testBlackSource) Invert() LuminanceSource {
-	return LuminanceSourceInvert(this)
-}
-func (this *testBlackSource) String() string {
-	return LuminanceSourceString(this)
 }
 
 func TestGlobalHistgramBinarizer(t *testing.T) {

@@ -1,12 +1,14 @@
 package testutil
 
 import (
+	"errors"
 	"image"
 	_ "image/jpeg"
 	_ "image/png"
 	"os"
 
 	"github.com/makiuchi-d/gozxing"
+	"github.com/makiuchi-d/gozxing/common"
 )
 
 func ExpandBitMatrix(src *gozxing.BitMatrix, factor int) *gozxing.BitMatrix {
@@ -81,4 +83,17 @@ func (this *testBitMatrixSource) Invert() gozxing.LuminanceSource {
 
 func (this *testBitMatrixSource) String() string {
 	return gozxing.LuminanceSourceString(this)
+}
+
+type DummyGridSampler struct{}
+
+func (s DummyGridSampler) SampleGrid(image *gozxing.BitMatrix, dimensionX, dimensionY int,
+	p1ToX, p1ToY, p2ToX, p2ToY, p3ToX, p3ToY, p4ToX, p4ToY float64,
+	p1FromX, p1FromY, p2FromX, p2FromY, p3FromX, p3FromY, p4FromX, p4FromY float64) (*gozxing.BitMatrix, error) {
+	return nil, errors.New("dummy sampler")
+}
+
+func (s DummyGridSampler) SampleGridWithTransform(image *gozxing.BitMatrix,
+	dimensionX, dimensionY int, transform *common.PerspectiveTransform) (*gozxing.BitMatrix, error) {
+	return nil, errors.New("dummy sampler")
 }

@@ -7,11 +7,13 @@ import (
 
 type testLuminanceSource struct {
 	LuminanceSourceBase
+	get func(x, y int) byte
 }
 
-func newTestLuminanceSource(size int) *testLuminanceSource {
+func newTestLuminanceSource(size int) LuminanceSource {
 	return &testLuminanceSource{
 		LuminanceSourceBase{size, size},
+		func(x, y int) byte { return byte(255 * x / (size - 1)) },
 	}
 }
 
@@ -21,7 +23,7 @@ func (this *testLuminanceSource) GetRow(y int, row []byte) ([]byte, error) {
 	}
 	width := this.GetWidth()
 	for i := 0; i < width; i++ {
-		row[i] = byte(255 * i / (width - 1))
+		row[i] = this.get(i, y)
 	}
 	return row, nil
 }

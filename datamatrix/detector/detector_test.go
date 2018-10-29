@@ -1,7 +1,6 @@
 package detector
 
 import (
-	"errors"
 	"reflect"
 	"testing"
 
@@ -306,19 +305,6 @@ func TestTransitionsBetween(t *testing.T) {
 	}
 }
 
-type dummySampler struct{}
-
-func (dummySampler) SampleGrid(image *gozxing.BitMatrix, dimensionX, dimensionY int,
-	p1ToX, p1ToY, p2ToX, p2ToY, p3ToX, p3ToY, p4ToX, p4ToY float64,
-	p1FromX, p1FromY, p2FromX, p2FromY, p3FromX, p3FromY, p4FromX, p4FromY float64) (*gozxing.BitMatrix, error) {
-	return nil, errors.New("dummy sampler")
-}
-
-func (dummySampler) SampleGridWithTransform(image *gozxing.BitMatrix,
-	dimensionX, dimensionY int, transform *common.PerspectiveTransform) (*gozxing.BitMatrix, error) {
-	return nil, errors.New("dummy sampler")
-}
-
 func TestDetector_Detect(t *testing.T) {
 	img, _ := gozxing.NewBitMatrix(50, 50)
 	det, _ := NewDetector(img)
@@ -369,7 +355,7 @@ func TestDetector_Detect(t *testing.T) {
 	}
 
 	sampler := common.GridSampler_GetInstance()
-	common.GridSampler_SetGridSampler(dummySampler{})
+	common.GridSampler_SetGridSampler(testutil.DummyGridSampler{})
 	_, e = det.Detect()
 	common.GridSampler_SetGridSampler(sampler)
 	if e == nil {

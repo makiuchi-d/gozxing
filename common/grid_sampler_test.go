@@ -1,32 +1,20 @@
-package common
+package common_test
 
 import (
 	"reflect"
 	"testing"
 
 	"github.com/makiuchi-d/gozxing"
+	"github.com/makiuchi-d/gozxing/common"
+	"github.com/makiuchi-d/gozxing/testutil"
 )
 
-type DummyGridSampler struct{}
-type Dummy struct{}
-
-func (s DummyGridSampler) SampleGrid(image *gozxing.BitMatrix, dimensionX, dimensionY int,
-	p1ToX, p1ToY, p2ToX, p2ToY, p3ToX, p3ToY, p4ToX, p4ToY float64,
-	p1FromX, p1FromY, p2FromX, p2FromY, p3FromX, p3FromY, p4FromX, p4FromY float64) (*gozxing.BitMatrix, error) {
-	return nil, nil
-}
-
-func (s DummyGridSampler) SampleGridWithTransform(image *gozxing.BitMatrix,
-	dimensionX, dimensionY int, transform *PerspectiveTransform) (*gozxing.BitMatrix, error) {
-	return nil, nil
-}
-
 func TestGridSampler_GetSetInstance(t *testing.T) {
-	dummySampler := DummyGridSampler{}
+	dummySampler := testutil.DummyGridSampler{}
 
-	GridSampler_SetGridSampler(dummySampler)
+	common.GridSampler_SetGridSampler(dummySampler)
 
-	if s := GridSampler_GetInstance(); s != dummySampler {
+	if s := common.GridSampler_GetInstance(); s != dummySampler {
 		t.Fatalf("sampler is not DummyGridSampler")
 	}
 }
@@ -37,7 +25,7 @@ func TestGridSampler_checkAndNudgePoints(t *testing.T) {
 	var e error
 
 	points = []float64{-2, 0}
-	e = GridSampler_checkAndNudgePoints(image, points)
+	e = common.GridSampler_checkAndNudgePoints(image, points)
 	if e == nil {
 		t.Fatalf("return must be error")
 	}
@@ -46,7 +34,7 @@ func TestGridSampler_checkAndNudgePoints(t *testing.T) {
 	}
 
 	points = []float64{11, 0}
-	e = GridSampler_checkAndNudgePoints(image, points)
+	e = common.GridSampler_checkAndNudgePoints(image, points)
 	if e == nil {
 		t.Fatalf("return must be error")
 	}
@@ -55,7 +43,7 @@ func TestGridSampler_checkAndNudgePoints(t *testing.T) {
 	}
 
 	points = []float64{0, -2}
-	e = GridSampler_checkAndNudgePoints(image, points)
+	e = common.GridSampler_checkAndNudgePoints(image, points)
 	if e == nil {
 		t.Fatalf("return must be error")
 	}
@@ -64,7 +52,7 @@ func TestGridSampler_checkAndNudgePoints(t *testing.T) {
 	}
 
 	points = []float64{0, 11}
-	e = GridSampler_checkAndNudgePoints(image, points)
+	e = common.GridSampler_checkAndNudgePoints(image, points)
 	if e == nil {
 		t.Fatalf("return must be error")
 	}
@@ -73,7 +61,7 @@ func TestGridSampler_checkAndNudgePoints(t *testing.T) {
 	}
 
 	points = []float64{0, 0, -2, 0}
-	e = GridSampler_checkAndNudgePoints(image, points)
+	e = common.GridSampler_checkAndNudgePoints(image, points)
 	if e == nil {
 		t.Fatalf("return must be error")
 	}
@@ -82,7 +70,7 @@ func TestGridSampler_checkAndNudgePoints(t *testing.T) {
 	}
 
 	points = []float64{0, 0, 11, 0}
-	e = GridSampler_checkAndNudgePoints(image, points)
+	e = common.GridSampler_checkAndNudgePoints(image, points)
 	if e == nil {
 		t.Fatalf("return must be error")
 	}
@@ -91,7 +79,7 @@ func TestGridSampler_checkAndNudgePoints(t *testing.T) {
 	}
 
 	points = []float64{0, 0, 0, -2}
-	e = GridSampler_checkAndNudgePoints(image, points)
+	e = common.GridSampler_checkAndNudgePoints(image, points)
 	if e == nil {
 		t.Fatalf("return must be error")
 	}
@@ -100,7 +88,7 @@ func TestGridSampler_checkAndNudgePoints(t *testing.T) {
 	}
 
 	points = []float64{0, 0, 0, 11}
-	e = GridSampler_checkAndNudgePoints(image, points)
+	e = common.GridSampler_checkAndNudgePoints(image, points)
 	if e == nil {
 		t.Fatalf("return must be error")
 	}
@@ -109,7 +97,7 @@ func TestGridSampler_checkAndNudgePoints(t *testing.T) {
 	}
 
 	points = []float64{-1, -1, 10, 10, 0, 0, -1, -1, 10, 10}
-	e = GridSampler_checkAndNudgePoints(image, points)
+	e = common.GridSampler_checkAndNudgePoints(image, points)
 	if e != nil {
 		t.Fatalf("return must not be error")
 	}
