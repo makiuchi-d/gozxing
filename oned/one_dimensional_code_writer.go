@@ -78,14 +78,8 @@ func onedWriter_renderResult(code []bool, width, height, sidesMargin int) (*gozx
 	inputWidth := len(code)
 	// Add quiet zone on both sides.
 	fullWidth := inputWidth + sidesMargin
-	outputWidth := width
-	if outputWidth < fullWidth {
-		outputWidth = fullWidth
-	}
-	outputHeight := height
-	if outputHeight < 1 {
-		outputHeight = 1
-	}
+	outputWidth := max(width, fullWidth)
+	outputHeight := max(1, height)
 
 	multiple := outputWidth / fullWidth
 	leftPadding := (outputWidth - (inputWidth * multiple)) / 2

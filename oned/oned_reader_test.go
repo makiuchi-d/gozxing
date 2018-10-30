@@ -227,3 +227,12 @@ func TestOneDReader_DecodeFail(t *testing.T) {
 		t.Fatalf("Decode must be error")
 	}
 }
+
+func TestMax(t *testing.T) {
+	if r := max(-1, 1); r != 1 {
+		t.Fatalf("max(-1, 1) = %v, expect 1", r)
+	}
+	if r := max(10, 9); r != 10 {
+		t.Fatalf("max(10, 9) = %v, expect 10", r)
+	}
+}

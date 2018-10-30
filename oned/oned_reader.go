@@ -108,9 +108,7 @@ func (this *OneDReader) doDecode(
 	if tryHarder {
 		rowStep = height >> 8
 	}
-	if rowStep < 1 {
-		rowStep = 1
-	}
+	rowStep = max(1, rowStep)
 	var maxLines int
 	if tryHarder {
 		maxLines = height // Look at the whole image, not just the center
@@ -298,4 +296,11 @@ func patternMatchVariance(counters, pattern []int, maxIndividualVariance float64
 		totalVariance += variance
 	}
 	return totalVariance / float64(total)
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }

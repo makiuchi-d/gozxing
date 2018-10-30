@@ -25,6 +25,16 @@ func ExpandBitMatrix(src *gozxing.BitMatrix, factor int) *gozxing.BitMatrix {
 	return dst
 }
 
+func NewBitArrayFromString(str string) *gozxing.BitArray {
+	arr := gozxing.NewBitArray(len(str))
+	for i, c := range str {
+		if c == '1' {
+			arr.Set(i)
+		}
+	}
+	return arr
+}
+
 func NewBinaryBitmapFromBitMatrix(matrix *gozxing.BitMatrix) *gozxing.BinaryBitmap {
 	src := newTestBitMatrixSource(matrix)
 	binarizer := gozxing.NewHybridBinarizer(src)
