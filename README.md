@@ -32,7 +32,7 @@ This project is a port of Zxing core library to pure Go.
 
 | Format       | Scanning           | Encoding           |
 |--------------|--------------------|--------------------|
-| Code 39      |                    |                    |
+| Code 39      | :heavy_check_mark: |                    |
 | Code 93      |                    |                    |
 | Code 128     |                    |                    |
 | Codabar      |                    |                    |
