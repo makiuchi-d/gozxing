@@ -63,7 +63,7 @@ func TestCode39ToNarrowWidePattern(t *testing.T) {
 		t.Fatalf("code39ToNarrowWidePattern = %v expect -1", r)
 	}
 
-	counters = []int{3, 7, 3, 2, 6, 4, 6, 3, 3} // |  | ■ ■ |
+	counters = []int{3, 7, 3, 2, 6, 4, 6, 3, 3} // 1,2,1,1,2,1,2,1,1
 	r = code39ToNarrowWidePattern(counters)
 	if r != code39AsteriskEncoding {
 		t.Fatalf("code39ToNarrowWidePattern = %v, expect %v", r, code39AsteriskEncoding)
@@ -195,7 +195,7 @@ func TestCode39RowDecoder_decodeRowWithExtendedModeCheckDigit(t *testing.T) {
 	}
 }
 
-func TestCode39Decoder(t *testing.T) {
+func TestCode39Reader(t *testing.T) {
 	// testdata from zxing core/src/test/resources/blackbox/code39-*/
 	format := gozxing.BarcodeFormat_CODE_39
 
