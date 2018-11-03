@@ -4,7 +4,7 @@
 [![codecov](https://codecov.io/gh/makiuchi-d/gozxing/branch/master/graph/badge.svg)](https://codecov.io/gh/makiuchi-d/gozxing)
 
 [ZXing](https://github.com/zxing/zxing) is an open-source, multi-format 1D/2D barcode image processing library for Java.
-This project is a port of Zxing core library to pure Go.
+This project is a port of ZXing core library to pure Go.
 
 ## Porting Status (supported formats)
 
@@ -33,7 +33,7 @@ This project is a port of Zxing core library to pure Go.
 | Format       | Scanning           | Encoding           |
 |--------------|--------------------|--------------------|
 | Code 39      | :heavy_check_mark: |                    |
-| Code 93      |                    |                    |
+| Code 93      | :heavy_check_mark: |                    |
 | Code 128     |                    |                    |
 | Codabar      |                    |                    |
 | ITF          |                    |                    |
@@ -85,4 +85,3 @@ func main() {
 	fmt.Println(result)
 }
 ```
-
