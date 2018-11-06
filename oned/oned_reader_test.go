@@ -236,3 +236,12 @@ func TestMax(t *testing.T) {
 		t.Fatalf("max(10, 9) = %v, expect 10", r)
 	}
 }
+
+func TestMin(t *testing.T) {
+	if r := min(-1, 1); r != -1 {
+		t.Fatalf("min(-1, 1) = %v, expect -1", r)
+	}
+	if r := min(10, 9); r != 9 {
+		t.Fatalf("min(10, 9) = %v, expect 9", r)
+	}
+}
