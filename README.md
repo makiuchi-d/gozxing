@@ -1,4 +1,4 @@
-# gozxing A Barcode Scaniing/Encoding Library for Go
+# gozxing A Barcode Scanning/Encoding Library for Go
 
 [![Build Status](https://travis-ci.org/makiuchi-d/gozxing.svg?branch=master)](https://travis-ci.org/makiuchi-d/gozxing)
 [![codecov](https://codecov.io/gh/makiuchi-d/gozxing/branch/master/graph/badge.svg)](https://codecov.io/gh/makiuchi-d/gozxing)
@@ -34,7 +34,7 @@ This project is a port of ZXing core library to pure Go.
 |--------------|--------------------|--------------------|
 | Code 39      | :heavy_check_mark: |                    |
 | Code 93      | :heavy_check_mark: |                    |
-| Code 128     |                    |                    |
+| Code 128     | :heavy_check_mark: |                    |
 | Codabar      |                    |                    |
 | ITF          |                    |                    |
 | RSS-14       |                    |                    |
@@ -51,7 +51,6 @@ This project is a port of ZXing core library to pure Go.
 | QRCodeMultiReader            |                    |
 | MultiFormatUPCEANReader      |                    |
 | MultiFormatOneDReader        |                    |
-| OneDimensionalCodeWriter     |                    |
 
 ## Usage Examples
 
