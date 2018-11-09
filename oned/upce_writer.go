@@ -16,14 +16,10 @@ const (
 type upcEEncoder struct{}
 
 func NewUPCEWriter() gozxing.Writer {
-	return NewUPCEANWriter(upcEEncoder{})
+	return NewUPCEANWriter(upcEEncoder{}, gozxing.BarcodeFormat_UPC_E)
 }
 
-func (upcEEncoder) getFormat() gozxing.BarcodeFormat {
-	return gozxing.BarcodeFormat_UPC_E
-}
-
-func (upcEEncoder) encodeContents(contents string) ([]bool, error) {
+func (upcEEncoder) encode(contents string) ([]bool, error) {
 	length := len(contents)
 	switch length {
 	case 7:

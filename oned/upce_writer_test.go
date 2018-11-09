@@ -7,40 +7,32 @@ import (
 	"github.com/makiuchi-d/gozxing"
 )
 
-func TestUPCEWriter_GetFormat(t *testing.T) {
-	enc := upcEEncoder{}
-	format := enc.getFormat()
-	if format != gozxing.BarcodeFormat_UPC_E {
-		t.Fatalf("getFormat = %v, expect UPC_E", format)
-	}
-}
-
-func TestUPCEWriter_encodeContents(t *testing.T) {
+func TestUPCEWriter_encode(t *testing.T) {
 	enc := upcEEncoder{}
 
-	_, e := enc.encodeContents("")
+	_, e := enc.encode("")
 	if e == nil {
-		t.Fatalf("encodeContents must be error")
+		t.Fatalf("encode must be error")
 	}
 
-	_, e = enc.encodeContents("123456a")
+	_, e = enc.encode("123456a")
 	if e == nil {
-		t.Fatalf("encodeContents must be error")
+		t.Fatalf("encode must be error")
 	}
 
-	_, e = enc.encodeContents("123456ab")
+	_, e = enc.encode("123456ab")
 	if e == nil {
-		t.Fatalf("encodeContents must be error")
+		t.Fatalf("encode must be error")
 	}
 
-	_, e = enc.encodeContents("12345678")
+	_, e = enc.encode("12345678")
 	if e == nil {
-		t.Fatalf("encodeContents must be error")
+		t.Fatalf("encode must be error")
 	}
 
-	_, e = enc.encodeContents("2345678")
+	_, e = enc.encode("2345678")
 	if e == nil {
-		t.Fatalf("encodeContents must be error")
+		t.Fatalf("encode must be error")
 	}
 
 	// contents=1234567, check=0, parity[1,0]=0x7=LLLGGG
@@ -55,20 +47,20 @@ func TestUPCEWriter_encodeContents(t *testing.T) {
 		false, true, false, true, false, true, // end
 	}
 
-	r, e := enc.encodeContents("1234567")
+	r, e := enc.encode("1234567")
 	if e != nil {
-		t.Fatalf("encodeContents returns error, %v", e)
+		t.Fatalf("encode returns error, %v", e)
 	}
 	if !reflect.DeepEqual(r, expect) {
-		t.Fatalf("encodeContents:\n%v\nexpect:\n%v", r, expect)
+		t.Fatalf("encode:\n%v\nexpect:\n%v", r, expect)
 	}
 
-	r, e = enc.encodeContents("12345670")
+	r, e = enc.encode("12345670")
 	if e != nil {
-		t.Fatalf("encodeContents returns error, %v", e)
+		t.Fatalf("encode returns error, %v", e)
 	}
 	if !reflect.DeepEqual(r, expect) {
-		t.Fatalf("encodeContents:\n%v\nexpect:\n%v", r, expect)
+		t.Fatalf("encode:\n%v\nexpect:\n%v", r, expect)
 	}
 }
 

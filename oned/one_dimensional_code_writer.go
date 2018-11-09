@@ -9,18 +9,19 @@ import (
 )
 
 type encoder interface {
-	encodeContents(contents string) ([]bool, error)
-	getFormat() gozxing.BarcodeFormat
+	encode(contents string) ([]bool, error)
 }
 
 type OneDimensionalCodeWriter struct {
 	encoder
+	format        gozxing.BarcodeFormat
 	defaultMargin int
 }
 
-func NewOneDimensionalCodeWriter(enc encoder) *OneDimensionalCodeWriter {
+func NewOneDimensionalCodeWriter(enc encoder, format gozxing.BarcodeFormat) *OneDimensionalCodeWriter {
 	return &OneDimensionalCodeWriter{
 		encoder:       enc,
+		format:        format,
 		defaultMargin: 10,
 	}
 }
@@ -39,8 +40,8 @@ func (this *OneDimensionalCodeWriter) Encode(
 	contents string, format gozxing.BarcodeFormat, width, height int,
 	hints map[gozxing.EncodeHintType]interface{}) (*gozxing.BitMatrix, error) {
 
-	if f := this.getFormat(); format != f {
-		return nil, fmt.Errorf("IllegalArgumentException: Can only encode %v, but got %v", f, format)
+	if format != this.format {
+		return nil, fmt.Errorf("IllegalArgumentException: Can only encode %v, but got %v", this.format, format)
 	}
 
 	if len(contents) == 0 {
@@ -66,7 +67,7 @@ func (this *OneDimensionalCodeWriter) Encode(
 		}
 	}
 
-	code, e := this.encodeContents(contents)
+	code, e := this.encode(contents)
 	if e != nil {
 		return nil, e
 	}

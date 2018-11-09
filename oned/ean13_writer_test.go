@@ -7,35 +7,27 @@ import (
 	"github.com/makiuchi-d/gozxing"
 )
 
-func TestEAN13Writer_getFormat(t *testing.T) {
-	enc := ean13Encoder{}
-	format := enc.getFormat()
-	if format != gozxing.BarcodeFormat_EAN_13 {
-		t.Fatalf("getFormat = %v, expect EAN_13", format)
-	}
-}
-
-func TestEAN13Writer_encodeContents(t *testing.T) {
+func TestEAN13Writer_encode(t *testing.T) {
 	enc := ean13Encoder{}
 
-	_, e := enc.encodeContents("")
+	_, e := enc.encode("")
 	if e == nil {
-		t.Fatalf("encodeContents must be error")
+		t.Fatalf("encode must be error")
 	}
 
-	_, e = enc.encodeContents("12345678901a")
+	_, e = enc.encode("12345678901a")
 	if e == nil {
-		t.Fatalf("encodeContents must be error")
+		t.Fatalf("encode must be error")
 	}
 
-	_, e = enc.encodeContents("12345678901ab")
+	_, e = enc.encode("12345678901ab")
 	if e == nil {
-		t.Fatalf("encodeContents must be error")
+		t.Fatalf("encode must be error")
 	}
 
-	_, e = enc.encodeContents("1234567890123")
+	_, e = enc.encode("1234567890123")
 	if e == nil {
-		t.Fatalf("encodeContents must be error")
+		t.Fatalf("encode must be error")
 	}
 
 	expect := []bool{
@@ -59,9 +51,9 @@ func TestEAN13Writer_encodeContents(t *testing.T) {
 		true, false, true, // false
 	}
 
-	r, e := enc.encodeContents("123456789012")
+	r, e := enc.encode("123456789012")
 	if e != nil {
-		t.Fatalf("encodeContents must be error")
+		t.Fatalf("encode must be error")
 	}
 	if !reflect.DeepEqual(r, expect) {
 		for i := range r {
@@ -70,15 +62,15 @@ func TestEAN13Writer_encodeContents(t *testing.T) {
 			}
 		}
 
-		t.Fatalf("encodeContents:\n%v\nexpect:\n%v", r, expect)
+		t.Fatalf("encode:\n%v\nexpect:\n%v", r, expect)
 	}
 
-	r, e = enc.encodeContents("1234567890128")
+	r, e = enc.encode("1234567890128")
 	if e != nil {
-		t.Fatalf("encodeContents must be error")
+		t.Fatalf("encode must be error")
 	}
 	if !reflect.DeepEqual(r, expect) {
-		t.Fatalf("encodeContents:\n%v\nexpect:\n%v", r, expect)
+		t.Fatalf("encode:\n%v\nexpect:\n%v", r, expect)
 	}
 }
 

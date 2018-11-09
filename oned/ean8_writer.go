@@ -18,16 +18,12 @@ const (
 type ean8Encoder struct{}
 
 func NewEAN8Writer() gozxing.Writer {
-	return NewUPCEANWriter(ean8Encoder{})
+	return NewUPCEANWriter(ean8Encoder{}, gozxing.BarcodeFormat_EAN_8)
 }
 
-func (ean8Encoder) getFormat() gozxing.BarcodeFormat {
-	return gozxing.BarcodeFormat_EAN_8
-}
-
-// encodeContents encode contents string
+// encode encode contents string
 // @return a byte array of horizontal pixels (false = white, true = black)
-func (ean8Encoder) encodeContents(contents string) ([]bool, error) {
+func (ean8Encoder) encode(contents string) ([]bool, error) {
 	length := len(contents)
 	switch length {
 	case 7:

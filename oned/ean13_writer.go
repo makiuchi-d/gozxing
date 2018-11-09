@@ -17,19 +17,11 @@ const (
 
 type ean13Encoder struct{}
 
-type EAN13Writer struct {
-	*OneDimensionalCodeWriter
-}
-
 func NewEAN13Writer() gozxing.Writer {
-	return NewUPCEANWriter(ean13Encoder{})
+	return NewUPCEANWriter(ean13Encoder{}, gozxing.BarcodeFormat_EAN_13)
 }
 
-func (ean13Encoder) getFormat() gozxing.BarcodeFormat {
-	return gozxing.BarcodeFormat_EAN_13
-}
-
-func (ean13Encoder) encodeContents(contents string) ([]bool, error) {
+func (ean13Encoder) encode(contents string) ([]bool, error) {
 	length := len(contents)
 	switch length {
 	case 12:
