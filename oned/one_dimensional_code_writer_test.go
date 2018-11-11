@@ -141,3 +141,18 @@ func TestOnedWriter_encode(t *testing.T) {
 		}
 	}
 }
+
+func testEncode(t *testing.T, writer gozxing.Writer, format gozxing.BarcodeFormat, contents, expect string) {
+	r, e := writer.Encode(contents, format, 0, 5, nil)
+	if e != nil {
+		t.Fatalf("Encode(\"%v\") returns error: %v", contents, e)
+	}
+	if w := r.GetWidth(); w != len(expect) {
+		t.Fatalf("Encode(\"%v\") width = %v, expect %v", contents, w, len(expect))
+	}
+	for i := range expect {
+		if b, e := r.Get(i, 1), (expect[i] == '1'); b != e {
+			t.Fatalf("Encode(\"%v\") [%v] = %v, expect %v", contents, i, b, e)
+		}
+	}
+}
