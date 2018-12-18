@@ -32,7 +32,9 @@ func (this *Detector) DetectWithoutHints() (*common.DetectorResult, error) {
 
 func (this *Detector) Detect(hints map[gozxing.DecodeHintType]interface{}) (*common.DetectorResult, error) {
 	if hints != nil {
-		this.resultPointCallback = hints[gozxing.DecodeHintType_NEED_RESULT_POINT_CALLBACK].(gozxing.ResultPointCallback)
+		if cb, ok := hints[gozxing.DecodeHintType_NEED_RESULT_POINT_CALLBACK]; ok {
+			this.resultPointCallback, _ = cb.(gozxing.ResultPointCallback)
+		}
 	}
 
 	finder := NewFinderPatternFinder(this.image, this.resultPointCallback)
