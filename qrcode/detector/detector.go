@@ -43,10 +43,10 @@ func (this *Detector) Detect(hints map[gozxing.DecodeHintType]interface{}) (*com
 		return nil, e
 	}
 
-	return this.processFinderPatternInfo(info)
+	return this.ProcessFinderPatternInfo(info)
 }
 
-func (this *Detector) processFinderPatternInfo(info *FinderPatternInfo) (*common.DetectorResult, error) {
+func (this *Detector) ProcessFinderPatternInfo(info *FinderPatternInfo) (*common.DetectorResult, error) {
 	topLeft := info.GetTopLeft()
 	topRight := info.GetTopRight()
 	bottomLeft := info.GetBottomLeft()

@@ -314,7 +314,7 @@ func TestDetector_createTransform(t *testing.T) {
 	}
 }
 
-func TestDetector_processFinderPatternInfo(t *testing.T) {
+func TestDetector_ProcessFinderPatternInfo(t *testing.T) {
 	image, _ := gozxing.NewBitMatrix(300, 300)
 	d := NewDetector(image)
 
@@ -333,12 +333,12 @@ func TestDetector_processFinderPatternInfo(t *testing.T) {
 		topRight:   NewFinderPattern1(30, 20, 1),
 		bottomLeft: NewFinderPattern1(20, 30, 1),
 	}
-	_, e := d.processFinderPatternInfo(&info)
+	_, e := d.ProcessFinderPatternInfo(&info)
 	if e == nil {
-		t.Fatalf("processFinderPatternInfo must be error")
+		t.Fatalf("ProcessFinderPatternInfo must be error")
 	}
 	if _, ok := e.(gozxing.NotFoundException); !ok {
-		t.Fatalf("processFinderPatternInfo must be NotFoundException, %v", e)
+		t.Fatalf("ProcessFinderPatternInfo must be NotFoundException, %v", e)
 	}
 	// dimension error
 	image.Clear()
@@ -347,12 +347,12 @@ func TestDetector_processFinderPatternInfo(t *testing.T) {
 	makePattern(image, 72, 20, 1)
 	info.topRight = NewFinderPattern1(20, 80, 1)
 	info.bottomLeft = NewFinderPattern1(72, 20, 1)
-	_, e = d.processFinderPatternInfo(&info)
+	_, e = d.ProcessFinderPatternInfo(&info)
 	if e == nil {
-		t.Fatalf("processFinderPatternInfo must be error")
+		t.Fatalf("ProcessFinderPatternInfo must be error")
 	}
 	if _, ok := e.(gozxing.NotFoundException); !ok {
-		t.Fatalf("processFinderPatternInfo must be NotFoundException, %v", e)
+		t.Fatalf("ProcessFinderPatternInfo must be NotFoundException, %v", e)
 	}
 
 	// version error
@@ -362,12 +362,12 @@ func TestDetector_processFinderPatternInfo(t *testing.T) {
 	makePattern(image, 270, 20, 1)
 	info.topRight = NewFinderPattern1(20, 270, 1)
 	info.bottomLeft = NewFinderPattern1(270, 20, 1)
-	_, e = d.processFinderPatternInfo(&info)
+	_, e = d.ProcessFinderPatternInfo(&info)
 	if e == nil {
-		t.Fatalf("processFinderPatternInfo must be error")
+		t.Fatalf("ProcessFinderPatternInfo must be error")
 	}
 	if _, ok := e.(gozxing.FormatException); !ok {
-		t.Fatalf("processFinderPatternInfo must be FormatException, %v", e)
+		t.Fatalf("ProcessFinderPatternInfo must be FormatException, %v", e)
 	}
 
 	// no alignment patterns
@@ -378,9 +378,9 @@ func TestDetector_processFinderPatternInfo(t *testing.T) {
 	info.topLeft = NewFinderPattern1(20, 20, 1)
 	info.topRight = NewFinderPattern1(35, 20, 1)
 	info.bottomLeft = NewFinderPattern1(20, 35, 1)
-	r, e := d.processFinderPatternInfo(&info)
+	r, e := d.ProcessFinderPatternInfo(&info)
 	if e != nil {
-		t.Fatalf("processFinderPatternInfo returns error, %v", e)
+		t.Fatalf("ProcessFinderPatternInfo returns error, %v", e)
 	}
 	if c := len(r.GetPoints()); c != 3 {
 		t.Fatalf("points has %v members, expect 3", c)
@@ -410,9 +410,9 @@ func TestDetector_processFinderPatternInfo(t *testing.T) {
 	makeAlignPattern(image, 10+22, 10+38)
 	makeAlignPattern(image, 10+38, 10+22)
 	makeAlignPattern(image, 10+38, 10+38)
-	r, e = d.processFinderPatternInfo(&info)
+	r, e = d.ProcessFinderPatternInfo(&info)
 	if e != nil {
-		t.Fatalf("processFinderPatternInfo returns error, %v", e)
+		t.Fatalf("ProcessFinderPatternInfo returns error, %v", e)
 	}
 	if c := len(r.GetPoints()); c != 4 {
 		t.Fatalf("points has %v members, expect 4", c)
@@ -438,12 +438,12 @@ func TestDetector_processFinderPatternInfo(t *testing.T) {
 	info.topLeft = NewFinderPattern1(250, 60, 1)
 	info.topRight = NewFinderPattern1(290, 20, 1)
 	info.bottomLeft = NewFinderPattern1(290, 100, 1)
-	r, e = d.processFinderPatternInfo(&info)
+	r, e = d.ProcessFinderPatternInfo(&info)
 	if e == nil {
-		t.Fatalf("processFinderPatternInfo must be error")
+		t.Fatalf("ProcessFinderPatternInfo must be error")
 	}
 	if _, ok := e.(gozxing.NotFoundException); !ok {
-		t.Fatalf("processFinderPatternInfo must be NotFoundException, %v", e)
+		t.Fatalf("ProcessFinderPatternInfo must be NotFoundException, %v", e)
 	}
 }
 
@@ -506,10 +506,10 @@ func TestDetector_DetectWithoutHint(t *testing.T) {
 	d := NewDetector(image)
 	_, e := d.DetectWithoutHints()
 	if e == nil {
-		t.Fatalf("processFinderPatternInfo must be error")
+		t.Fatalf("DetectWithoutHints must be error")
 	}
 	if _, ok := e.(gozxing.NotFoundException); !ok {
-		t.Fatalf("processFinderPatternInfo must be NotFoundException, %v", e)
+		t.Fatalf("DetectWithoutHints must be NotFoundException, %v", e)
 	}
 
 	// version3 pattern, transformed, x3
