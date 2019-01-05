@@ -4,32 +4,7 @@ import (
 	"testing"
 
 	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/common"
 )
-
-func containsPoints(points []*common.DetectorResult, tlx, tly, blx, bly, trx, try float64) bool {
-	for _, r := range points {
-		ps := r.GetPoints()
-		bl, tl, tr := ps[0], ps[1], ps[2]
-
-		if bl.GetX() == blx && bl.GetY() == bly &&
-			tl.GetX() == tlx && tl.GetY() == tly &&
-			tr.GetX() == trx && tr.GetY() == try {
-			return true
-		}
-	}
-
-	return false
-}
-
-func containsPoint(points []gozxing.ResultPoint, x, y float64) bool {
-	for _, p := range points {
-		if p.GetX() == x && p.GetY() == y {
-			return true
-		}
-	}
-	return false
-}
 
 func TestMultiDetector_DetectMulti(t *testing.T) {
 	hints := make(map[gozxing.DecodeHintType]interface{})
@@ -53,60 +28,42 @@ func TestMultiDetector_DetectMulti(t *testing.T) {
 		t.Fatalf("DetectMulti returns error: %v", e)
 	}
 
-	// top left
-	if !containsPoints(results, 3.5, 3.5, 3.5, 17.5, 17.5, 3.5) {
-		t.Fatalf("result must contain: {(3.5,3.5), (3.5,17.5), (17.5,3.5)}")
+	testsPoints := []struct{ tlx, tly, blx, bly, trx, try float64 }{
+		{3.5, 3.5, 3.5, 17.5, 17.5, 3.5},     // TopLeft
+		{28.5, 3.5, 28.5, 17.5, 42.5, 3.5},   // TopRight
+		{28.5, 3.5, 28.5, 17.5, 42.5, 3.5},   // BottomLeft
+		{28.5, 28.5, 28.5, 42.5, 42.5, 28.5}, // BottomLeft
 	}
-	// top right
-	if !containsPoints(results, 28.5, 3.5, 28.5, 17.5, 42.5, 3.5) {
-		t.Fatalf("result must contain: {(28.5,3.5), (28.5,17.5), (42.5,3.5)}")
-	}
-	// bottom left
-	if !containsPoints(results, 3.5, 28.5, 3.5, 42.5, 17.5, 28.5) {
-		t.Fatalf("result must contain: {(3.5,28.5), (3.5,42.5), (17.5,28.5)}")
-	}
-	// bottom right
-	if !containsPoints(results, 28.5, 28.5, 28.5, 42.5, 42.5, 28.5) {
-		t.Fatalf("result must contain: {(28.5,28.5), (28.5,42.5), (42.5,28.5)}")
+FORTESTPOINTS:
+	for _, test := range testsPoints {
+		for _, r := range results {
+			ps := r.GetPoints()
+			bl, tl, tr := ps[0], ps[1], ps[2]
+
+			if bl.GetX() == test.blx && bl.GetY() == test.bly &&
+				tl.GetX() == test.tlx && tl.GetY() == test.tly &&
+				tr.GetX() == test.trx && tr.GetY() == test.try {
+				continue FORTESTPOINTS
+			}
+		}
+
+		t.Fatalf("result must contain: {(%v,%v), (%v,%v), (%v,%v)}",
+			test.tlx, test.tly, test.blx, test.bly, test.trx, test.try)
 	}
 
-	if !containsPoint(points, 3.5, 3.5) {
-		t.Fatalf("callback point must contain (3.5,3.5)")
+	testCallbacks := []struct{ x, y float64 }{
+		{3.5, 3.5}, {3.5, 17.5}, {17.5, 3.5}, // TopLeft
+		{28.5, 3.5}, {28.5, 17.5}, {42.5, 3.5}, // TopRight
+		{3.5, 28.5}, {3.5, 42.5}, {17.5, 28.5}, // BottomLeft
+		{28.5, 28.5}, {28.5, 42.5}, {42.5, 28.5}, // BottomRight
 	}
-	if !containsPoint(points, 3.5, 17.5) {
-		t.Fatalf("callback point must contain (3.5,17.5)")
-	}
-	if !containsPoint(points, 17.5, 3.5) {
-		t.Fatalf("callback point must contain (17.5,3.5)")
-	}
-
-	if !containsPoint(points, 28.5, 3.5) {
-		t.Fatalf("callback point must contain (28.5,3.5)")
-	}
-	if !containsPoint(points, 28.5, 17.5) {
-		t.Fatalf("callback point must contain (28.5,3.5)")
-	}
-	if !containsPoint(points, 42.5, 3.5) {
-		t.Fatalf("callback point must contain (28.5,3.5)")
-	}
-
-	if !containsPoint(points, 3.5, 28.5) {
-		t.Fatalf("callback point must contain (3.5,28.5)")
-	}
-	if !containsPoint(points, 3.5, 42.5) {
-		t.Fatalf("callback point must contain (3.5,42.5)")
-	}
-	if !containsPoint(points, 17.5, 28.5) {
-		t.Fatalf("callback point must contain (17.5,28.5)")
-	}
-
-	if !containsPoint(points, 28.5, 28.5) {
-		t.Fatalf("callback point must contain (28.5,28.5)")
-	}
-	if !containsPoint(points, 28.5, 42.5) {
-		t.Fatalf("callback point must contain (28.5,42.5)")
-	}
-	if !containsPoint(points, 42.5, 28.5) {
-		t.Fatalf("callback point must contain (42.5,28.5)")
+FORTESTCALLBACKS:
+	for _, test := range testCallbacks {
+		for _, p := range points {
+			if p.GetX() == test.x && p.GetY() == test.y {
+				continue FORTESTCALLBACKS
+			}
+		}
+		t.Fatalf("callbacked points must contain %v", test)
 	}
 }

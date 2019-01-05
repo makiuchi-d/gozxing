@@ -168,17 +168,6 @@ func TestMultiFinderPatternFinder_selectMultipleBestPatterns(t *testing.T) {
 	}
 }
 
-func containsPatternInfo(patterns []*detector.FinderPatternInfo, tlx, tly, blx, bly, trx, try float64) bool {
-	for _, p := range patterns {
-		if compResultPoint(p.GetTopLeft(), tlx, tly) &&
-			compResultPoint(p.GetBottomLeft(), blx, bly) &&
-			compResultPoint(p.GetTopRight(), trx, try) {
-			return true
-		}
-	}
-	return false
-}
-
 func TestMultiFinderPatternFinder_FindMulti(t *testing.T) {
 	img, _ := gozxing.NewBitMatrix(100, 100)
 	finder := NewMultiFinderPatternFinder(img, nil)
@@ -199,20 +188,22 @@ func TestMultiFinderPatternFinder_FindMulti(t *testing.T) {
 		t.Fatalf("FindMulti returns error: %v", e)
 	}
 
-	// top left
-	if !containsPatternInfo(r, 3.5, 3.5, 3.5, 17.5, 17.5, 3.5) {
-		t.Fatalf("result must contains: {(3.5,3.5), (3.5,17.5), (17.5,3.5)}")
+	testsPoints := []struct{ tlx, tly, blx, bly, trx, try float64 }{
+		{3.5, 3.5, 3.5, 17.5, 17.5, 3.5},     // TopLeft
+		{28.5, 3.5, 28.5, 17.5, 42.5, 3.5},   // TopRight
+		{28.5, 3.5, 28.5, 17.5, 42.5, 3.5},   // BottomLeft
+		{28.5, 28.5, 28.5, 42.5, 42.5, 28.5}, // BottomLeft
 	}
-	// top right
-	if !containsPatternInfo(r, 28.5, 3.5, 28.5, 17.5, 42.5, 3.5) {
-		t.Fatalf("result must contains: {(28.5,3.5), (28.5,17.5), (42.5,3.5)}")
-	}
-	// bottom left
-	if !containsPatternInfo(r, 3.5, 28.5, 3.5, 42.5, 17.5, 28.5) {
-		t.Fatalf("result must contains: {(3.5,28.5), (3.5,42.5), (17.5,28.5)}")
-	}
-	// bottom right
-	if !containsPatternInfo(r, 28.5, 28.5, 28.5, 42.5, 42.5, 28.5) {
-		t.Fatalf("result must contains: {(28.5,28.5), (28.5,42.5), (42.5,28.5)}")
+FORTESTPOINTS:
+	for _, test := range testsPoints {
+		for _, p := range r {
+			if compResultPoint(p.GetTopLeft(), test.tlx, test.tly) &&
+				compResultPoint(p.GetBottomLeft(), test.blx, test.bly) &&
+				compResultPoint(p.GetTopRight(), test.trx, test.try) {
+				continue FORTESTPOINTS
+			}
+		}
+		t.Fatalf("result must contain: {(%v,%v), (%v,%v), (%v,%v)}",
+			test.tlx, test.tly, test.blx, test.bly, test.trx, test.try)
 	}
 }
