@@ -25,6 +25,18 @@ func ExpandBitMatrix(src *gozxing.BitMatrix, factor int) *gozxing.BitMatrix {
 	return dst
 }
 
+func MirrorBitMatrix(src *gozxing.BitMatrix) *gozxing.BitMatrix {
+	dst, _ := gozxing.NewBitMatrix(src.GetHeight(), src.GetWidth())
+	for j := 0; j < src.GetHeight(); j++ {
+		for i := 0; i < src.GetWidth(); i++ {
+			if src.Get(i, j) {
+				dst.Set(j, i)
+			}
+		}
+	}
+	return dst
+}
+
 func NewBitArrayFromString(str string) *gozxing.BitArray {
 	arr := gozxing.NewBitArray(len(str))
 	for i, c := range str {

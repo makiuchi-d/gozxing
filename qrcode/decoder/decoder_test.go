@@ -5,6 +5,7 @@ import (
 
 	"github.com/makiuchi-d/gozxing"
 	"github.com/makiuchi-d/gozxing/common"
+	"github.com/makiuchi-d/gozxing/testutil"
 )
 
 func unsetRegion(image *gozxing.BitMatrix, x, y, w, h int) {
@@ -15,25 +16,13 @@ func unsetRegion(image *gozxing.BitMatrix, x, y, w, h int) {
 	}
 }
 
-func mirror(src *gozxing.BitMatrix) *gozxing.BitMatrix {
-	dst, _ := gozxing.NewBitMatrix(src.GetHeight(), src.GetWidth())
-	for j := 0; j < src.GetHeight(); j++ {
-		for i := 0; i < src.GetWidth(); i++ {
-			if src.Get(i, j) {
-				dst.Set(j, i)
-			}
-		}
-	}
-	return dst
-}
-
 func TestDecoder_Decode(t *testing.T) {
 	decoder := NewDecoder()
 	var result *common.DecoderResult
 	var e error
 
 	bits, _ := gozxing.ParseStringToBitMatrix(qrstr, "##", "  ")
-	rbits := mirror(bits)
+	rbits := testutil.MirrorBitMatrix(bits)
 
 	// normal qrcode
 	result, e = decoder.Decode(bits, nil)
