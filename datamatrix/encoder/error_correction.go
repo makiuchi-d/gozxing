@@ -95,14 +95,9 @@ func ErrorCorrection_EncodeECC200(codewords []byte, symbolInfo *SymbolInfo) ([]b
 		sb = sb[:cap(sb)]
 		dataSizes := make([]int, blockCount)
 		errorSizes := make([]int, blockCount)
-		startPos := make([]int, blockCount)
 		for i := 0; i < blockCount; i++ {
 			dataSizes[i] = symbolInfo.GetDataLengthForInterleavedBlock(i + 1)
 			errorSizes[i] = symbolInfo.GetErrorLengthForInterleavedBlock(i + 1)
-			startPos[i] = 0
-			if i > 0 {
-				startPos[i] = startPos[i-1] + dataSizes[i]
-			}
 		}
 		for block := 0; block < blockCount; block++ {
 			temp := make([]byte, 0, dataSizes[block])

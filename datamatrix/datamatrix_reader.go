@@ -89,8 +89,6 @@ func (r *DataMatrixReader) Reset() {
 // which contains only an unrotated, unskewed, image of a code, with some white border
 // around it. This is a specialized method that works exceptionally fast in this special case.
 //
-// @see com.google.zxing.qrcode.QRCodeReader#extractPureBits(BitMatrix)
-//
 func extractPureBits(image *gozxing.BitMatrix) (*gozxing.BitMatrix, error) {
 
 	leftTopBlack := image.GetTopLeftOnBit()

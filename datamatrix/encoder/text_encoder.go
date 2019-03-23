@@ -25,12 +25,12 @@ func textEncodeChar(c byte, sb []byte) (int, []byte) {
 		sb = append(sb, c)
 		return 2, sb
 	}
-	if c >= '!' && c <= '/' {
+	if c <= '/' {
 		sb = append(sb, 1) //Shift 2 Set
 		sb = append(sb, c-33)
 		return 2, sb
 	}
-	if c >= ':' && c <= '@' {
+	if c <= '@' {
 		sb = append(sb, 1) //Shift 2 Set
 		sb = append(sb, c-58+15)
 		return 2, sb
@@ -45,12 +45,12 @@ func textEncodeChar(c byte, sb []byte) (int, []byte) {
 		sb = append(sb, c-96)
 		return 2, sb
 	}
-	if c >= 'A' && c <= 'Z' {
+	if c <= 'Z' {
 		sb = append(sb, 2) //Shift 3 Set
 		sb = append(sb, c-65+1)
 		return 2, sb
 	}
-	if c >= '{' && c <= 127 {
+	if c <= 127 {
 		sb = append(sb, 2) //Shift 3 Set
 		sb = append(sb, c-123+27)
 		return 2, sb

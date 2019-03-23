@@ -67,7 +67,7 @@ func NewMultiFinderPatternFinder(image *gozxing.BitMatrix, resultPointCallback g
 
 // selectMultipleBestPatterns select the best patterns.
 // @return the 3 best {@link FinderPattern}s from our list of candidates. The "best" are
-//         those that have been detected at least {@link #CENTER_QUORUM} times, and whose module
+//         those that have been detected at least 2 times, and whose module
 //         size differs from the average among those patterns the least
 // @throws NotFoundException if 3 such finder patterns do not exist
 func (this *MultiFinderPatternFinder) selectMultipleBestPatterns() ([][]*detector.FinderPattern, error) {
