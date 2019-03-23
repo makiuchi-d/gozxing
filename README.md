@@ -48,7 +48,7 @@ This project is a port of ZXing core library to pure Go.
 | MultiFormatWriter            |                    |
 | ByQuadrantReader             |                    |
 | GenericMultipleBarcodeReader |                    |
-| QRCodeMultiReader            |                    |
+| QRCodeMultiReader            | :heavy_check_mark: |
 | MultiFormatUPCEANReader      |                    |
 | MultiFormatOneDReader        |                    |
 
