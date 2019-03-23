@@ -42,7 +42,7 @@ func (this *C40Encoder) encode(context *EncoderContext) error {
 		if !context.HasMoreCharacters() {
 			//Avoid having a single C40 value in the last triplet
 			removed := make([]byte, 0)
-			if (len(buffer)%3) == 2 && (available < 2 || available > 2) {
+			if (len(buffer)%3) == 2 && available != 2 {
 				lastCharSize, buffer, removed = this.backtrackOneCharacter(context, buffer, removed, lastCharSize)
 			}
 			for (len(buffer)%3) == 1 && (lastCharSize > 3 || available != 1) {
