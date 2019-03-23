@@ -31,7 +31,7 @@ func (upcEEncoder) encode(contents string) ([]bool, error) {
 		contents += strconv.Itoa(check)
 		break
 	case 8:
-		ok, e := upceanReader_checkStandardUPCEANChecksum(contents)
+		ok, e := upceanReader_checkStandardUPCEANChecksum(convertUPCEtoUPCA(contents))
 		if e != nil {
 			return nil, fmt.Errorf("IllegalArgumentException: Illegal contents")
 		}
