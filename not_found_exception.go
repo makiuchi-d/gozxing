@@ -1,23 +1,28 @@
 package gozxing
 
 import (
-	"errors"
+	errors "golang.org/x/xerrors"
 )
 
 type NotFoundException interface {
 	ReaderException
-	NotFoundException()
+	notFoundException()
 }
 
-type notFoundException struct {
-	error
+type NotFoundError struct {
+	ReaderError
 }
 
-func (notFoundException) ReaderException()   {}
-func (notFoundException) NotFoundException() {}
+func (NotFoundError) notFoundException() {}
 
-var notFoundInstance = notFoundException{errors.New("NotFoundException")}
+func (e NotFoundError) Unwrap() error {
+	return e.ReaderError
+}
 
-func GetNotFoundExceptionInstance() NotFoundException {
-	return notFoundInstance
+func GetNotFoundExceptionInstance() NotFoundError {
+	return NotFoundError{
+		ReaderError{
+			errors.New("NotFoundException"),
+		},
+	}
 }

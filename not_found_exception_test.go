@@ -2,21 +2,39 @@ package gozxing
 
 import (
 	"testing"
+
+	errors "golang.org/x/xerrors"
 )
 
-func TestNotFoundException(t *testing.T) {
-	var e error = GetNotFoundExceptionInstance()
+func testNotFoundErrorType(t *testing.T, e error) {
+	var ne NotFoundError
+	if !errors.As(e, &ne) {
+		t.Fatalf("Type must be NotFoundError")
+	}
+	var re ReaderError
+	if !errors.As(e, &re) {
+		t.Fatalf("Type must be ReaderError")
+	}
+	var ce ChecksumError
+	if errors.As(e, &ce) {
+		t.Fatalf("Type must not be ChecksumError")
+	}
 
 	if _, ok := e.(NotFoundException); !ok {
-		t.Fatalf("Not NotFoundException, %T", e)
+		t.Fatalf("Type must be NotFoundException")
 	}
 	if _, ok := e.(ReaderException); !ok {
-		t.Fatalf("Not ReaderException, %T", e)
+		t.Fatalf("Type must be ReaderException")
 	}
 	if _, ok := e.(FormatException); ok {
 		t.Fatalf("Type must not be FormatException")
 	}
 
-	e.(NotFoundException).NotFoundException()
-	e.(NotFoundException).ReaderException()
+	ne.notFoundException()
+	ne.readerException()
+}
+
+func TestNotFoundException(t *testing.T) {
+	var e error = GetNotFoundExceptionInstance()
+	testNotFoundErrorType(t, e)
 }

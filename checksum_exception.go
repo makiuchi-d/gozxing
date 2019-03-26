@@ -1,27 +1,36 @@
 package gozxing
 
 import (
-	"errors"
+	errors "golang.org/x/xerrors"
 )
 
 type ChecksumException interface {
 	ReaderException
-	ChecksumException()
+	checksumException()
 }
 
-type checksumException struct {
-	error
+type ChecksumError struct {
+	ReaderError
 }
 
-func (checksumException) ReaderException()   {}
-func (checksumException) ChecksumException() {}
+func (ChecksumError) checksumException() {}
 
-var checksumInstance = checksumException{errors.New("ChecksumException")}
+func (e ChecksumError) Unwrap() error {
+	return e.ReaderError
+}
 
 func GetChecksumExceptionInstance() ChecksumException {
-	return checksumInstance
+	return ChecksumError{
+		ReaderError{
+			errors.New("ChecksumException"),
+		},
+	}
 }
 
 func NewChecksumExceptionInstance(e error) ChecksumException {
-	return checksumException{e}
+	return ChecksumError{
+		ReaderError{
+			errors.Errorf("ChecksumException: %w", e),
+		},
+	}
 }

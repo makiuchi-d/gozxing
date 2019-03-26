@@ -1,27 +1,36 @@
 package gozxing
 
 import (
-	"errors"
+	errors "golang.org/x/xerrors"
 )
 
 type FormatException interface {
 	ReaderException
-	FormatException()
+	formatException()
 }
 
-type formatException struct {
-	error
+type FormatError struct {
+	ReaderError
 }
 
-func (formatException) ReaderException() {}
-func (formatException) FormatException() {}
+func (FormatError) formatException() {}
 
-var formatInstance = formatException{errors.New("FormatException")}
+func (e FormatError) Unwrap() error {
+	return e.ReaderError
+}
 
 func GetFormatExceptionInstance() FormatException {
-	return formatInstance
+	return FormatError{
+		ReaderError{
+			errors.New("FormatException"),
+		},
+	}
 }
 
-func NewFormatExceptionInstance(e error) FormatException {
-	return formatException{e}
+func WrapFormatExceptionInstance(e error) FormatException {
+	return FormatError{
+		ReaderError{
+			errors.Errorf("FormatException: %w", e),
+		},
+	}
 }
