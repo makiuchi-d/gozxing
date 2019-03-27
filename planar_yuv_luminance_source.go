@@ -1,8 +1,7 @@
 package gozxing
 
 import (
-	"errors"
-	"fmt"
+	errors "golang.org/x/xerrors"
 )
 
 const thumbnailScaleFactor = 2
@@ -48,7 +47,7 @@ func (this *PlanarYUVLuminanceSource) String() string {
 
 func (this *PlanarYUVLuminanceSource) GetRow(y int, row []byte) ([]byte, error) {
 	if y < 0 || y >= this.GetHeight() {
-		return nil, fmt.Errorf("IllegalArgumentException: Requested row is outside the image: %v", y)
+		return nil, errors.Errorf("IllegalArgumentException: Requested row is outside the image: %v", y)
 	}
 	width := this.GetWidth()
 	if row == nil || len(row) < width {

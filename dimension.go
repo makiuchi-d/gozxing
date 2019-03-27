@@ -1,8 +1,9 @@
 package gozxing
 
 import (
-	"errors"
 	"fmt"
+
+	errors "golang.org/x/xerrors"
 )
 
 type Dimension struct {

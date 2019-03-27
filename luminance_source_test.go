@@ -1,8 +1,9 @@
 package gozxing
 
 import (
-	"fmt"
 	"testing"
+
+	errors "golang.org/x/xerrors"
 )
 
 type testLuminanceSource struct {
@@ -19,7 +20,7 @@ func newTestLuminanceSource(size int) LuminanceSource {
 
 func (this *testLuminanceSource) GetRow(y int, row []byte) ([]byte, error) {
 	if y >= this.GetHeight() {
-		return row, fmt.Errorf("y(%d) >= height(%d)", y, this.GetHeight())
+		return row, errors.Errorf("y(%d) >= height(%d)", y, this.GetHeight())
 	}
 	width := this.GetWidth()
 	for i := 0; i < width; i++ {

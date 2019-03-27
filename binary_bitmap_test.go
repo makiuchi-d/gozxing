@@ -1,8 +1,9 @@
 package gozxing
 
 import (
-	"errors"
 	"testing"
+
+	errors "golang.org/x/xerrors"
 )
 
 type testBinarizer struct {

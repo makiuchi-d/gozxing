@@ -1,7 +1,7 @@
 package gozxing
 
 import (
-	"errors"
+	errors "golang.org/x/xerrors"
 )
 
 type BinaryBitmap struct {
@@ -11,7 +11,7 @@ type BinaryBitmap struct {
 
 func NewBinaryBitmap(binarizer Binarizer) (*BinaryBitmap, error) {
 	if binarizer == nil {
-		return nil, errors.New("IllegalArgumentException: Binarizer must be non-null.")
+		return nil, errors.New("IllegalArgumentException: Binarizer must be non-null")
 	}
 	return &BinaryBitmap{binarizer, nil}, nil
 }

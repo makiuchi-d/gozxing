@@ -1,9 +1,10 @@
 package gozxing
 
 import (
-	"errors"
 	"reflect"
 	"testing"
+
+	errors "golang.org/x/xerrors"
 )
 
 func TestInvertedLuminanceSource(t *testing.T) {

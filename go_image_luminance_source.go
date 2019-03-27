@@ -1,8 +1,9 @@
 package gozxing
 
 import (
-	"errors"
 	"image"
+
+	errors "golang.org/x/xerrors"
 )
 
 func NewBinaryBitmapFromImage(img image.Image) (*BinaryBitmap, error) {
