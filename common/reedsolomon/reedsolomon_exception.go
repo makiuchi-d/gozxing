@@ -1,20 +1,32 @@
 package reedsolomon
 
 import (
-	"errors"
+	"fmt"
+
+	errors "golang.org/x/xerrors"
 )
 
 type ReedSolomonException interface {
 	error
-	ReedSolomonException()
+	reedSolomonException()
 }
 
-type reedSolomonException struct {
+type reedSolomonError struct {
 	error
 }
 
-func (reedSolomonException) ReedSolomonException() {}
+func (reedSolomonError) reedSolomonException() {}
+
+func (e reedSolomonError) Unwrap() error {
+	return e.error
+}
+
+func (e reedSolomonError) Format(s fmt.State, v rune) {
+	errors.FormatError(e.error.(errors.Formatter), s, v)
+}
 
 func NewReedSolomonException(msg string) ReedSolomonException {
-	return reedSolomonException{errors.New(msg)}
+	return reedSolomonError{
+		errors.Errorf("ReedSolomonException: %s", msg),
+	}
 }

@@ -1,24 +1,38 @@
 package gozxing
 
 import (
-	"errors"
+	"fmt"
+
+	errors "golang.org/x/xerrors"
 )
 
 type WriterException interface {
 	error
-	WriterException()
+	writerException()
 }
 
-type writerException struct {
+type writerError struct {
 	error
 }
 
-func (writerException) WriterException() {}
+func (writerError) writerException() {}
+
+func (e writerError) Unwrap() error {
+	return e.error
+}
+
+func (e writerError) Format(s fmt.State, v rune) {
+	errors.FormatError(e.error.(errors.Formatter), s, v)
+}
 
 func NewWriterException(message string) WriterException {
-	return writerException{errors.New(message)}
+	return writerError{
+		errors.Errorf("WriterException: %s", message),
+	}
 }
 
 func NewWriterExceptionWithError(err error) WriterException {
-	return writerException{err}
+	return writerError{
+		errors.Errorf("WriterException: %w", err),
+	}
 }
