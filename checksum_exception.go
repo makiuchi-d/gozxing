@@ -9,27 +9,27 @@ type ChecksumException interface {
 	checksumException()
 }
 
-type ChecksumError struct {
-	ReaderError
+type checksumError struct {
+	readerError
 }
 
-func (ChecksumError) checksumException() {}
+func (checksumError) checksumException() {}
 
-func (e ChecksumError) Unwrap() error {
-	return e.ReaderError
+func (e checksumError) Unwrap() error {
+	return e.readerError
 }
 
 func GetChecksumExceptionInstance() ChecksumException {
-	return ChecksumError{
-		ReaderError{
+	return checksumError{
+		readerError{
 			errors.New("ChecksumException"),
 		},
 	}
 }
 
 func NewChecksumExceptionInstance(e error) ChecksumException {
-	return ChecksumError{
-		ReaderError{
+	return checksumError{
+		readerError{
 			errors.Errorf("ChecksumException: %w", e),
 		},
 	}

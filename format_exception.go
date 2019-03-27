@@ -9,27 +9,27 @@ type FormatException interface {
 	formatException()
 }
 
-type FormatError struct {
-	ReaderError
+type formatError struct {
+	readerError
 }
 
-func (FormatError) formatException() {}
+func (formatError) formatException() {}
 
-func (e FormatError) Unwrap() error {
-	return e.ReaderError
+func (e formatError) Unwrap() error {
+	return e.readerError
 }
 
 func GetFormatExceptionInstance() FormatException {
-	return FormatError{
-		ReaderError{
+	return formatError{
+		readerError{
 			errors.New("FormatException"),
 		},
 	}
 }
 
 func WrapFormatExceptionInstance(e error) FormatException {
-	return FormatError{
-		ReaderError{
+	return formatError{
+		readerError{
 			errors.Errorf("FormatException: %w", e),
 		},
 	}

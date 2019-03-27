@@ -9,19 +9,19 @@ type NotFoundException interface {
 	notFoundException()
 }
 
-type NotFoundError struct {
-	ReaderError
+type notFoundError struct {
+	readerError
 }
 
-func (NotFoundError) notFoundException() {}
+func (notFoundError) notFoundException() {}
 
-func (e NotFoundError) Unwrap() error {
-	return e.ReaderError
+func (e notFoundError) Unwrap() error {
+	return e.readerError
 }
 
-func GetNotFoundExceptionInstance() NotFoundError {
-	return NotFoundError{
-		ReaderError{
+func GetNotFoundExceptionInstance() NotFoundException {
+	return notFoundError{
+		readerError{
 			errors.New("NotFoundException"),
 		},
 	}

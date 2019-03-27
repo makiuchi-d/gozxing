@@ -9,7 +9,7 @@ import (
 )
 
 func TestReaderError_Format(t *testing.T) {
-	re := ReaderError{
+	re := readerError{
 		errors.New("test error"),
 	}
 

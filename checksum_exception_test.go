@@ -7,17 +7,17 @@ import (
 )
 
 func testChecksumErrorType(t *testing.T, e error) {
-	var ce ChecksumError
+	var ce ChecksumException
 	if !errors.As(e, &ce) {
-		t.Fatalf("Type must be FormatError")
+		t.Fatalf("Type must be FormatException")
 	}
-	var re ReaderError
+	var re ReaderException
 	if !errors.As(e, &re) {
-		t.Fatalf("Type must be ReaderError")
+		t.Fatalf("Type must be ReaderException")
 	}
-	var fe FormatError
+	var fe FormatException
 	if errors.As(e, &fe) {
-		t.Fatalf("Type must not be FormatError")
+		t.Fatalf("Type must not be FormatException")
 	}
 
 	if _, ok := e.(ChecksumException); !ok {

@@ -7,17 +7,17 @@ import (
 )
 
 func testNotFoundErrorType(t *testing.T, e error) {
-	var ne NotFoundError
+	var ne NotFoundException
 	if !errors.As(e, &ne) {
-		t.Fatalf("Type must be NotFoundError")
+		t.Fatalf("Type must be NotFoundException")
 	}
-	var re ReaderError
+	var re ReaderException
 	if !errors.As(e, &re) {
-		t.Fatalf("Type must be ReaderError")
+		t.Fatalf("Type must be ReaderException")
 	}
-	var ce ChecksumError
+	var ce ChecksumException
 	if errors.As(e, &ce) {
-		t.Fatalf("Type must not be ChecksumError")
+		t.Fatalf("Type must not be ChecksumException")
 	}
 
 	if _, ok := e.(NotFoundException); !ok {

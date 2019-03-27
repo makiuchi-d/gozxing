@@ -7,17 +7,17 @@ import (
 )
 
 func testFormatErrorType(t *testing.T, e error) {
-	var fe FormatError
+	var fe FormatException
 	if !errors.As(e, &fe) {
-		t.Fatalf("Type must be FormatError")
+		t.Fatalf("Type must be FormatException")
 	}
-	var re ReaderError
+	var re ReaderException
 	if !errors.As(e, &re) {
-		t.Fatalf("Type must be ReaderError")
+		t.Fatalf("Type must be ReaderException")
 	}
-	var ne NotFoundError
+	var ne NotFoundException
 	if errors.As(e, &ne) {
-		t.Fatalf("Type must not be NotFoundError")
+		t.Fatalf("Type must not be NotFoundException")
 	}
 
 	if _, ok := e.(FormatException); !ok {
