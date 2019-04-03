@@ -1,7 +1,7 @@
 package reedsolomon
 
 import (
-	"errors"
+	errors "golang.org/x/xerrors"
 )
 
 type ReedSolomonDecoder struct {
@@ -12,10 +12,10 @@ func NewReedSolomonDecoder(field *GenericGF) *ReedSolomonDecoder {
 	return &ReedSolomonDecoder{field}
 }
 
-func (this *ReedSolomonDecoder) Decode(received []int, twoS int) error {
+func (this *ReedSolomonDecoder) Decode(received []int, twoS int) ReedSolomonException {
 	poly, e := NewGenericGFPoly(this.field, received)
 	if e != nil {
-		return e
+		return WrapReedSolomonException(e)
 	}
 	syndromeCoefficients := make([]int, twoS)
 	noError := true
@@ -31,28 +31,28 @@ func (this *ReedSolomonDecoder) Decode(received []int, twoS int) error {
 	}
 	syndrome, e := NewGenericGFPoly(this.field, syndromeCoefficients)
 	if e != nil {
-		return e
+		return WrapReedSolomonException(e)
 	}
 	monomial, e := this.field.BuildMonomial(twoS, 1)
 	if e != nil {
-		return e
+		return WrapReedSolomonException(e)
 	}
 	sigma, omega, e := this.runEuclideanAlgorithm(monomial, syndrome, twoS)
 	if e != nil {
-		return e
+		return WrapReedSolomonException(e)
 	}
 	errorLocations, e := this.findErrorLocations(sigma)
 	if e != nil {
-		return e
+		return WrapReedSolomonException(e)
 	}
 	errorMagnitudes, e := this.findErrorMagnitudes(omega, errorLocations)
 	if e != nil {
-		return e
+		return WrapReedSolomonException(e)
 	}
 	for i := 0; i < len(errorLocations); i++ {
 		log, e := this.field.Log(errorLocations[i])
 		if e != nil {
-			return e
+			return WrapReedSolomonException(e)
 		}
 		position := len(received) - 1 - log
 		if position < 0 {

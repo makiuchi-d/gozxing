@@ -1,8 +1,9 @@
 package reedsolomon
 
 import (
-	"errors"
 	"fmt"
+
+	errors "golang.org/x/xerrors"
 )
 
 type GenericGFPoly struct {
