@@ -6,7 +6,7 @@ import (
 	errors "golang.org/x/xerrors"
 )
 
-func testChecksumErrorType(t *testing.T, e error) {
+func testChecksumExceptionType(t *testing.T, e error) {
 	var ce ChecksumException
 	if !errors.As(e, &ce) {
 		t.Fatalf("Type must be FormatException")
@@ -36,14 +36,14 @@ func testChecksumErrorType(t *testing.T, e error) {
 
 func TestChecksumException(t *testing.T) {
 	var e error = GetChecksumExceptionInstance()
-	testChecksumErrorType(t, e)
+	testChecksumExceptionType(t, e)
 }
 
 func TestNewChecksumException(t *testing.T) {
 	base := errors.New("newchecksumexceptionstring")
 	var e error = NewChecksumExceptionInstance(base)
 
-	testChecksumErrorType(t, e)
+	testChecksumExceptionType(t, e)
 
 	if !errors.Is(e, base) {
 		t.Fatalf("err(%v) is not base(%v)", e, base)

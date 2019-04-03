@@ -1,7 +1,7 @@
 package gozxing
 
 import (
-	errors "golang.org/x/xerrors"
+	"fmt"
 )
 
 type FormatException interface {
@@ -9,28 +9,25 @@ type FormatException interface {
 	formatException()
 }
 
-type formatError struct {
-	readerError
+type formatException struct {
+	exception
 }
 
-func (formatError) formatException() {}
+func (formatException) readerException() {}
+func (formatException) formatException() {}
 
-func (e formatError) Unwrap() error {
-	return e.readerError
-}
-
-func GetFormatExceptionInstance() FormatException {
-	return formatError{
-		readerError{
-			errors.New("FormatException"),
-		},
+func NewFormatException(args ...interface{}) FormatException {
+	msg := "FormatException"
+	if len(args) > 0 {
+		msg += ": " + fmt.Sprintf(args[0].(string), args[1:]...)
+	}
+	return formatException{
+		newException(msg, nil),
 	}
 }
 
-func WrapFormatExceptionInstance(e error) FormatException {
-	return formatError{
-		readerError{
-			errors.Errorf("FormatException: %w", e),
-		},
+func NewFormatExceptionWithError(e error) FormatException {
+	return formatException{
+		newException("FormatException: "+e.Error(), e),
 	}
 }

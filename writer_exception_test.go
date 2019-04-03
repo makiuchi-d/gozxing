@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	errors "golang.org/x/xerrors"
-
 )
 
 func testWriterErrorType(t *testing.T, e error) {
@@ -28,7 +27,6 @@ func testWriterErrorType(t *testing.T, e error) {
 
 	we.writerException()
 }
-
 
 func TestNewWriterException(t *testing.T) {
 	var e error = NewWriterException("test message")
@@ -52,7 +50,7 @@ func TestWriterError_Format(t *testing.T) {
 	s := fmt.Sprintf("%+v", e)
 	cases := []string{
 		"test error",
-		"writer_exception.go:",
+		"writer_exception_test.go:",
 	}
 	for _, c := range cases {
 		if strings.Index(s, c) < 0 {

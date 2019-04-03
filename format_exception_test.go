@@ -6,7 +6,7 @@ import (
 	errors "golang.org/x/xerrors"
 )
 
-func testFormatErrorType(t *testing.T, e error) {
+func testFormatExceptionType(t *testing.T, e error) {
 	var fe FormatException
 	if !errors.As(e, &fe) {
 		t.Fatalf("Type must be FormatException")
@@ -35,15 +35,26 @@ func testFormatErrorType(t *testing.T, e error) {
 }
 
 func TestFormatException(t *testing.T) {
-	var e error = GetFormatExceptionInstance()
-	testFormatErrorType(t, e)
+	var e error = NewFormatException()
+	testFormatExceptionType(t, e)
+}
+
+func TestFormatExceptionWithMessage(t *testing.T) {
+	var e error = NewFormatException("testmsg %d, %d", 10, 20)
+	testFormatExceptionType(t, e)
+
+	msg := e.Error()
+	wants := "FormatException: testmsg 10, 20"
+	if msg != wants {
+		t.Fatalf("Error() = \"%s\", wants \"%s\"", msg, wants)
+	}
 }
 
 func TestNewFormatException(t *testing.T) {
 	base := errors.New("newformatexception")
-	var e error = WrapFormatExceptionInstance(base)
+	var e error = NewFormatExceptionWithError(base)
 
-	testFormatErrorType(t, e)
+	testFormatExceptionType(t, e)
 
 	if !errors.Is(e, base) {
 		t.Fatalf("err(%v) is not base(%v)", e, base)

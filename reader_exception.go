@@ -11,16 +11,34 @@ type ReaderException interface {
 	readerException()
 }
 
-type readerError struct {
-	error
+type exception struct {
+	msg   string
+	next  error
+	frame errors.Frame
 }
 
-func (readerError) readerException() {}
-
-func (e readerError) Unwrap() error {
-	return e.error
+func newException(msg string, next error) exception {
+	return exception{
+		msg,
+		next,
+		errors.Caller(2),
+	}
 }
 
-func (e readerError) Format(s fmt.State, v rune) {
-	errors.FormatError(e.error.(errors.Formatter), s, v)
+func (e exception) Error() string {
+	return e.msg
+}
+
+func (e exception) Unwrap() error {
+	return e.next
+}
+
+func (e exception) Format(s fmt.State, v rune) {
+	errors.FormatError(e, s, v)
+}
+
+func (e exception) FormatError(p errors.Printer) error {
+	p.Print(e.msg)
+	e.frame.Format(p)
+	return e.next
 }

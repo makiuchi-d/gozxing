@@ -1,12 +1,14 @@
 package gozxing
 
 import (
+	"fmt"
+	"strings"
 	"testing"
 
 	errors "golang.org/x/xerrors"
 )
 
-func testNotFoundErrorType(t *testing.T, e error) {
+func testNotFoundExceptionType(t *testing.T, e error) {
 	var ne NotFoundException
 	if !errors.As(e, &ne) {
 		t.Fatalf("Type must be NotFoundException")
@@ -36,5 +38,17 @@ func testNotFoundErrorType(t *testing.T, e error) {
 
 func TestNotFoundException(t *testing.T) {
 	var e error = GetNotFoundExceptionInstance()
-	testNotFoundErrorType(t, e)
+	testNotFoundExceptionType(t, e)
+
+	s := fmt.Sprintf("%+v", e)
+	cases := []string{
+		"NotFoundException",
+		"TestNotFoundException",
+		"not_found_exception_test.go:",
+	}
+	for _, c := range cases {
+		if strings.Index(s, c) < 0 {
+			t.Fatalf("error message must contains \"%s\"", c)
+		}
+	}
 }
