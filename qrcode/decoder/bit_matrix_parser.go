@@ -95,7 +95,7 @@ func (this *BitMatrixParser) ReadVersion() (*Version, error) {
 		return theParsedVersion, nil
 	}
 
-	return nil, gozxing.NewFormatException()
+	return nil, gozxing.WrapFormatException(e)
 }
 
 func (this *BitMatrixParser) copyBit(i, j, versionBits int) int {

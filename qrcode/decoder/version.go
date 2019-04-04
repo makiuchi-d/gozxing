@@ -102,7 +102,7 @@ func Version_decodeVersionInformation(versionBits int) (*Version, error) {
 		return Version_GetVersionForNumber(bestVersion)
 	}
 
-	return nil, errors.Errorf("we didn't find a close enough match: %x", versionBits)
+	return nil, errors.Errorf("we didn't find a close enough match 0x%x", versionBits)
 }
 
 func (v *Version) buildFunctionPattern() (*gozxing.BitMatrix, error) {

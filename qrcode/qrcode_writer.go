@@ -1,9 +1,9 @@
 package qrcode
 
 import (
-	"errors"
-	"fmt"
 	"strconv"
+
+	errors "golang.org/x/xerrors"
 
 	"github.com/makiuchi-d/gozxing"
 	"github.com/makiuchi-d/gozxing/qrcode/decoder"
@@ -34,11 +34,11 @@ func (this *QRCodeWriter) Encode(
 	}
 
 	if format != gozxing.BarcodeFormat_QR_CODE {
-		return nil, fmt.Errorf("IllegalArgumentException: Can only encode QR_CODE, but got %v", format)
+		return nil, errors.Errorf("IllegalArgumentException: Can only encode QR_CODE, but got %v", format)
 	}
 
 	if width < 0 || height < 0 {
-		return nil, fmt.Errorf(
+		return nil, errors.Errorf(
 			"IllegalArgumentException: Requested dimensions are too small: %vx%v", width, height)
 	}
 
@@ -51,11 +51,11 @@ func (this *QRCodeWriter) Encode(
 			} else if str, ok := ec.(string); ok {
 				ecl, e := decoder.ErrorCorrectionLevel_ValueOf(str)
 				if e != nil {
-					return nil, e
+					return nil, errors.Errorf("EncodeHintType_ERROR_CORRECTION: %w", e)
 				}
 				errorCorrectionLevel = ecl
 			} else {
-				return nil, fmt.Errorf(
+				return nil, errors.Errorf(
 					"IllegalArgumentException: EncodeHintType_ERROR_CORRECTION %v", ec)
 			}
 		}
@@ -65,11 +65,11 @@ func (this *QRCodeWriter) Encode(
 			} else if str, ok := m.(string); ok {
 				qz, e := strconv.Atoi(str)
 				if e != nil {
-					return nil, e
+					return nil, errors.Errorf("EncodeHintType_MARGIN = \"%v\": %w", m, e)
 				}
 				quietZone = qz
 			} else {
-				return nil, fmt.Errorf("IllegalArgumentException: EncodeHintType_MARGIN %v", m)
+				return nil, errors.Errorf("IllegalArgumentException: EncodeHintType_MARGIN %v", m)
 			}
 		}
 	}
