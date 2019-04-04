@@ -53,7 +53,7 @@ func (this *Detector) ProcessFinderPatternInfo(info *FinderPatternInfo) (*common
 
 	moduleSize := this.calculateModuleSize(topLeft, topRight, bottomLeft)
 	if moduleSize < 1.0 {
-		return nil, gozxing.GetNotFoundExceptionInstance()
+		return nil, gozxing.NewNotFoundException("moduleSize = %v", moduleSize)
 	}
 	dimension, e := this.computeDimension(topLeft, topRight, bottomLeft, moduleSize)
 	if e != nil {
@@ -61,7 +61,7 @@ func (this *Detector) ProcessFinderPatternInfo(info *FinderPatternInfo) (*common
 	}
 	provisionalVersion, e := decoder.Version_GetProvisionalVersionForDimension(dimension)
 	if e != nil {
-		return nil, e
+		return nil, gozxing.WrapFormatException(e)
 	}
 	modulesBetweenFPCenters := provisionalVersion.GetDimensionForVersion() - 7
 
@@ -97,7 +97,7 @@ func (this *Detector) ProcessFinderPatternInfo(info *FinderPatternInfo) (*common
 
 	bits, e := Detector_sampleGrid(this.image, transform, dimension)
 	if e != nil {
-		return nil, e
+		return nil, gozxing.WrapNotFoundException(e)
 	}
 
 	var points []gozxing.ResultPoint
@@ -166,7 +166,7 @@ func (this *Detector) computeDimension(topLeft, topRight, bottomLeft gozxing.Res
 		dimension--
 		break
 	case 3:
-		return 0, gozxing.GetNotFoundExceptionInstance()
+		return 0, gozxing.NewNotFoundException("dimension = %v", dimension)
 	}
 	return dimension, nil
 }
@@ -311,8 +311,8 @@ func (this *Detector) findAlignmentInRegion(overallEstModuleSize float64, estAli
 	if a := this.image.GetWidth() - 1; a < alignmentAreaRightX {
 		alignmentAreaRightX = a
 	}
-	if float64(alignmentAreaRightX-alignmentAreaLeftX) < overallEstModuleSize*3 {
-		return nil, gozxing.GetNotFoundExceptionInstance()
+	if x := float64(alignmentAreaRightX - alignmentAreaLeftX); x < overallEstModuleSize*3 {
+		return nil, gozxing.NewNotFoundException("x = %v, moduleSize = %v", x, overallEstModuleSize)
 	}
 
 	alignmentAreaTopY := estAlignmentY - allowance
@@ -324,8 +324,8 @@ func (this *Detector) findAlignmentInRegion(overallEstModuleSize float64, estAli
 		alignmentAreaBottomY = a
 	}
 
-	if float64(alignmentAreaBottomY-alignmentAreaTopY) < overallEstModuleSize*3 {
-		return nil, gozxing.GetNotFoundExceptionInstance()
+	if y := float64(alignmentAreaBottomY - alignmentAreaTopY); y < overallEstModuleSize*3 {
+		return nil, gozxing.NewNotFoundException("y = %v, moduleSize = %v", y, overallEstModuleSize)
 	}
 
 	alignmentFinder := NewAlignmentPatternFinder(
