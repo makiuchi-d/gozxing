@@ -25,7 +25,7 @@ func (s DefaultGridSampler) SampleGridWithTransform(image *gozxing.BitMatrix,
 	dimensionX, dimensionY int, transform *PerspectiveTransform) (*gozxing.BitMatrix, error) {
 
 	if dimensionX <= 0 || dimensionY <= 0 {
-		return nil, gozxing.NewNotFoundException()
+		return nil, gozxing.NewNotFoundException("dimensions X, Y = %v, %v", dimensionX, dimensionY)
 	}
 	bits, _ := gozxing.NewBitMatrix(dimensionX, dimensionY) // always success
 	points := make([]float64, 2*dimensionX)

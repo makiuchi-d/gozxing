@@ -24,7 +24,7 @@ type WhiteRectangleDetector struct {
 	upInit    int
 }
 
-func NewWhiteRectangleDetectorFromImage(image *gozxing.BitMatrix) (*WhiteRectangleDetector, error) {
+func NewWhiteRectangleDetectorFromImage(image *gozxing.BitMatrix) (*WhiteRectangleDetector, gozxing.NotFoundException) {
 	return NewWhiteRectangleDetector(
 		image, whiteRectangleDetector_INIT_SIZE, image.GetWidth()/2, image.GetHeight()/2)
 }
@@ -35,7 +35,7 @@ func NewWhiteRectangleDetectorFromImage(image *gozxing.BitMatrix) (*WhiteRectang
 // @param x x position of search center
 // @param y y position of search center
 // @throws NotFoundException if image is too small to accommodate {@code initSize}
-func NewWhiteRectangleDetector(image *gozxing.BitMatrix, initSize, x, y int) (*WhiteRectangleDetector, error) {
+func NewWhiteRectangleDetector(image *gozxing.BitMatrix, initSize, x, y int) (*WhiteRectangleDetector, gozxing.NotFoundException) {
 	halfsize := initSize / 2
 	d := &WhiteRectangleDetector{
 		image:     image,
@@ -63,7 +63,7 @@ func NewWhiteRectangleDetector(image *gozxing.BitMatrix, initSize, x, y int) (*W
 //         leftmost and the third, the rightmost
 // @throws NotFoundException if no Data Matrix Code can be found
 //
-func (this *WhiteRectangleDetector) Detect() ([]gozxing.ResultPoint, error) {
+func (this *WhiteRectangleDetector) Detect() ([]gozxing.ResultPoint, gozxing.NotFoundException) {
 	left := this.leftInit
 	right := this.rightInit
 	up := this.upInit
@@ -166,50 +166,49 @@ func (this *WhiteRectangleDetector) Detect() ([]gozxing.ResultPoint, error) {
 
 		maxSize := right - left
 
-		var z gozxing.ResultPoint = nil
+		var z gozxing.ResultPoint
 		for i := 1; z == nil && i < maxSize; i++ {
 			z = this.getBlackPointOnSegment(left, down-i, left+i, down)
 		}
 
 		if z == nil {
-			return nil, gozxing.NewNotFoundException()
+			return nil, gozxing.NewNotFoundException("no black point on left-down")
 		}
 
-		var t gozxing.ResultPoint = nil
+		var t gozxing.ResultPoint
 		//go down right
 		for i := 1; t == nil && i < maxSize; i++ {
 			t = this.getBlackPointOnSegment(left, up+i, left+i, up)
 		}
 
 		if t == nil {
-			return nil, gozxing.NewNotFoundException()
+			return nil, gozxing.NewNotFoundException("no black point on left-up")
 		}
 
-		var x gozxing.ResultPoint = nil
+		var x gozxing.ResultPoint
 		//go down left
 		for i := 1; x == nil && i < maxSize; i++ {
 			x = this.getBlackPointOnSegment(right, up+i, right-i, up)
 		}
 
 		if x == nil {
-			return nil, gozxing.NewNotFoundException()
+			return nil, gozxing.NewNotFoundException("no black point on right-up")
 		}
 
-		var y gozxing.ResultPoint = nil
+		var y gozxing.ResultPoint
 		//go up left
 		for i := 1; y == nil && i < maxSize; i++ {
 			y = this.getBlackPointOnSegment(right, down-i, right-i, down)
 		}
 
 		if y == nil {
-			return nil, gozxing.NewNotFoundException()
+			return nil, gozxing.NewNotFoundException("no black point on right-down")
 		}
 
 		return this.centerEdges(y, z, x, t), nil
-
-	} else {
-		return nil, gozxing.NewNotFoundException()
 	}
+
+	return nil, gozxing.NewNotFoundException()
 }
 
 func (this *WhiteRectangleDetector) getBlackPointOnSegment(aX, aY, bX, bY int) gozxing.ResultPoint {

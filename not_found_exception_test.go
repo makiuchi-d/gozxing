@@ -51,6 +51,13 @@ func TestNewNotFoundException(t *testing.T) {
 			t.Fatalf("error message must contains \"%s\"", c)
 		}
 	}
+
+	e = NewNotFoundException("not %s", "found")
+	msg := e.Error()
+	wants := "NotFoundException: not found"
+	if msg != wants {
+		t.Fatalf("Error() = \"%s\", wants \"%s\"", msg, wants)
+	}
 }
 
 func TestWrapNotFoundException(t *testing.T) {
