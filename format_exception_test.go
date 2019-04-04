@@ -39,7 +39,7 @@ func TestFormatException(t *testing.T) {
 	testFormatExceptionType(t, e)
 }
 
-func TestFormatExceptionWithMessage(t *testing.T) {
+func TestNewFormatException(t *testing.T) {
 	var e error = NewFormatException("testmsg %d, %d", 10, 20)
 	testFormatExceptionType(t, e)
 
@@ -50,9 +50,9 @@ func TestFormatExceptionWithMessage(t *testing.T) {
 	}
 }
 
-func TestNewFormatException(t *testing.T) {
+func TestWrapFormatException(t *testing.T) {
 	base := errors.New("newformatexception")
-	var e error = NewFormatExceptionWithError(base)
+	var e error = WrapFormatException(base)
 
 	testFormatExceptionType(t, e)
 

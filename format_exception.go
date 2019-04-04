@@ -26,7 +26,7 @@ func NewFormatException(args ...interface{}) FormatException {
 	}
 }
 
-func NewFormatExceptionWithError(e error) FormatException {
+func WrapFormatException(e error) FormatException {
 	return formatException{
 		newException("FormatException: "+e.Error(), e),
 	}

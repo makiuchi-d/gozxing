@@ -23,7 +23,7 @@ func NewWriterException(message string, args ...interface{}) WriterException {
 	}
 }
 
-func NewWriterExceptionWithError(err error) WriterException {
+func WrapWriterException(err error) WriterException {
 	return writerException{
 		newException("WriterException: "+err.Error(), err),
 	}

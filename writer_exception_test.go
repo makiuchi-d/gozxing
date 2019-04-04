@@ -33,9 +33,9 @@ func TestNewWriterException(t *testing.T) {
 	testWriterErrorType(t, e)
 }
 
-func TestNewWriterExceptionWithError(t *testing.T) {
+func TestWrapWriterException(t *testing.T) {
 	base := errors.New("test error")
-	var e error = NewWriterExceptionWithError(base)
+	var e error = WrapWriterException(base)
 
 	testWriterErrorType(t, e)
 

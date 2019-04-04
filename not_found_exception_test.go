@@ -36,14 +36,14 @@ func testNotFoundExceptionType(t *testing.T, e error) {
 	ne.readerException()
 }
 
-func TestNotFoundException(t *testing.T) {
-	var e error = GetNotFoundExceptionInstance()
+func TestNewNotFoundException(t *testing.T) {
+	var e error = NewNotFoundException()
 	testNotFoundExceptionType(t, e)
 
 	s := fmt.Sprintf("%+v", e)
 	cases := []string{
 		"NotFoundException",
-		"TestNotFoundException",
+		"TestNewNotFoundException",
 		"not_found_exception_test.go:",
 	}
 	for _, c := range cases {

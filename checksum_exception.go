@@ -12,13 +12,13 @@ type checksumException struct {
 func (checksumException) readerException()   {}
 func (checksumException) checksumException() {}
 
-func GetChecksumExceptionInstance() ChecksumException {
+func NewChecksumException() ChecksumException {
 	return checksumException{
 		newException("ChecksumException", nil),
 	}
 }
 
-func NewChecksumExceptionInstance(e error) ChecksumException {
+func WrapChecksumException(e error) ChecksumException {
 	return checksumException{
 		newException("ChecksumException"+e.Error(), e),
 	}

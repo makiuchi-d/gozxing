@@ -34,14 +34,14 @@ func testChecksumExceptionType(t *testing.T, e error) {
 	ce.readerException()
 }
 
-func TestChecksumException(t *testing.T) {
-	var e error = GetChecksumExceptionInstance()
+func TestNewChecksumException(t *testing.T) {
+	var e error = NewChecksumException()
 	testChecksumExceptionType(t, e)
 }
 
-func TestNewChecksumException(t *testing.T) {
+func TestWrapChecksumException(t *testing.T) {
 	base := errors.New("newchecksumexceptionstring")
-	var e error = NewChecksumExceptionInstance(base)
+	var e error = WrapChecksumException(base)
 
 	testChecksumExceptionType(t, e)
 

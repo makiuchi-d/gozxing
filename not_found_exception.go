@@ -12,7 +12,7 @@ type notFoundException struct {
 func (notFoundException) readerException()   {}
 func (notFoundException) notFoundException() {}
 
-func GetNotFoundExceptionInstance() NotFoundException {
+func NewNotFoundException() NotFoundException {
 	return notFoundException{
 		newException("NotFoundException", nil),
 	}
