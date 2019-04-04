@@ -47,7 +47,7 @@ func NewWhiteRectangleDetector(image *gozxing.BitMatrix, initSize, x, y int) (*W
 		downInit:  y + halfsize,
 	}
 	if d.upInit < 0 || d.leftInit < 0 || d.downInit >= d.height || d.rightInit >= d.width {
-		return nil, gozxing.GetNotFoundExceptionInstance()
+		return nil, gozxing.NewNotFoundException()
 	}
 	return d, nil
 }
@@ -172,7 +172,7 @@ func (this *WhiteRectangleDetector) Detect() ([]gozxing.ResultPoint, error) {
 		}
 
 		if z == nil {
-			return nil, gozxing.GetNotFoundExceptionInstance()
+			return nil, gozxing.NewNotFoundException()
 		}
 
 		var t gozxing.ResultPoint = nil
@@ -182,7 +182,7 @@ func (this *WhiteRectangleDetector) Detect() ([]gozxing.ResultPoint, error) {
 		}
 
 		if t == nil {
-			return nil, gozxing.GetNotFoundExceptionInstance()
+			return nil, gozxing.NewNotFoundException()
 		}
 
 		var x gozxing.ResultPoint = nil
@@ -192,7 +192,7 @@ func (this *WhiteRectangleDetector) Detect() ([]gozxing.ResultPoint, error) {
 		}
 
 		if x == nil {
-			return nil, gozxing.GetNotFoundExceptionInstance()
+			return nil, gozxing.NewNotFoundException()
 		}
 
 		var y gozxing.ResultPoint = nil
@@ -202,13 +202,13 @@ func (this *WhiteRectangleDetector) Detect() ([]gozxing.ResultPoint, error) {
 		}
 
 		if y == nil {
-			return nil, gozxing.GetNotFoundExceptionInstance()
+			return nil, gozxing.NewNotFoundException()
 		}
 
 		return this.centerEdges(y, z, x, t), nil
 
 	} else {
-		return nil, gozxing.GetNotFoundExceptionInstance()
+		return nil, gozxing.NewNotFoundException()
 	}
 }
 

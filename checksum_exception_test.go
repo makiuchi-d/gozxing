@@ -1,6 +1,8 @@
 package gozxing
 
 import (
+	"fmt"
+	"strings"
 	"testing"
 
 	errors "golang.org/x/xerrors"
@@ -37,6 +39,18 @@ func testChecksumExceptionType(t *testing.T, e error) {
 func TestNewChecksumException(t *testing.T) {
 	var e error = NewChecksumException()
 	testChecksumExceptionType(t, e)
+
+	s := fmt.Sprintf("%+v", e)
+	cases := []string{
+		"ChecksumException",
+		"TestNewChecksumException",
+		"checksum_exception_test.go:",
+	}
+	for _, c := range cases {
+		if strings.Index(s, c) < 0 {
+			t.Fatalf("error message must contains \"%s\"", c)
+		}
+	}
 }
 
 func TestWrapChecksumException(t *testing.T) {

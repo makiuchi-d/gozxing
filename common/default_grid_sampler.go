@@ -25,7 +25,7 @@ func (s DefaultGridSampler) SampleGridWithTransform(image *gozxing.BitMatrix,
 	dimensionX, dimensionY int, transform *PerspectiveTransform) (*gozxing.BitMatrix, error) {
 
 	if dimensionX <= 0 || dimensionY <= 0 {
-		return nil, gozxing.GetNotFoundExceptionInstance()
+		return nil, gozxing.NewNotFoundException()
 	}
 	bits, _ := gozxing.NewBitMatrix(dimensionX, dimensionY) // always success
 	points := make([]float64, 2*dimensionX)
@@ -41,7 +41,7 @@ func (s DefaultGridSampler) SampleGridWithTransform(image *gozxing.BitMatrix,
 		// sufficient to check the endpoints
 		e := GridSampler_checkAndNudgePoints(image, points)
 		if e != nil {
-			return nil, e
+			return nil, gozxing.WrapNotFoundException(e)
 		}
 		for x := 0; x < max; x += 2 {
 			px := int(points[x])
@@ -57,7 +57,7 @@ func (s DefaultGridSampler) SampleGridWithTransform(image *gozxing.BitMatrix,
 				// This results in an ugly runtime exception despite our clever checks above -- can't have
 				// that. We could check each point's coordinates but that feels duplicative. We settle for
 				// catching and wrapping ArrayIndexOutOfBoundsException.
-				return nil, gozxing.GetNotFoundExceptionInstance()
+				return nil, gozxing.NewNotFoundException()
 			}
 
 			if image.Get(px, py) {

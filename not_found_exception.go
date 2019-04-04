@@ -17,3 +17,9 @@ func NewNotFoundException() NotFoundException {
 		newException("NotFoundException", nil),
 	}
 }
+
+func WrapNotFoundException(e error) NotFoundException {
+	return notFoundException{
+		newException("NotFoundException: "+e.Error(), e),
+	}
+}
