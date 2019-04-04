@@ -1,7 +1,6 @@
 package encoder
 
 import (
-	"fmt"
 	"math"
 	"strconv"
 	"unicode/utf8"
@@ -38,11 +37,11 @@ func calculateMaskPenalty(matrix *ByteMatrix) int {
 		MaskUtil_applyMaskPenaltyRule4(matrix)
 }
 
-func Encoder_encodeWithoutHint(content string, ecLevel decoder.ErrorCorrectionLevel) (*QRCode, error) {
+func Encoder_encodeWithoutHint(content string, ecLevel decoder.ErrorCorrectionLevel) (*QRCode, gozxing.WriterException) {
 	return Encoder_encode(content, ecLevel, nil)
 }
 
-func Encoder_encode(content string, ecLevel decoder.ErrorCorrectionLevel, hints map[gozxing.EncodeHintType]interface{}) (*QRCode, error) {
+func Encoder_encode(content string, ecLevel decoder.ErrorCorrectionLevel, hints map[gozxing.EncodeHintType]interface{}) (*QRCode, gozxing.WriterException) {
 	// Determine what character encoding has been specified by the caller, if any
 	encoding := Encoder_DEFAULT_BYTE_MODE_ENCODING
 	encodingHint, hasEncodingHint := hints[gozxing.EncodeHintType_CHARACTER_SET]
@@ -111,14 +110,13 @@ func Encoder_encode(content string, ecLevel decoder.ErrorCorrectionLevel, hints 
 		var e error
 		version, e = decoder.Version_GetVersionForNumber(versionNumber)
 		if e != nil {
-			return nil, e
+			return nil, gozxing.WrapWriterException(e)
 		}
 		bitsNeeded := calculateBitsNeeded(mode, headerBits, dataBits, version)
 		if !willFit(bitsNeeded, version, ecLevel) {
 			return nil, gozxing.NewWriterException("Data too big for requested version")
 		}
 	} else {
-		var e error
 		version, e = recommendVersion(ecLevel, mode, headerBits, dataBits)
 		if e != nil {
 			return nil, e
@@ -183,7 +181,7 @@ func Encoder_encode(content string, ecLevel decoder.ErrorCorrectionLevel, hints 
 // recommendVersion  Decides the smallest version of QR code that will contain all of the provided data.
 // @throws WriterException if the data cannot fit in any version
 func recommendVersion(ecLevel decoder.ErrorCorrectionLevel, mode *decoder.Mode,
-	headerBits *gozxing.BitArray, dataBits *gozxing.BitArray) (*decoder.Version, error) {
+	headerBits *gozxing.BitArray, dataBits *gozxing.BitArray) (*decoder.Version, gozxing.WriterException) {
 	// Hard part: need to know version to know how many bits length takes. But need to know how many
 	// bits it takes to know version. First we take a guess at version by assuming version will be
 	// the minimum, 1:
@@ -265,7 +263,7 @@ func isOnlyDoubleByteKanji(content string) bool {
 }
 
 func chooseMaskPattern(bits *gozxing.BitArray, ecLevel decoder.ErrorCorrectionLevel,
-	version *decoder.Version, matrix *ByteMatrix) (int, error) {
+	version *decoder.Version, matrix *ByteMatrix) (int, gozxing.WriterException) {
 
 	minPenalty := math.MaxInt32 // Lower penalty is better.
 	bestMaskPattern := -1
@@ -273,7 +271,7 @@ func chooseMaskPattern(bits *gozxing.BitArray, ecLevel decoder.ErrorCorrectionLe
 	for maskPattern := 0; maskPattern < QRCode_NUM_MASK_PATERNS; maskPattern++ {
 		e := MatrixUtil_buildMatrix(bits, ecLevel, version, maskPattern, matrix)
 		if e != nil {
-			return -1, e
+			return -1, gozxing.WrapWriterException(e)
 		}
 		penalty := calculateMaskPenalty(matrix)
 		if penalty < minPenalty {
@@ -284,7 +282,7 @@ func chooseMaskPattern(bits *gozxing.BitArray, ecLevel decoder.ErrorCorrectionLe
 	return bestMaskPattern, nil
 }
 
-func chooseVersion(numInputBits int, ecLevel decoder.ErrorCorrectionLevel) (*decoder.Version, error) {
+func chooseVersion(numInputBits int, ecLevel decoder.ErrorCorrectionLevel) (*decoder.Version, gozxing.WriterException) {
 	for versionNum := 1; versionNum <= 40; versionNum++ {
 		version, _ := decoder.Version_GetVersionForNumber(versionNum)
 		if willFit(numInputBits, version, ecLevel) {
@@ -310,11 +308,11 @@ func willFit(numInputBits int, version *decoder.Version, ecLevel decoder.ErrorCo
 }
 
 // terminateBits Terminate bits as described in 8.4.8 and 8.4.9 of JISX0510:2004 (p.24).
-func terminateBits(numDataBytes int, bits *gozxing.BitArray) error {
+func terminateBits(numDataBytes int, bits *gozxing.BitArray) gozxing.WriterException {
 	capacity := numDataBytes * 8
 	if bits.GetSize() > capacity {
-		return gozxing.NewWriterExceptionWithError(
-			fmt.Errorf("data bits cannot fit in the QR Code %v > %v", bits.GetSize(), capacity))
+		return gozxing.NewWriterException(
+			"data bits cannot fit in the QR Code %v > %v", bits.GetSize(), capacity)
 	}
 	for i := 0; i < 4 && bits.GetSize() < capacity; i++ {
 		bits.AppendBit(false)
@@ -346,7 +344,7 @@ func terminateBits(numDataBytes int, bits *gozxing.BitArray) error {
 // error correction bytes for block id "blockID".
 // Returns are "numDataBytesInBlock", and "numECBytesInBlock".
 // See table 12 in 8.5.1 of JISX0510:2004 (p.30)
-func getNumDataBytesAndNumECBytesForBlockID(numTotalBytes, numDataBytes, numRSBlocks, blockID int) (int, int, error) {
+func getNumDataBytesAndNumECBytesForBlockID(numTotalBytes, numDataBytes, numRSBlocks, blockID int) (int, int, gozxing.WriterException) {
 	if blockID >= numRSBlocks {
 		return 0, 0, gozxing.NewWriterException("Block ID too large")
 	}
@@ -391,7 +389,7 @@ func getNumDataBytesAndNumECBytesForBlockID(numTotalBytes, numDataBytes, numRSBl
 // interleaveWithECBytes Interleave "bits" with corresponding error correction bytes.
 // On success, store the result in "result".
 // The interleave rule is complicated. See 8.6 of JISX0510:2004 (p.37) for details.
-func interleaveWithECBytes(bits *gozxing.BitArray, numTotalBytes, numDataBytes, numRSBlocks int) (*gozxing.BitArray, error) {
+func interleaveWithECBytes(bits *gozxing.BitArray, numTotalBytes, numDataBytes, numRSBlocks int) (*gozxing.BitArray, gozxing.WriterException) {
 
 	// "bits" must have "getNumDataBytes" bytes of data.
 	if bits.GetSizeInBytes() != numDataBytes {
@@ -456,14 +454,14 @@ func interleaveWithECBytes(bits *gozxing.BitArray, numTotalBytes, numDataBytes, 
 		}
 	}
 	if numTotalBytes != result.GetSizeInBytes() { // Should be same.
-		return nil, gozxing.NewWriterExceptionWithError(
-			fmt.Errorf("Interleaving error: %v  and %v differ", numTotalBytes, result.GetSizeInBytes()))
+		return nil, gozxing.NewWriterException(
+			"Interleaving error: %v  and %v differ", numTotalBytes, result.GetSizeInBytes())
 	}
 
 	return result, nil
 }
 
-func generateECBytes(dataBytes []byte, numEcBytesInBlock int) ([]byte, error) {
+func generateECBytes(dataBytes []byte, numEcBytesInBlock int) ([]byte, gozxing.WriterException) {
 	numDataBytes := len(dataBytes)
 	toEncode := make([]int, numDataBytes+numEcBytesInBlock)
 	for i := 0; i < numDataBytes; i++ {
@@ -471,7 +469,7 @@ func generateECBytes(dataBytes []byte, numEcBytesInBlock int) ([]byte, error) {
 	}
 	e := reedsolomon.NewReedSolomonEncoder(reedsolomon.GenericGF_QR_CODE_FIELD_256).Encode(toEncode, numEcBytesInBlock)
 	if e != nil {
-		return nil, e
+		return nil, gozxing.WrapWriterException(e)
 	}
 
 	ecBytes := make([]byte, numEcBytesInBlock)
@@ -487,11 +485,11 @@ func appendModeInfo(mode *decoder.Mode, bits *gozxing.BitArray) {
 }
 
 // appendLengthInfo Append length info. On success, store the result in "bits".
-func appendLengthInfo(numLetters int, version *decoder.Version, mode *decoder.Mode, bits *gozxing.BitArray) error {
+func appendLengthInfo(numLetters int, version *decoder.Version, mode *decoder.Mode, bits *gozxing.BitArray) gozxing.WriterException {
 	numBits := mode.GetCharacterCountBits(version)
 	if numLetters >= (1 << uint(numBits)) {
-		return gozxing.NewWriterExceptionWithError(
-			fmt.Errorf("%v is bigger than %v", numLetters, (1 << uint(numBits))))
+		return gozxing.NewWriterException(
+			"%v is bigger than %v", numLetters, (1 << uint(numBits)))
 	}
 	_ = bits.AppendBits(numLetters, numBits)
 	return nil
@@ -499,7 +497,7 @@ func appendLengthInfo(numLetters int, version *decoder.Version, mode *decoder.Mo
 
 // appendBytes Append "bytes" in "mode" mode (encoding) into "bits".
 //  On success, store the result in "bits".
-func appendBytes(content string, mode *decoder.Mode, bits *gozxing.BitArray, encoding string) error {
+func appendBytes(content string, mode *decoder.Mode, bits *gozxing.BitArray, encoding string) gozxing.WriterException {
 	switch mode {
 	case decoder.Mode_NUMERIC:
 		appendNumericBytes(content, bits)
@@ -511,7 +509,7 @@ func appendBytes(content string, mode *decoder.Mode, bits *gozxing.BitArray, enc
 	case decoder.Mode_KANJI:
 		return appendKanjiBytes(content, bits)
 	default:
-		return gozxing.NewWriterExceptionWithError(fmt.Errorf("Invalid mode: %v", mode))
+		return gozxing.NewWriterException("Invalid mode: %v", mode)
 	}
 }
 
@@ -539,7 +537,7 @@ func appendNumericBytes(content string, bits *gozxing.BitArray) {
 	}
 }
 
-func appendAlphanumericBytes(content string, bits *gozxing.BitArray) error {
+func appendAlphanumericBytes(content string, bits *gozxing.BitArray) gozxing.WriterException {
 	length := len(content)
 	i := 0
 	for i < length {
@@ -564,17 +562,17 @@ func appendAlphanumericBytes(content string, bits *gozxing.BitArray) error {
 	return nil
 }
 
-func append8BitBytes(content string, bits *gozxing.BitArray, encoding string) error {
+func append8BitBytes(content string, bits *gozxing.BitArray, encoding string) gozxing.WriterException {
 	bytes := []byte(content)
 
 	if encoding != "ASCII" {
 		enc, e := ianaindex.IANA.Encoding(encoding)
 		if e != nil {
-			return e
+			return gozxing.WrapWriterException(e)
 		}
 		bytes, e = enc.NewEncoder().Bytes([]byte(content))
 		if e != nil {
-			return gozxing.NewWriterExceptionWithError(e)
+			return gozxing.WrapWriterException(e)
 		}
 	}
 
@@ -584,11 +582,11 @@ func append8BitBytes(content string, bits *gozxing.BitArray, encoding string) er
 	return nil
 }
 
-func appendKanjiBytes(content string, bits *gozxing.BitArray) error {
+func appendKanjiBytes(content string, bits *gozxing.BitArray) gozxing.WriterException {
 	enc := japanese.ShiftJIS.NewEncoder()
 	bytes, e := enc.Bytes([]byte(content))
 	if e != nil {
-		return gozxing.NewWriterExceptionWithError(e)
+		return gozxing.WrapWriterException(e)
 	}
 	if len(bytes)%2 != 0 {
 		return gozxing.NewWriterException("Kanji byte size not even")

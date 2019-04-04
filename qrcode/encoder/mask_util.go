@@ -1,7 +1,7 @@
 package encoder
 
 import (
-	"fmt"
+	errors "golang.org/x/xerrors"
 )
 
 const (
@@ -165,7 +165,7 @@ func MaskUtil_getDataMaskBit(maskPattern, x, y int) (bool, error) {
 		intermediate = ((temp % 3) + ((y + x) & 0x1)) & 0x1
 		break
 	default:
-		return false, fmt.Errorf("IllegalArgumentException: Invalid mask pattern: %d", maskPattern)
+		return false, errors.Errorf("IllegalArgumentException: Invalid mask pattern: %d", maskPattern)
 	}
 	return (intermediate == 0), nil
 }
