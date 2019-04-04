@@ -3,8 +3,6 @@ package decoder
 import (
 	"reflect"
 	"testing"
-
-	"github.com/makiuchi-d/gozxing"
 )
 
 func checkVersion(t *testing.T, v *Version, number, dimension int) {
@@ -124,16 +122,10 @@ func TestVersion_GetProvisionalVersionForDimensionFail(t *testing.T) {
 	if e == nil {
 		t.Fatalf("GetProvisionalVersionForDimension(3) must be error")
 	}
-	if _, ok := e.(gozxing.FormatException); !ok {
-		t.Fatalf("error must be FormatException, %T", e)
-	}
 
 	_, e = Version_GetProvisionalVersionForDimension(181)
 	if e == nil {
 		t.Fatalf("GetProvisionalVersionForDimension(3) must be error")
-	}
-	if _, ok := e.(gozxing.FormatException); !ok {
-		t.Fatalf("error must be FormatException, %T", e)
 	}
 }
 

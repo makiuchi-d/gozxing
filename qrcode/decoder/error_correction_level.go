@@ -1,8 +1,7 @@
 package decoder
 
 import (
-	"errors"
-	"fmt"
+	errors "golang.org/x/xerrors"
 )
 
 type ErrorCorrectionLevel int
@@ -57,6 +56,6 @@ func ErrorCorrectionLevel_ValueOf(s string) (ErrorCorrectionLevel, error) {
 	case "Q":
 		return ErrorCorrectionLevel_Q, nil
 	default:
-		return -1, fmt.Errorf("IllegalArgumentException: ErrorCorrectionLevel %v", s)
+		return -1, errors.Errorf("IllegalArgumentException: ErrorCorrectionLevel %v", s)
 	}
 }

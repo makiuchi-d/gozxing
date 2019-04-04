@@ -37,10 +37,9 @@ func (this *Decoder) Decode(bits *gozxing.BitMatrix, hints map[gozxing.DecodeHin
 	// Construct a parser and read version, error-correction level
 	parser, e := NewBitMatrixParser(bits)
 	if e != nil {
-		return nil, e
+		return nil, gozxing.WrapFormatException(e)
 	}
-	var fe gozxing.FormatException
-	var ce gozxing.ChecksumException
+	var fece gozxing.ReaderException
 
 	result, e := this.decode(parser, hints)
 	if e == nil {
@@ -48,10 +47,8 @@ func (this *Decoder) Decode(bits *gozxing.BitMatrix, hints map[gozxing.DecodeHin
 	}
 
 	switch e.(type) {
-	case gozxing.FormatException:
-		fe = e.(gozxing.FormatException)
-	case gozxing.ChecksumException:
-		ce = e.(gozxing.ChecksumException)
+	case gozxing.FormatException, gozxing.ChecksumException:
+		fece = e.(gozxing.ReaderException)
 	}
 	e = nil
 
@@ -96,10 +93,7 @@ func (this *Decoder) Decode(bits *gozxing.BitMatrix, hints map[gozxing.DecodeHin
 	switch e.(type) {
 	case gozxing.FormatException, gozxing.ChecksumException:
 		// Throw the exception from the original reading
-		if fe != nil {
-			return nil, fe
-		}
-		return nil, ce // If fe is null, this can't be
+		return nil, fece
 	default:
 		return nil, e
 	}
@@ -108,23 +102,23 @@ func (this *Decoder) Decode(bits *gozxing.BitMatrix, hints map[gozxing.DecodeHin
 func (this *Decoder) decode(parser *BitMatrixParser, hints map[gozxing.DecodeHintType]interface{}) (*common.DecoderResult, error) {
 	version, e := parser.ReadVersion()
 	if e != nil {
-		return nil, e
+		return nil, gozxing.WrapFormatException(e)
 	}
 	formatinfo, e := parser.ReadFormatInformation()
 	if e != nil {
-		return nil, e
+		return nil, gozxing.WrapFormatException(e)
 	}
 	ecLevel := formatinfo.GetErrorCorrectionLevel()
 
 	// Read codewords
 	codewords, e := parser.ReadCodewords()
 	if e != nil {
-		return nil, e
+		return nil, gozxing.WrapFormatException(e)
 	}
 	// Separate into data blocks
 	dataBlocks, e := DataBlock_GetDataBlocks(codewords, version, ecLevel)
 	if e != nil {
-		return nil, e
+		return nil, gozxing.WrapFormatException(e)
 	}
 
 	// Count total number of data bytes
@@ -163,10 +157,7 @@ func (this *Decoder) correctErrors(codewordBytes []byte, numDataCodewords int) e
 
 	e := this.rsDecoder.Decode(codewordsInts, numCodewords-numDataCodewords)
 	if e != nil {
-		if _, ok := e.(reedsolomon.ReedSolomonException); ok {
-			return gozxing.GetChecksumExceptionInstance()
-		}
-		return e
+		return gozxing.WrapChecksumException(e)
 	}
 	// Copy back into array of bytes -- only need to worry about the bytes that were data
 	// We don't care about errors in the error-correction codewords
