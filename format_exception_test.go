@@ -59,4 +59,13 @@ func TestWrapFormatException(t *testing.T) {
 	if !errors.Is(e, base) {
 		t.Fatalf("err(%v) is not base(%v)", e, base)
 	}
+
+	wants := "FormatException: newformatexception"
+	if msg := e.Error(); msg != wants {
+		t.Fatalf("e.Error() = \"%s\", wants \"%s\"", msg, wants)
+	}
+	e = WrapFormatException(e)
+	if msg := e.Error(); msg != wants {
+		t.Fatalf("e.Error() = \"%s\", wants \"%s\"", msg, wants)
+	}
 }

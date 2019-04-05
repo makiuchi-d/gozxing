@@ -12,24 +12,24 @@ type testException struct {
 
 func (testException) readerException() {}
 
-func newTestException(msg string) ReaderException {
+func newTestException(args ...interface{}) ReaderException {
 	return testException{
-		newException(msg, nil),
+		newException("TestException", args...),
 	}
 }
 
 func TestException_Format(t *testing.T) {
-	re := newTestException("test error")
+	re := newTestException("%d %x", 10, 10)
 
 	s := fmt.Sprintf("%+v", re)
 	cases := []string{
-		"test error",
-		"TestException_Format",
-		"reader_exception_test.go:",
+		"TestException: 10 a:",
+		"gozxing.TestException_Format",
+		"reader_exception_test.go:22",
 	}
 	for _, c := range cases {
 		if strings.Index(s, c) < 0 {
-			t.Fatalf("error message must contains \"%s\"", c)
+			t.Fatalf("error message must contains \"%s\"\n%s", c, s)
 		}
 	}
 }

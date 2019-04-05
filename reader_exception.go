@@ -2,6 +2,7 @@ package gozxing
 
 import (
 	"fmt"
+	"strings"
 
 	errors "golang.org/x/xerrors"
 )
@@ -17,7 +18,23 @@ type exception struct {
 	frame errors.Frame
 }
 
-func newException(msg string, next error) exception {
+func newException(prefix string, args ...interface{}) exception {
+	msg := prefix
+	if len(args) > 0 {
+		msg += ": " + fmt.Sprintf(args[0].(string), args[1:]...)
+	}
+	return exception{
+		msg,
+		nil,
+		errors.Caller(2),
+	}
+}
+
+func wrapException(prefix string, next error) exception {
+	msg := next.Error()
+	if !strings.HasPrefix(msg, prefix) {
+		msg = prefix + ": " + msg
+	}
 	return exception{
 		msg,
 		next,

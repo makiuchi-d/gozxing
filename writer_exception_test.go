@@ -1,8 +1,6 @@
 package gozxing
 
 import (
-	"fmt"
-	"strings"
 	"testing"
 
 	errors "golang.org/x/xerrors"
@@ -42,19 +40,13 @@ func TestWrapWriterException(t *testing.T) {
 	if !errors.Is(e, base) {
 		t.Fatalf("err(%v) is not base(%v)", e, base)
 	}
-}
 
-func TestWriterError_Format(t *testing.T) {
-	e := NewWriterException("test error")
-
-	s := fmt.Sprintf("%+v", e)
-	cases := []string{
-		"test error",
-		"writer_exception_test.go:",
+	wants := "WriterException: test error"
+	if msg := e.Error(); msg != wants {
+		t.Fatalf("e.Error() = \"%s\", wants \"%s\"", msg, wants)
 	}
-	for _, c := range cases {
-		if strings.Index(s, c) < 0 {
-			t.Fatalf("error message must contains \"%s\"", c)
-		}
+	e = WrapWriterException(e)
+	if msg := e.Error(); msg != wants {
+		t.Fatalf("e.Error() = \"%s\", wants \"%s\"", msg, wants)
 	}
 }

@@ -2,6 +2,7 @@ package reedsolomon
 
 import (
 	"fmt"
+	"strings"
 
 	errors "golang.org/x/xerrors"
 )
@@ -46,8 +47,13 @@ func NewReedSolomonException(msg string) ReedSolomonException {
 }
 
 func WrapReedSolomonException(err error) ReedSolomonException {
+	msg := err.Error()
+	if !strings.HasPrefix(msg, "ReedSolomonException") {
+		msg = "ReedSolomonException: " + msg
+	}
+
 	return reedSolomonException{
-		"ReedSolomonException: " + err.Error(),
+		msg,
 		err,
 		errors.Caller(1),
 	}

@@ -1,9 +1,5 @@
 package gozxing
 
-import (
-	"fmt"
-)
-
 type FormatException interface {
 	ReaderException
 	formatException()
@@ -17,17 +13,13 @@ func (formatException) readerException() {}
 func (formatException) formatException() {}
 
 func NewFormatException(args ...interface{}) FormatException {
-	msg := "FormatException"
-	if len(args) > 0 {
-		msg += ": " + fmt.Sprintf(args[0].(string), args[1:]...)
-	}
 	return formatException{
-		newException(msg, nil),
+		newException("FormatException", args...),
 	}
 }
 
 func WrapFormatException(e error) FormatException {
 	return formatException{
-		newException("FormatException: "+e.Error(), e),
+		wrapException("FormatException", e),
 	}
 }

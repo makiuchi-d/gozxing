@@ -78,4 +78,13 @@ func TestWrapReedSolomonException(t *testing.T) {
 			t.Fatalf("error message must contains \"%s\"\n", c)
 		}
 	}
+
+	wants := "ReedSolomonException: test error"
+	if msg := e.Error(); msg != wants {
+		t.Fatalf("e.Error() = \"%s\", wants \"%s\"", msg, wants)
+	}
+	e = WrapReedSolomonException(e)
+	if msg := e.Error(); msg != wants {
+		t.Fatalf("e.Error() = \"%s\", wants \"%s\"", msg, wants)
+	}
 }

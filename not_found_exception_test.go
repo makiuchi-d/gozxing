@@ -61,12 +61,21 @@ func TestNewNotFoundException(t *testing.T) {
 }
 
 func TestWrapNotFoundException(t *testing.T) {
-	base := errors.New("newchecksumexceptionstring")
+	base := errors.New("newnotfoundexception")
 	var e error = WrapNotFoundException(base)
 
 	testNotFoundExceptionType(t, e)
 
 	if !errors.Is(e, base) {
 		t.Fatalf("err(%v) is not base(%v)", e, base)
+	}
+
+	wants := "NotFoundException: newnotfoundexception"
+	if msg := e.Error(); msg != wants {
+		t.Fatalf("e.Error() = \"%s\", wants \"%s\"", msg, wants)
+	}
+	e = WrapNotFoundException(e)
+	if msg := e.Error(); msg != wants {
+		t.Fatalf("e.Error() = \"%s\", wants \"%s\"", msg, wants)
 	}
 }

@@ -62,4 +62,13 @@ func TestWrapChecksumException(t *testing.T) {
 	if !errors.Is(e, base) {
 		t.Fatalf("err(%v) is not base(%v)", e, base)
 	}
+
+	wants := "ChecksumException: newchecksumexceptionstring"
+	if msg := e.Error(); msg != wants {
+		t.Fatalf("e.Error() = \"%s\", wants \"%s\"", msg, wants)
+	}
+	e = WrapChecksumException(e)
+	if msg := e.Error(); msg != wants {
+		t.Fatalf("e.Error() = \"%s\", wants \"%s\"", msg, wants)
+	}
 }

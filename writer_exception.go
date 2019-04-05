@@ -1,9 +1,5 @@
 package gozxing
 
-import (
-	"fmt"
-)
-
 type WriterException interface {
 	error
 	writerException()
@@ -15,16 +11,14 @@ type writerException struct {
 
 func (writerException) writerException() {}
 
-func NewWriterException(message string, args ...interface{}) WriterException {
+func NewWriterException(args ...interface{}) WriterException {
 	return writerException{
-		newException(
-			fmt.Sprintf("WriterException: "+message, args...),
-			nil),
+		newException("WriterException", args...),
 	}
 }
 
 func WrapWriterException(err error) WriterException {
 	return writerException{
-		newException("WriterException: "+err.Error(), err),
+		wrapException("WriterException", err),
 	}
 }
