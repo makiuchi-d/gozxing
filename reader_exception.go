@@ -31,7 +31,10 @@ func newException(prefix string, args ...interface{}) exception {
 }
 
 func wrapException(prefix string, next error) exception {
-	msg := next.Error()
+	msg := prefix
+	if next != nil {
+		msg = next.Error()
+	}
 	if !strings.HasPrefix(msg, prefix) {
 		msg = prefix + ": " + msg
 	}

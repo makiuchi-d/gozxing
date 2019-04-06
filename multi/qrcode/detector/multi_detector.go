@@ -25,7 +25,7 @@ func (this *MultiDetector) DetectMulti(hints map[gozxing.DecodeHintType]interfac
 	finder := NewMultiFinderPatternFinder(image, resultPointCallback)
 	infos, e := finder.FindMulti(hints)
 	if e != nil || len(infos) == 0 {
-		return nil, gozxing.GetNotFoundExceptionInstance()
+		return nil, gozxing.WrapNotFoundException(e)
 	}
 
 	result := make([]*common.DetectorResult, 0)
