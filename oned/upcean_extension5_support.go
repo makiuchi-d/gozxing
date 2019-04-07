@@ -64,7 +64,7 @@ func (this *UPCEANExtension5Support) decodeMiddle(row *gozxing.BitArray, startRa
 	for x := 0; x < 5 && rowOffset < end; x++ {
 		bestMatch, e := upceanReader_decodeDigit(row, counters, rowOffset, UPCEANReader_L_AND_G_PATTERNS)
 		if e != nil {
-			return 0, e
+			return 0, gozxing.WrapNotFoundException(e)
 		}
 		resultString = append(resultString, byte('0'+bestMatch%10))
 		for _, counter := range counters {
@@ -83,15 +83,15 @@ func (this *UPCEANExtension5Support) decodeMiddle(row *gozxing.BitArray, startRa
 	this.decodeRowStringBuffer = resultString
 
 	if len(resultString) != 5 {
-		return 0, gozxing.GetNotFoundExceptionInstance()
+		return 0, gozxing.NewNotFoundException("len(resultString) = %v", len(resultString))
 	}
 
 	checkDigit, e := this.determineCheckDigit(lgPatternFound)
 	if e != nil {
 		return 0, e
 	}
-	if this.extensionChecksum(string(resultString)) != checkDigit {
-		return 0, gozxing.GetNotFoundExceptionInstance()
+	if checksum := this.extensionChecksum(string(resultString)); checksum != checkDigit {
+		return 0, gozxing.NewChecksumException("chechsum = %v, wants %v", checksum, checkDigit)
 	}
 
 	return rowOffset, nil
@@ -117,7 +117,7 @@ func (this *UPCEANExtension5Support) determineCheckDigit(lgPatternFound int) (in
 			return d, nil
 		}
 	}
-	return 0, gozxing.GetNotFoundExceptionInstance()
+	return 0, gozxing.NewNotFoundException()
 }
 
 // @param raw raw content of extension

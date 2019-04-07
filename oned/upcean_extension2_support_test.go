@@ -78,8 +78,8 @@ func TestUPCEANExtension2Support_decodeMiddle(t *testing.T) {
 	row.Flip(19)
 	e2s = NewUPCEANExtension2Support()
 	_, e = e2s.decodeMiddle(row, startRange)
-	if _, ok := e.(gozxing.NotFoundException); !ok {
-		t.Fatalf("decodeMiddle must be NotFoundException, %T", e)
+	if _, ok := e.(gozxing.ReaderException); !ok {
+		t.Fatalf("decodeMiddle must be ReaderException, %T", e)
 	}
 }
 

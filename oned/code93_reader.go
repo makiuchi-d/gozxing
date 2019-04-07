@@ -59,11 +59,11 @@ func (this *code93RowDecoder) decodeRow(rowNumber int, row *gozxing.BitArray, hi
 	for {
 		e := recordPattern(row, nextStart, theCounters)
 		if e != nil {
-			return nil, e
+			return nil, gozxing.WrapNotFoundException(e)
 		}
 		pattern := code93ToPattern(theCounters)
 		if pattern < 0 {
-			return nil, gozxing.GetNotFoundExceptionInstance()
+			return nil, gozxing.NewNotFoundException("counters = %v", theCounters)
 		}
 		decodedChar, e := code93PatternToChar(pattern)
 		if e != nil {
@@ -89,12 +89,12 @@ func (this *code93RowDecoder) decodeRow(rowNumber int, row *gozxing.BitArray, hi
 
 	// Should be at least one more black module
 	if nextStart == end || !row.Get(nextStart) {
-		return nil, gozxing.GetNotFoundExceptionInstance()
+		return nil, gozxing.NewNotFoundException("nextStart=%d, end=%d", nextStart, end)
 	}
 
 	if len(result) < 2 {
 		// false positive -- need at least 2 checksum digits
-		return nil, gozxing.GetNotFoundExceptionInstance()
+		return nil, gozxing.NewNotFoundException("len(result) = %d", len(result))
 	}
 
 	if e := code93CheckChecksums(result); e != nil {
@@ -153,7 +153,7 @@ func (this *code93RowDecoder) findAsteriskPattern(row *gozxing.BitArray) (int, i
 			isWhite = !isWhite
 		}
 	}
-	return 0, 0, gozxing.GetNotFoundExceptionInstance()
+	return 0, 0, gozxing.NewNotFoundException()
 }
 
 func code93ToPattern(counters []int) int {
@@ -186,7 +186,7 @@ func code93PatternToChar(pattern int) (byte, error) {
 			return code93Alphabet[i], nil
 		}
 	}
-	return 0, gozxing.GetNotFoundExceptionInstance()
+	return 0, gozxing.NewNotFoundException("pattern = %d", pattern)
 }
 
 func code93DecodeExtended(encoded []byte) (string, error) {
@@ -197,7 +197,7 @@ func code93DecodeExtended(encoded []byte) (string, error) {
 		// ($)=a, (%)=b, (/)=c, (+)=d
 		if c >= 'a' && c <= 'd' {
 			if i >= length-1 {
-				return "", gozxing.GetFormatExceptionInstance()
+				return "", gozxing.NewFormatException("i=%d, length=%d", i, length)
 			}
 			next := encoded[i+1]
 			decodedChar := byte(0)
@@ -207,7 +207,7 @@ func code93DecodeExtended(encoded []byte) (string, error) {
 				if next >= 'A' && next <= 'Z' {
 					decodedChar = next + 32
 				} else {
-					return "", gozxing.GetFormatExceptionInstance()
+					return "", gozxing.NewFormatException("encoded = (+)0x02x", next)
 				}
 				break
 			case 'a':
@@ -215,7 +215,7 @@ func code93DecodeExtended(encoded []byte) (string, error) {
 				if next >= 'A' && next <= 'Z' {
 					decodedChar = next - 64
 				} else {
-					return "", gozxing.GetFormatExceptionInstance()
+					return "", gozxing.NewFormatException("encoded = ($)0x02x", next)
 				}
 				break
 			case 'b':
@@ -241,7 +241,7 @@ func code93DecodeExtended(encoded []byte) (string, error) {
 					// %X to %Z all map to DEL (127)
 					decodedChar = 127
 				} else {
-					return "", gozxing.GetFormatExceptionInstance()
+					return "", gozxing.NewFormatException("encoded = (%)0x02x", next)
 				}
 				break
 			case 'c':
@@ -251,7 +251,7 @@ func code93DecodeExtended(encoded []byte) (string, error) {
 				} else if next == 'Z' {
 					decodedChar = ':'
 				} else {
-					return "", gozxing.GetFormatExceptionInstance()
+					return "", gozxing.NewFormatException("encoded = (/)0x02x", next)
 				}
 				break
 			}
@@ -284,8 +284,8 @@ func code93CheckOneChecksum(result []byte, checkPosition, weightMax int) error {
 			weight = 1
 		}
 	}
-	if result[checkPosition] != code93Alphabet[total%47] {
-		return gozxing.GetChecksumExceptionInstance()
+	if s, t := result[checkPosition], code93Alphabet[total%47]; s != t {
+		return gozxing.NewChecksumException("checkPosition=%d, total=%d", s, t)
 	}
 	return nil
 }

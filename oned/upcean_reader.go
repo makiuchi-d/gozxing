@@ -122,7 +122,7 @@ func upceanReader_findStartGuardPattern(row *gozxing.BitArray) ([]int, error) {
 func (this *upceanReader) decodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
 	start, e := upceanReader_findStartGuardPattern(row)
 	if e != nil {
-		return nil, e
+		return nil, gozxing.WrapNotFoundException(e)
 	}
 	return this.decodeRowWithStartRange(rowNumber, row, start, hints)
 }
@@ -165,7 +165,7 @@ func (this *upceanReader) decodeRowWithStartRange(
 
 	endRange, e := this.decodeEnd(row, endStart)
 	if e != nil {
-		return nil, e
+		return nil, gozxing.WrapNotFoundException(e)
 	}
 
 	if resultPointCallback != nil {
@@ -178,11 +178,11 @@ func (this *upceanReader) decodeRowWithStartRange(
 	end := endRange[1]
 	quietEnd := end + (end - endRange[0])
 	if quietEnd >= row.GetSize() {
-		return nil, gozxing.GetNotFoundExceptionInstance()
+		return nil, gozxing.NewNotFoundException("quietEnd=%v, row size=%v", quietEnd, row.GetSize())
 	}
 	rowIsRange, _ := row.IsRange(end, quietEnd, false)
 	if !rowIsRange {
-		return nil, gozxing.GetNotFoundExceptionInstance()
+		return nil, gozxing.NewNotFoundException("raw is not range")
 	}
 
 	this.decodeRowStringBuffer = result
@@ -190,14 +190,14 @@ func (this *upceanReader) decodeRowWithStartRange(
 	resultString := string(result)
 	// UPC/EAN should never be less than 8 chars anyway
 	if len(resultString) < 8 {
-		return nil, gozxing.GetFormatExceptionInstance()
+		return nil, gozxing.NewFormatException("len(resultString) = %v", len(resultString))
 	}
 	ok, e := this.checkChecksum(resultString)
 	if e != nil {
-		return nil, e
+		return nil, gozxing.WrapChecksumException(e)
 	}
 	if !ok {
-		return nil, gozxing.GetChecksumExceptionInstance()
+		return nil, gozxing.NewChecksumException()
 	}
 
 	left := float64(startGuardRange[1]+startGuardRange[0]) / 2.0
@@ -223,7 +223,7 @@ func (this *upceanReader) decodeRowWithStartRange(
 	} else {
 		// ignore ReaderException
 		if _, ok := e.(gozxing.ReaderException); !ok {
-			return nil, e
+			return nil, gozxing.WrapReaderException(e)
 		}
 	}
 
@@ -238,7 +238,7 @@ func (this *upceanReader) decodeRowWithStartRange(
 				}
 			}
 			if !valid {
-				return nil, gozxing.GetNotFoundExceptionInstance()
+				return nil, gozxing.NewNotFoundException()
 			}
 		}
 	}
@@ -286,7 +286,7 @@ func upceanReader_getStandardUPCEANChecksum(s string) (int, error) {
 	for i := length - 1; i >= 0; i -= 2 {
 		digit := int(s[i] - '0')
 		if digit < 0 || digit > 9 {
-			return 0, gozxing.GetFormatExceptionInstance()
+			return 0, gozxing.NewFormatException("0x%02x is not digit", s[i])
 		}
 		sum += digit
 	}
@@ -294,7 +294,7 @@ func upceanReader_getStandardUPCEANChecksum(s string) (int, error) {
 	for i := length - 2; i >= 0; i -= 2 {
 		digit := int(s[i] - '0')
 		if digit < 0 || digit > 9 {
-			return 0, gozxing.GetFormatExceptionInstance()
+			return 0, gozxing.NewFormatException("0x%02x is not digit", s[i])
 		}
 		sum += digit
 	}
@@ -353,7 +353,7 @@ func upceanReader_findGuardPatternWithCounters(
 			isWhite = !isWhite
 		}
 	}
-	return nil, gozxing.GetNotFoundExceptionInstance()
+	return nil, gozxing.NewNotFoundException()
 }
 
 // UPCEANReader_decodeDigit Attempts to decode a single UPC/EAN-encoded digit.
@@ -383,7 +383,7 @@ func upceanReader_decodeDigit(row *gozxing.BitArray, counters []int, rowOffset i
 		}
 	}
 	if bestMatch < 0 {
-		return 0, gozxing.GetNotFoundExceptionInstance()
+		return 0, gozxing.NewNotFoundException()
 	}
 	return bestMatch, nil
 }

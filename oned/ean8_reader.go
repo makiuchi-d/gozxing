@@ -26,7 +26,7 @@ func (this *ean8Reader) decodeMiddle(row *gozxing.BitArray, startRange []int, re
 	for x := 0; x < 4 && rowOffset < end; x++ {
 		bestMatch, e := upceanReader_decodeDigit(row, counters, rowOffset, UPCEANReader_L_PATTERNS)
 		if e != nil {
-			return 0, result, e
+			return 0, result, gozxing.WrapNotFoundException(e)
 		}
 		result = append(result, byte('0'+bestMatch))
 		for _, counter := range counters {
@@ -36,14 +36,14 @@ func (this *ean8Reader) decodeMiddle(row *gozxing.BitArray, startRange []int, re
 
 	middleRange, e := upceanReader_findGuardPattern(row, rowOffset, true, UPCEANReader_MIDDLE_PATTERN)
 	if e != nil {
-		return 0, result, e
+		return 0, result, gozxing.WrapNotFoundException(e)
 	}
 	rowOffset = middleRange[1]
 
 	for x := 0; x < 4 && rowOffset < end; x++ {
 		bestMatch, e := upceanReader_decodeDigit(row, counters, rowOffset, UPCEANReader_L_PATTERNS)
 		if e != nil {
-			return 0, result, e
+			return 0, result, gozxing.WrapNotFoundException(e)
 		}
 		result = append(result, byte('0'+bestMatch))
 		for _, counter := range counters {

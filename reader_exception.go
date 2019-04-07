@@ -12,6 +12,18 @@ type ReaderException interface {
 	readerException()
 }
 
+type readerException struct {
+	exception
+}
+
+func WrapReaderException(e error) ReaderException {
+	return readerException{
+		wrapException("ReaderException", e),
+	}
+}
+
+func (readerException) readerException() {}
+
 type exception struct {
 	msg   string
 	next  error

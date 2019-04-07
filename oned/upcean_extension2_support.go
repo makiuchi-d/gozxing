@@ -59,7 +59,7 @@ func (this *UPCEANExtension2Support) decodeMiddle(row *gozxing.BitArray, startRa
 	for x := 0; x < 2 && rowOffset < end; x++ {
 		bestMatch, e := upceanReader_decodeDigit(row, counters, rowOffset, UPCEANReader_L_AND_G_PATTERNS)
 		if e != nil {
-			return 0, e
+			return 0, gozxing.WrapNotFoundException(e)
 		}
 		resultString = append(resultString, byte('0'+bestMatch%10))
 		for _, counter := range counters {
@@ -78,12 +78,12 @@ func (this *UPCEANExtension2Support) decodeMiddle(row *gozxing.BitArray, startRa
 	this.decodeRowStringBuffer = resultString
 
 	if len(resultString) != 2 {
-		return 0, gozxing.GetNotFoundExceptionInstance()
+		return 0, gozxing.NewNotFoundException("len(resultString) = %v", len(resultString))
 	}
 
 	rstr, _ := strconv.Atoi(string(resultString))
-	if rstr%4 != checkParity {
-		return 0, gozxing.GetNotFoundExceptionInstance()
+	if parity := rstr%4; parity != checkParity {
+		return 0, gozxing.NewChecksumException("parity=%v, wants %v", parity, checkParity)
 	}
 
 	return rowOffset, nil
