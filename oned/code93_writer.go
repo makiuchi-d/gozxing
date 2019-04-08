@@ -1,7 +1,6 @@
 package oned
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/makiuchi-d/gozxing"
@@ -23,7 +22,7 @@ func (code93Encoder) encode(contents string) ([]bool, error) {
 	}
 	length := len(contents)
 	if length > 80 {
-		return nil, fmt.Errorf("IllegalArgumentException: "+
+		return nil, gozxing.NewWriterException("IllegalArgumentException: "+
 			"Requested contents should be less than 80 digits long "+
 			"after converting to extended encoding, but got %v", length)
 	}
@@ -140,7 +139,7 @@ func code93ConvertToExtended(contents string) (string, error) {
 			extendedContent = append(extendedContent, 'b')
 			extendedContent = append(extendedContent, 'P'+character-'{')
 		} else {
-			return string(extendedContent), fmt.Errorf("IllegalArgumentException: "+
+			return string(extendedContent), gozxing.NewWriterException("IllegalArgumentException: "+
 				"Requested content contains a non-encodable character: '%v'", character)
 		}
 	}

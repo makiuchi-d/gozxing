@@ -1,7 +1,6 @@
 package oned
 
 import (
-	"fmt"
 	"github.com/makiuchi-d/gozxing"
 )
 
@@ -49,7 +48,7 @@ func (code128Encoder) encode(contents string) ([]bool, error) {
 	length := len(contents)
 	// Check length
 	if length < 1 || length > 80 {
-		return nil, fmt.Errorf("IllegalArgumentException: "+
+		return nil, gozxing.NewWriterException("IllegalArgumentException: "+
 			"Contents length should be between 1 and 80 characters, but got %v", length)
 	}
 	// Check content
@@ -61,7 +60,8 @@ func (code128Encoder) encode(contents string) ([]bool, error) {
 		default:
 			if c > 127 {
 				// support for FNC4 isn't implemented, no full Latin-1 character set available at the moment
-				return nil, fmt.Errorf("IllegalArgumentException: Bad character in input: %v", c)
+				return nil, gozxing.NewWriterException(
+					"IllegalArgumentException: Bad character in input: %v", c)
 			}
 		}
 	}
