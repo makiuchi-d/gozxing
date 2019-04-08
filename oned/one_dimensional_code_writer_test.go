@@ -1,9 +1,10 @@
 package oned
 
 import (
-	"errors"
 	"reflect"
 	"testing"
+
+	errors "golang.org/x/xerrors"
 
 	"github.com/makiuchi-d/gozxing"
 )

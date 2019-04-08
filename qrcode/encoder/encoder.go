@@ -335,7 +335,7 @@ func terminateBits(numDataBytes int, bits *gozxing.BitArray) gozxing.WriterExcep
 		_ = bits.AppendBits(v, 8)
 	}
 	if bits.GetSize() != capacity {
-		return gozxing.NewWriterException("Bits size does not equal capacity")
+		return gozxing.NewWriterException("bits.GetSize()=%d, capacity=&d", bits.GetSize(), capacity)
 	}
 	return nil
 }

@@ -1,11 +1,12 @@
 package testutil
 
 import (
-	"errors"
 	"image"
 	_ "image/jpeg"
 	_ "image/png"
 	"os"
+
+	errors "golang.org/x/xerrors"
 
 	"github.com/makiuchi-d/gozxing"
 	"github.com/makiuchi-d/gozxing/common"
