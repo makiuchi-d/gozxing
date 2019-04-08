@@ -1,7 +1,6 @@
 package oned
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/makiuchi-d/gozxing"
@@ -26,21 +25,21 @@ func (upcEEncoder) encode(contents string) ([]bool, error) {
 		// No check digit present, calculate it and add it
 		check, e := upceanReader_getStandardUPCEANChecksum(contents)
 		if e != nil {
-			return nil, fmt.Errorf("IllegalArgumentException: %s", e.Error())
+			return nil, gozxing.NewWriterException("IllegalArgumentException: %s", e.Error())
 		}
 		contents += strconv.Itoa(check)
 		break
 	case 8:
 		ok, e := upceanReader_checkStandardUPCEANChecksum(convertUPCEtoUPCA(contents))
 		if e != nil {
-			return nil, fmt.Errorf("IllegalArgumentException: Illegal contents")
+			return nil, gozxing.NewWriterException("IllegalArgumentException: Illegal contents")
 		}
 		if !ok {
-			return nil, fmt.Errorf("IllegalArgumentException: Contents do not pass checksum")
+			return nil, gozxing.NewWriterException("IllegalArgumentException: Contents do not pass checksum")
 		}
 		break
 	default:
-		return nil, fmt.Errorf("IllegalArgumentException: "+
+		return nil, gozxing.NewWriterException("IllegalArgumentException: "+
 			"Requested contents should be 7 or 8 digits long, but got %v", length)
 	}
 
@@ -50,7 +49,7 @@ func (upcEEncoder) encode(contents string) ([]bool, error) {
 
 	firstDigit := contents[0] - '0'
 	if firstDigit != 0 && firstDigit != 1 {
-		return nil, fmt.Errorf("IllegalArgumentException: Number system must be 0 or 1")
+		return nil, gozxing.NewWriterException("IllegalArgumentException: Number system must be 0 or 1")
 	}
 
 	checkDigit := contents[7] - '0'
