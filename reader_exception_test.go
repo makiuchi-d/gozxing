@@ -30,7 +30,7 @@ func TestException_Format(t *testing.T) {
 	}
 }
 
-func TestWrapReaderException(t *testing.T){
+func TestWrapReaderException(t *testing.T) {
 	base := errors.New("base error")
 	e := WrapReaderException(base)
 

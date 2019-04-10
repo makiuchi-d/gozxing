@@ -82,7 +82,7 @@ func (this *UPCEANExtension2Support) decodeMiddle(row *gozxing.BitArray, startRa
 	}
 
 	rstr, _ := strconv.Atoi(string(resultString))
-	if parity := rstr%4; parity != checkParity {
+	if parity := rstr % 4; parity != checkParity {
 		return 0, gozxing.NewChecksumException("parity=%v, wants %v", parity, checkParity)
 	}
 
