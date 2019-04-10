@@ -1,7 +1,7 @@
 package encoder
 
 import (
-	"errors"
+	"github.com/makiuchi-d/gozxing"
 )
 
 type C40Encoder struct {
@@ -35,7 +35,7 @@ func (this *C40Encoder) encode(context *EncoderContext) error {
 		curCodewordCount := context.GetCodewordCount() + unwritten
 		e := context.UpdateSymbolInfoByLength(curCodewordCount)
 		if e != nil {
-			return e
+			return gozxing.WrapWriterException(e)
 		}
 		available := context.GetSymbolInfo().GetDataCapacity() - curCodewordCount
 
@@ -94,7 +94,7 @@ func c40HandleEOD(context *EncoderContext, buffer []byte) error {
 	curCodewordCount := context.GetCodewordCount() + unwritten
 	e := context.UpdateSymbolInfoByLength(curCodewordCount)
 	if e != nil {
-		return e
+		return gozxing.WrapWriterException(e)
 	}
 	available := context.GetSymbolInfo().GetDataCapacity() - curCodewordCount
 
@@ -123,7 +123,7 @@ func c40HandleEOD(context *EncoderContext, buffer []byte) error {
 			context.WriteCodeword(HighLevelEncoder_C40_UNLATCH)
 		}
 	} else {
-		return errors.New("IllegalStateException: Unexpected case. Please report!")
+		return gozxing.NewWriterException("IllegalStateException: Unexpected case. Please report!")
 	}
 	context.SignalEncoderChange(HighLevelEncoder_ASCII_ENCODATION)
 	return nil

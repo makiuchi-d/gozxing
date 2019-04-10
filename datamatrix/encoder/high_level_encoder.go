@@ -1,7 +1,6 @@
 package encoder
 
 import (
-	"fmt"
 	"math"
 	"strings"
 
@@ -139,7 +138,7 @@ func EncodeHighLevel(msg string, shape SymbolShapeHint, minSize, maxSize *gozxin
 	length := context.GetCodewordCount()
 	e := context.UpdateSymbolInfo()
 	if e != nil {
-		return nil, e
+		return nil, gozxing.WrapWriterException(e)
 	}
 
 	capacity := context.GetSymbolInfo().GetDataCapacity()
@@ -398,8 +397,4 @@ func HighLevelEncoder_determineConsecutiveDigitCount(msg []byte, startpos int) i
 		}
 	}
 	return count
-}
-
-func illegalCharacter(c byte) error {
-	return fmt.Errorf("Illegal character: %v (0x%04x)", c, c)
 }

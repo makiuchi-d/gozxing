@@ -163,13 +163,6 @@ func TestHighLevelEncoder_determineConsecutiveDigitCount(t *testing.T) {
 	}
 }
 
-func TestIillegalCharacter(t *testing.T) {
-	var e error = illegalCharacter(0)
-	if e == nil {
-		t.Fatalf("illegalCharacter returns nil")
-	}
-}
-
 func TestHighLevelEncoder_lookAheadTest(t *testing.T) {
 	msg := []byte{}
 	pos := 0

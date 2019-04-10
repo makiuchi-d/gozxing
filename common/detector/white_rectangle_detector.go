@@ -24,7 +24,7 @@ type WhiteRectangleDetector struct {
 	upInit    int
 }
 
-func NewWhiteRectangleDetectorFromImage(image *gozxing.BitMatrix) (*WhiteRectangleDetector, gozxing.NotFoundException) {
+func NewWhiteRectangleDetectorFromImage(image *gozxing.BitMatrix) (*WhiteRectangleDetector, error) {
 	return NewWhiteRectangleDetector(
 		image, whiteRectangleDetector_INIT_SIZE, image.GetWidth()/2, image.GetHeight()/2)
 }
@@ -35,7 +35,7 @@ func NewWhiteRectangleDetectorFromImage(image *gozxing.BitMatrix) (*WhiteRectang
 // @param x x position of search center
 // @param y y position of search center
 // @throws NotFoundException if image is too small to accommodate {@code initSize}
-func NewWhiteRectangleDetector(image *gozxing.BitMatrix, initSize, x, y int) (*WhiteRectangleDetector, gozxing.NotFoundException) {
+func NewWhiteRectangleDetector(image *gozxing.BitMatrix, initSize, x, y int) (*WhiteRectangleDetector, error) {
 	halfsize := initSize / 2
 	d := &WhiteRectangleDetector{
 		image:     image,
@@ -63,7 +63,7 @@ func NewWhiteRectangleDetector(image *gozxing.BitMatrix, initSize, x, y int) (*W
 //         leftmost and the third, the rightmost
 // @throws NotFoundException if no Data Matrix Code can be found
 //
-func (this *WhiteRectangleDetector) Detect() ([]gozxing.ResultPoint, gozxing.NotFoundException) {
+func (this *WhiteRectangleDetector) Detect() ([]gozxing.ResultPoint, error) {
 	left := this.leftInit
 	right := this.rightInit
 	up := this.upInit

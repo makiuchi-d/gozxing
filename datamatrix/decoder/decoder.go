@@ -30,7 +30,7 @@ func NewDecoder() *Decoder {
 func (d *Decoder) DecodeBoolMap(image [][]bool) (*common.DecoderResult, error) {
 	bits, e := gozxing.ParseBoolMapToBitMatrix(image)
 	if e != nil {
-		return nil, e
+		return nil, gozxing.WrapReaderException(e)
 	}
 	return d.Decode(bits)
 }
@@ -103,10 +103,7 @@ func (d *Decoder) correctErrors(codewordBytes []byte, numDataCodewords int) erro
 	}
 	e := d.rsDecoder.Decode(codewordsInts, len(codewordBytes)-numDataCodewords)
 	if e != nil {
-		if _, ok := e.(reedsolomon.ReedSolomonException); ok {
-			e = gozxing.GetChecksumExceptionInstance()
-		}
-		return e
+		return gozxing.WrapChecksumException(e)
 	}
 	// Copy back into array of bytes -- only need to worry about the bytes that were data
 	// We don't care about errors in the error-correction codewords

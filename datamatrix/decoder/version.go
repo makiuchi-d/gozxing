@@ -79,7 +79,7 @@ func (v *Version) getECBlocks() *ECBlocks {
 //
 func getVersionForDimensions(numRows, numColumns int) (*Version, error) {
 	if (numRows&0x01) != 0 || (numColumns&0x01) != 0 {
-		return nil, gozxing.GetFormatExceptionInstance()
+		return nil, gozxing.NewFormatException("numRows=%v, numCols=%v", numRows, numColumns)
 	}
 
 	for _, version := range versions {
@@ -88,7 +88,7 @@ func getVersionForDimensions(numRows, numColumns int) (*Version, error) {
 		}
 	}
 
-	return nil, gozxing.GetFormatExceptionInstance()
+	return nil, gozxing.NewFormatException("numRows=%v, numCols=%v", numRows, numColumns)
 }
 
 // ECBlocks Encapsulates a set of error-correction blocks in one symbol version.

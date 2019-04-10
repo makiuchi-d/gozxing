@@ -1,8 +1,6 @@
 package decoder
 
 import (
-	"errors"
-
 	"github.com/makiuchi-d/gozxing"
 )
 
@@ -18,7 +16,7 @@ type BitMatrixParser struct {
 func NewBitMatrixParser(bitMatrix *gozxing.BitMatrix) (*BitMatrixParser, error) {
 	dimension := bitMatrix.GetHeight()
 	if dimension < 8 || dimension > 144 || (dimension&0x01) != 0 {
-		return nil, gozxing.GetFormatExceptionInstance()
+		return nil, gozxing.NewFormatException("dimension = %v", dimension)
 	}
 
 	version, e := readVersion(bitMatrix)
@@ -139,8 +137,9 @@ func (p *BitMatrixParser) readCodewords() ([]byte, error) {
 		}
 	}
 
-	if resultOffset != p.version.getTotalCodewords() {
-		return nil, gozxing.GetFormatExceptionInstance()
+	if t := p.version.getTotalCodewords(); resultOffset != t {
+		return nil, gozxing.NewFormatException(
+			"resultOffset=%v, totalCodewords=%v", resultOffset, t)
 	}
 	return result, nil
 }
@@ -397,7 +396,8 @@ func extractDataRegion(version *Version, bitMatrix *gozxing.BitMatrix) (*gozxing
 	symbolSizeColumns := version.getSymbolSizeColumns()
 
 	if bitMatrix.GetHeight() != symbolSizeRows {
-		return nil, errors.New("IllegalArgumentException: Dimension of bitMatrix must match the version size")
+		return nil, gozxing.NewFormatException(
+			"IllegalArgumentException: Dimension of bitMatrix must match the version size")
 	}
 
 	dataRegionSizeRows := version.getDataRegionSizeRows()

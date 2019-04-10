@@ -1,8 +1,6 @@
 package datamatrix
 
 import (
-	"fmt"
-
 	"github.com/makiuchi-d/gozxing"
 	"github.com/makiuchi-d/gozxing/datamatrix/encoder"
 	qrencoder "github.com/makiuchi-d/gozxing/qrcode/encoder"
@@ -24,15 +22,16 @@ func (this *DataMatrixWriter) Encode(contents string, format gozxing.BarcodeForm
 	width, height int, hints map[gozxing.EncodeHintType]interface{}) (*gozxing.BitMatrix, error) {
 
 	if contents == "" {
-		return nil, fmt.Errorf("IllegalArgumentException: Found empty contents")
+		return nil, gozxing.NewWriterException("IllegalArgumentException: Found empty contents")
 	}
 
 	if format != gozxing.BarcodeFormat_DATA_MATRIX {
-		return nil, fmt.Errorf("IllegalArgumentException: Can only encode DATA_MATRIX, but got %v", format)
+		return nil, gozxing.NewWriterException(
+			"IllegalArgumentException: Can only encode DATA_MATRIX, but got %v", format)
 	}
 
 	if width < 0 || height < 0 {
-		return nil, fmt.Errorf(
+		return nil, gozxing.NewWriterException(
 			"IllegalArgumentException: Requested dimensions can't be negative: %vx%v", width, height)
 	}
 
