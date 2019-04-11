@@ -1,9 +1,9 @@
 package encoder
 
 import (
-	"errors"
-	"fmt"
 	"math/bits"
+
+	errors "golang.org/x/xerrors"
 
 	"github.com/makiuchi-d/gozxing"
 	"github.com/makiuchi-d/gozxing/qrcode/decoder"
@@ -139,7 +139,7 @@ func MatrixUtil_buildMatrix(
 // - Timing patterns
 // - Dark dot at the left bottom corner
 // - Position adjustment patterns, if need be
-func embedBasicPatterns(version *decoder.Version, matrix *ByteMatrix) error {
+func embedBasicPatterns(version *decoder.Version, matrix *ByteMatrix) gozxing.WriterException {
 	// Let's get started with embedding big squares at corners.
 	e := embedPositionDetectionPatternsAndSeparators(matrix)
 	if e != nil {
@@ -160,7 +160,7 @@ func embedBasicPatterns(version *decoder.Version, matrix *ByteMatrix) error {
 }
 
 // embedTypeInfo Embed type information. On success, modify the matrix.
-func embedTypeInfo(ecLevel decoder.ErrorCorrectionLevel, maskPattern int, matrix *ByteMatrix) error {
+func embedTypeInfo(ecLevel decoder.ErrorCorrectionLevel, maskPattern int, matrix *ByteMatrix) gozxing.WriterException {
 	typeInfoBits := gozxing.NewEmptyBitArray()
 
 	e := makeTypeInfoBits(ecLevel, maskPattern, typeInfoBits)
@@ -198,7 +198,7 @@ func embedTypeInfo(ecLevel decoder.ErrorCorrectionLevel, maskPattern int, matrix
 // maybeEmbedVersionInfo Embed version information if need be.
 // On success, modify the matrix and return true.
 // See 8.10 of JISX0510:2004 (p.47) for how to embed version information.
-func maybeEmbedVersionInfo(version *decoder.Version, matrix *ByteMatrix) error {
+func maybeEmbedVersionInfo(version *decoder.Version, matrix *ByteMatrix) gozxing.WriterException {
 	if version.GetVersionNumber() < 7 { // Version info is necessary if version >= 7.
 		return nil // Don't need version info.
 	}
@@ -227,7 +227,7 @@ func maybeEmbedVersionInfo(version *decoder.Version, matrix *ByteMatrix) error {
 // On success, modify the matrix and return true.
 // For debugging purposes, it skips masking process if "getMaskPattern" is -1.
 // See 8.7 of JISX0510:2004 (p.38) for how to embed data bits.
-func embedDataBits(dataBits *gozxing.BitArray, maskPattern int, matrix *ByteMatrix) error {
+func embedDataBits(dataBits *gozxing.BitArray, maskPattern int, matrix *ByteMatrix) gozxing.WriterException {
 	bitIndex := 0
 	direction := -1
 	// Start from the right bottom cell.
@@ -259,7 +259,7 @@ func embedDataBits(dataBits *gozxing.BitArray, maskPattern int, matrix *ByteMatr
 				if maskPattern != -1 {
 					maskBit, e := MaskUtil_getDataMaskBit(maskPattern, xx, y)
 					if e != nil {
-						return e
+						return gozxing.WrapWriterException(e)
 					}
 					if maskBit {
 						bit = !bit
@@ -275,8 +275,8 @@ func embedDataBits(dataBits *gozxing.BitArray, maskPattern int, matrix *ByteMatr
 	}
 	// All bits should be consumed.
 	if bitIndex != dataBits.GetSize() {
-		return gozxing.NewWriterExceptionWithError(
-			fmt.Errorf("Not all bits consumed: %v/%v", bitIndex, dataBits.GetSize()))
+		return gozxing.NewWriterException(
+			"Not all bits consumed: %v/%v", bitIndex, dataBits.GetSize())
 	}
 	return nil
 }
@@ -335,7 +335,7 @@ func calculateBCHCode(value, poly int) (int, error) {
 // maskTypeInfoBits Make bit vector of type information.
 // On success, store the result in "bits" and return true.
 // Encode error correction level and mask pattern. See 8.9 of JISX0510:2004 (p.45) for details.
-func makeTypeInfoBits(ecLevel decoder.ErrorCorrectionLevel, maskPattern int, bits *gozxing.BitArray) error {
+func makeTypeInfoBits(ecLevel decoder.ErrorCorrectionLevel, maskPattern int, bits *gozxing.BitArray) gozxing.WriterException {
 	if !QRCode_IsValidMaskPattern(maskPattern) {
 		return gozxing.NewWriterException("Invalid mask pattern")
 	}
@@ -350,8 +350,8 @@ func makeTypeInfoBits(ecLevel decoder.ErrorCorrectionLevel, maskPattern int, bit
 	bits.Xor(maskBits)
 
 	if bits.GetSize() != 15 { // Just in case.
-		return gozxing.NewWriterExceptionWithError(
-			fmt.Errorf("should not happen but we got: %v", bits.GetSize()))
+		return gozxing.NewWriterException(
+			"should not happen but we got: %v", bits.GetSize())
 	}
 
 	return nil
@@ -360,14 +360,14 @@ func makeTypeInfoBits(ecLevel decoder.ErrorCorrectionLevel, maskPattern int, bit
 // makeVersionInfoBits Make bit vector of version information.
 // On success, store the result in "bits" and return true.
 // See 8.10 of JISX0510:2004 (p.45) for details.
-func makeVersionInfoBits(version *decoder.Version, bits *gozxing.BitArray) error {
+func makeVersionInfoBits(version *decoder.Version, bits *gozxing.BitArray) gozxing.WriterException {
 	bits.AppendBits(version.GetVersionNumber(), 6)
 	bchCode, _ := calculateBCHCode(version.GetVersionNumber(), matrixUtil_VERSION_INFO_POLY)
 	bits.AppendBits(bchCode, 12)
 
 	if bits.GetSize() != 18 { // Just in case.
-		return gozxing.NewWriterExceptionWithError(
-			fmt.Errorf("should not happen but we got: %v", bits.GetSize()))
+		return gozxing.NewWriterException(
+			"should not happen but we got: %v", bits.GetSize())
 	}
 
 	return nil
@@ -395,7 +395,7 @@ func embedTimingPatterns(matrix *ByteMatrix) {
 }
 
 // embedDarkDotAtLeftBottomCorner Embed the lonely dark dot at left bottom corner. JISX0510:2004 (p.46)
-func embedDarkDotAtLeftBottomCorner(matrix *ByteMatrix) error {
+func embedDarkDotAtLeftBottomCorner(matrix *ByteMatrix) gozxing.WriterException {
 	if matrix.Get(8, matrix.GetHeight()-8) == 0 {
 		return gozxing.NewWriterException("embedDarkDotAtLeftBottomCorner")
 	}
@@ -403,22 +403,22 @@ func embedDarkDotAtLeftBottomCorner(matrix *ByteMatrix) error {
 	return nil
 }
 
-func embedHorizontalSeparationPattern(xStart, yStart int, matrix *ByteMatrix) error {
+func embedHorizontalSeparationPattern(xStart, yStart int, matrix *ByteMatrix) gozxing.WriterException {
 	for x := 0; x < 8; x++ {
 		if !isEmpty(matrix.Get(xStart+x, yStart)) {
-			return gozxing.NewWriterExceptionWithError(
-				fmt.Errorf("embedHorizontalSeparationPattern(%d, %d)", xStart, yStart))
+			return gozxing.NewWriterException(
+				"embedHorizontalSeparationPattern(%d, %d)", xStart, yStart)
 		}
 		matrix.Set(xStart+x, yStart, 0)
 	}
 	return nil
 }
 
-func embedVerticalSeparationPattern(xStart, yStart int, matrix *ByteMatrix) error {
+func embedVerticalSeparationPattern(xStart, yStart int, matrix *ByteMatrix) gozxing.WriterException {
 	for y := 0; y < 7; y++ {
 		if !isEmpty(matrix.Get(xStart, yStart+y)) {
-			return gozxing.NewWriterExceptionWithError(
-				fmt.Errorf("embedVerticalSeparationPattern(%d, %d)", xStart, yStart))
+			return gozxing.NewWriterException(
+				"embedVerticalSeparationPattern(%d, %d)", xStart, yStart)
 		}
 		matrix.Set(xStart, yStart+y, 0)
 	}
@@ -445,7 +445,7 @@ func embedPositionDetectionPattern(xStart, yStart int, matrix *ByteMatrix) {
 
 // embedPositionDetectionPatternsAndSeparators Embed position detection patterns and
 // surrounding vertical/horizontal separators.
-func embedPositionDetectionPatternsAndSeparators(matrix *ByteMatrix) error {
+func embedPositionDetectionPatternsAndSeparators(matrix *ByteMatrix) gozxing.WriterException {
 	// Embed three big squares at corners.
 	pdpWidth := len(matrixUtil_POSITION_DETECTION_PATTERN[0])
 	// Left top corner.

@@ -68,7 +68,7 @@ func (this *upcEReader) decodeMiddle(row *gozxing.BitArray, startRange []int, re
 	for x := 0; x < 6 && rowOffset < end; x++ {
 		bestMatch, e := upceanReader_decodeDigit(row, counters, rowOffset, UPCEANReader_L_AND_G_PATTERNS)
 		if e != nil {
-			return 0, result, e
+			return 0, result, gozxing.WrapNotFoundException(e)
 		}
 		result = append(result, '0'+byte(bestMatch%10))
 		for _, counter := range counters {
@@ -105,7 +105,7 @@ func determineNumSysAndCheckDigit(resultString []byte, lgPatternFound int) ([]by
 			}
 		}
 	}
-	return resultString, gozxing.GetNotFoundExceptionInstance()
+	return resultString, gozxing.NewNotFoundException()
 }
 
 func (this *upcEReader) getBarcodeFormat() gozxing.BarcodeFormat {

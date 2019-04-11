@@ -47,7 +47,7 @@ func NewWhiteRectangleDetector(image *gozxing.BitMatrix, initSize, x, y int) (*W
 		downInit:  y + halfsize,
 	}
 	if d.upInit < 0 || d.leftInit < 0 || d.downInit >= d.height || d.rightInit >= d.width {
-		return nil, gozxing.GetNotFoundExceptionInstance()
+		return nil, gozxing.NewNotFoundException()
 	}
 	return d, nil
 }
@@ -166,50 +166,49 @@ func (this *WhiteRectangleDetector) Detect() ([]gozxing.ResultPoint, error) {
 
 		maxSize := right - left
 
-		var z gozxing.ResultPoint = nil
+		var z gozxing.ResultPoint
 		for i := 1; z == nil && i < maxSize; i++ {
 			z = this.getBlackPointOnSegment(left, down-i, left+i, down)
 		}
 
 		if z == nil {
-			return nil, gozxing.GetNotFoundExceptionInstance()
+			return nil, gozxing.NewNotFoundException("no black point on left-down")
 		}
 
-		var t gozxing.ResultPoint = nil
+		var t gozxing.ResultPoint
 		//go down right
 		for i := 1; t == nil && i < maxSize; i++ {
 			t = this.getBlackPointOnSegment(left, up+i, left+i, up)
 		}
 
 		if t == nil {
-			return nil, gozxing.GetNotFoundExceptionInstance()
+			return nil, gozxing.NewNotFoundException("no black point on left-up")
 		}
 
-		var x gozxing.ResultPoint = nil
+		var x gozxing.ResultPoint
 		//go down left
 		for i := 1; x == nil && i < maxSize; i++ {
 			x = this.getBlackPointOnSegment(right, up+i, right-i, up)
 		}
 
 		if x == nil {
-			return nil, gozxing.GetNotFoundExceptionInstance()
+			return nil, gozxing.NewNotFoundException("no black point on right-up")
 		}
 
-		var y gozxing.ResultPoint = nil
+		var y gozxing.ResultPoint
 		//go up left
 		for i := 1; y == nil && i < maxSize; i++ {
 			y = this.getBlackPointOnSegment(right, down-i, right-i, down)
 		}
 
 		if y == nil {
-			return nil, gozxing.GetNotFoundExceptionInstance()
+			return nil, gozxing.NewNotFoundException("no black point on right-down")
 		}
 
 		return this.centerEdges(y, z, x, t), nil
-
-	} else {
-		return nil, gozxing.GetNotFoundExceptionInstance()
 	}
+
+	return nil, gozxing.NewNotFoundException()
 }
 
 func (this *WhiteRectangleDetector) getBlackPointOnSegment(aX, aY, bX, bY int) gozxing.ResultPoint {

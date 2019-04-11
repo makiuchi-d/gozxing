@@ -1,7 +1,7 @@
 package encoder
 
 import (
-	"fmt"
+	"github.com/makiuchi-d/gozxing"
 )
 
 type ASCIIEncoder struct{}
@@ -49,7 +49,7 @@ func (this ASCIIEncoder) encode(context *EncoderContext) error {
 				context.SignalEncoderChange(HighLevelEncoder_EDIFACT_ENCODATION)
 				break
 			default:
-				return fmt.Errorf("IllegalStateException: Illegal mode: %v", newMode)
+				return gozxing.NewWriterException("IllegalStateException: Illegal mode: %v", newMode)
 			}
 		} else if HighLevelEncoder_isExtendedASCII(c) {
 			context.WriteCodeword(HighLevelEncoder_UPPER_SHIFT)
@@ -68,5 +68,5 @@ func encodeASCIIDigits(digit1, digit2 byte) (byte, error) {
 		num := (digit1-48)*10 + (digit2 - 48)
 		return byte(num + 130), nil
 	}
-	return 0, fmt.Errorf("IllegalArgumentException: not digits: %c%c", digit1, digit2)
+	return 0, gozxing.NewWriterException("IllegalArgumentException: not digits: %c%c", digit1, digit2)
 }

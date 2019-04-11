@@ -54,7 +54,7 @@ func (this *OneDReader) Decode(
 
 	rotatedImage, e := image.RotateCounterClockwise()
 	if e != nil {
-		return nil, e
+		return nil, gozxing.WrapReaderException(e)
 	}
 
 	result, e = this.doDecode(rotatedImage, hints)
@@ -139,7 +139,7 @@ func (this *OneDReader) doDecode(
 			if _, ok := e.(gozxing.NotFoundException); ok {
 				continue
 			} else {
-				return nil, e
+				return nil, gozxing.WrapReaderException(e)
 			}
 		}
 
@@ -191,7 +191,7 @@ func (this *OneDReader) doDecode(
 		}
 	}
 
-	return nil, gozxing.GetNotFoundExceptionInstance()
+	return nil, gozxing.NewNotFoundException()
 }
 
 // Records the size of successive runs of white and black pixels in a row, starting at a given point.
@@ -212,7 +212,7 @@ func recordPattern(row *gozxing.BitArray, start int, counters []int) error {
 	}
 	end := row.GetSize()
 	if start >= end {
-		return gozxing.GetNotFoundExceptionInstance()
+		return gozxing.NewNotFoundException("start=%v, end=%v", start, end)
 	}
 	isWhite := !row.Get(start)
 	counterPosition := 0
@@ -234,7 +234,7 @@ func recordPattern(row *gozxing.BitArray, start int, counters []int) error {
 	// If we read fully the last section of pixels and filled up our counters -- or filled
 	// the last counter but ran off the side of the image, OK. Otherwise, a problem.
 	if !(counterPosition == numCounters || (counterPosition == numCounters-1 && i == end)) {
-		return gozxing.GetNotFoundExceptionInstance()
+		return gozxing.NewNotFoundException()
 	}
 	return nil
 }
@@ -251,7 +251,7 @@ func recordPatternInReverse(row *gozxing.BitArray, start int, counters []int) er
 		}
 	}
 	if numTransitionsLeft >= 0 {
-		return gozxing.GetNotFoundExceptionInstance()
+		return gozxing.NewNotFoundException("numTransitionsLeft = %v", numTransitionsLeft)
 	}
 	return recordPattern(row, start+1, counters)
 }

@@ -1,7 +1,7 @@
 package gozxing
 
 import (
-	"errors"
+	errors "golang.org/x/xerrors"
 )
 
 type LuminanceSource interface {

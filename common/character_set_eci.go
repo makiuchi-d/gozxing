@@ -68,7 +68,7 @@ func (this *CharacterSetECI) Name() string {
 
 func GetCharacterSetECIByValue(value int) (*CharacterSetECI, error) {
 	if value < 0 || value >= 900 {
-		return nil, gozxing.GetFormatExceptionInstance()
+		return nil, gozxing.NewFormatException()
 	}
 	return valueToECI[value], nil
 }

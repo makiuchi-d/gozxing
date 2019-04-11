@@ -1,28 +1,52 @@
 package gozxing
 
 import (
-	"errors"
 	"testing"
+
+	errors "golang.org/x/xerrors"
 )
 
-func TestWriteerException(t *testing.T) {
-	var e error
+func testWriterErrorType(t *testing.T, e error) {
+	var we WriterException
+	if !errors.As(e, &we) {
+		t.Fatalf("Type must be WriterException")
+	}
+	var re ReaderException
+	if errors.As(e, &re) {
+		t.Fatalf("Type must not be ReaderException")
+	}
 
-	e = NewWriterException("test message")
 	if _, ok := e.(WriterException); !ok {
-		t.Fatalf("Not WriterException, %T", e)
+		t.Fatalf("Type must be WriterException")
 	}
 	if _, ok := e.(ReaderException); ok {
 		t.Fatalf("Type must not be ReaderException")
 	}
 
-	e = NewWriterExceptionWithError(errors.New("test2 message"))
-	if _, ok := e.(WriterException); !ok {
-		t.Fatalf("Not WriterException, %T", e)
-	}
-	if _, ok := e.(ReaderException); ok {
-		t.Fatalf("Type must not be ReaderException")
+	we.writerException()
+}
+
+func TestNewWriterException(t *testing.T) {
+	var e error = NewWriterException("test message")
+	testWriterErrorType(t, e)
+}
+
+func TestWrapWriterException(t *testing.T) {
+	base := errors.New("test error")
+	var e error = WrapWriterException(base)
+
+	testWriterErrorType(t, e)
+
+	if !errors.Is(e, base) {
+		t.Fatalf("err(%v) is not base(%v)", e, base)
 	}
 
-	e.(WriterException).WriterException()
+	wants := "WriterException: test error"
+	if msg := e.Error(); msg != wants {
+		t.Fatalf("e.Error() = \"%s\", wants \"%s\"", msg, wants)
+	}
+	e = WrapWriterException(e)
+	if msg := e.Error(); msg != wants {
+		t.Fatalf("e.Error() = \"%s\", wants \"%s\"", msg, wants)
+	}
 }

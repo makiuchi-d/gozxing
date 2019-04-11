@@ -187,13 +187,13 @@ func code128FindStartPattern(row *gozxing.BitArray) ([]int, error) {
 			isWhite = !isWhite
 		}
 	}
-	return nil, gozxing.GetNotFoundExceptionInstance()
+	return nil, gozxing.NewNotFoundException()
 }
 
 func code128DecodeCode(row *gozxing.BitArray, counters []int, rowOffset int) (int, error) {
 	e := recordPattern(row, rowOffset, counters)
 	if e != nil {
-		return 0, e
+		return 0, gozxing.WrapNotFoundException(e)
 	}
 	bestVariance := float64(code128MAX_AVG_VARIANCE) // worst variance we'll accept
 	bestMatch := -1
@@ -209,7 +209,7 @@ func code128DecodeCode(row *gozxing.BitArray, counters []int, rowOffset int) (in
 	if bestMatch >= 0 {
 		return bestMatch, nil
 	} else {
-		return 0, gozxing.GetNotFoundExceptionInstance()
+		return 0, gozxing.NewNotFoundException()
 	}
 }
 
@@ -238,7 +238,7 @@ func (code128RowDecoder) decodeRow(rowNumber int, row *gozxing.BitArray, hints m
 		codeSet = code128CODE_CODE_C
 		break
 	default:
-		return nil, gozxing.GetFormatExceptionInstance()
+		return nil, gozxing.NewFormatException("startCode = %d", startCode)
 	}
 
 	done := false
@@ -294,7 +294,7 @@ func (code128RowDecoder) decodeRow(rowNumber int, row *gozxing.BitArray, hints m
 		// Take care of illegal start codes
 		switch code {
 		case code128CODE_START_A, code128CODE_START_B, code128CODE_START_C:
-			return nil, gozxing.GetFormatExceptionInstance()
+			return nil, gozxing.NewFormatException("code = %d", code)
 		}
 
 		switch codeSet {
@@ -473,21 +473,21 @@ func (code128RowDecoder) decodeRow(rowNumber int, row *gozxing.BitArray, hints m
 	if b, _ := row.IsRange(nextStart,
 		min(row.GetSize(), nextStart+(nextStart-lastStart)/2),
 		false); !b {
-		return nil, gozxing.GetNotFoundExceptionInstance()
+		return nil, gozxing.NewNotFoundException()
 	}
 
 	// Pull out from sum the value of the penultimate check code
 	checksumTotal -= multiplier * lastCode
 	// lastCode is the checksum then:
 	if checksumTotal%103 != lastCode {
-		return nil, gozxing.GetChecksumExceptionInstance()
+		return nil, gozxing.NewChecksumException("checksumTotal=%d, lastCode=%d", checksumTotal, lastCode)
 	}
 
 	// Need to pull out the check digits from string
 	resultLength := len(result)
 	if resultLength == 0 {
 		// false positive
-		return nil, gozxing.GetNotFoundExceptionInstance()
+		return nil, gozxing.NewNotFoundException("resultLength = %d", resultLength)
 	}
 
 	// Only bother if the result had at least one character, and if the checksum digit happened to

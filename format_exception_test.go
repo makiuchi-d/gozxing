@@ -1,41 +1,71 @@
 package gozxing
 
 import (
-	"errors"
 	"testing"
+
+	errors "golang.org/x/xerrors"
 )
 
-func TestFormatException(t *testing.T) {
-	var e error = GetFormatExceptionInstance()
-
-	if _, ok := e.(FormatException); !ok {
-		t.Fatalf("Type is not FormatException")
+func testFormatExceptionType(t *testing.T, e error) {
+	var fe FormatException
+	if !errors.As(e, &fe) {
+		t.Fatalf("Type must be FormatException")
 	}
-	if _, ok := e.(ReaderException); !ok {
-		t.Fatalf("Type is not ReaderException")
+	var re ReaderException
+	if !errors.As(e, &re) {
+		t.Fatalf("Type must be ReaderException")
 	}
-	if _, ok := e.(NotFoundException); ok {
+	var ne NotFoundException
+	if errors.As(e, &ne) {
 		t.Fatalf("Type must not be NotFoundException")
 	}
 
-	e.(FormatException).FormatException()
-	e.(FormatException).ReaderException()
+	if _, ok := e.(FormatException); !ok {
+		t.Fatalf("Type must be FormatException")
+	}
+	if _, ok := e.(ReaderException); !ok {
+		t.Fatalf("Type must be ReaderException")
+	}
+	if _, ok := e.(ChecksumException); ok {
+		t.Fatalf("Type must not be ChecksumException")
+	}
+
+	fe.formatException()
+	fe.readerException()
+}
+
+func TestFormatException(t *testing.T) {
+	var e error = NewFormatException()
+	testFormatExceptionType(t, e)
 }
 
 func TestNewFormatException(t *testing.T) {
-	base := errors.New("newformatexception")
-	var e error = NewFormatExceptionInstance(base)
+	var e error = NewFormatException("testmsg %d, %d", 10, 20)
+	testFormatExceptionType(t, e)
 
-	if _, ok := e.(FormatException); !ok {
-		t.Fatalf("Type is not FormatException")
+	msg := e.Error()
+	wants := "FormatException: testmsg 10, 20"
+	if msg != wants {
+		t.Fatalf("Error() = \"%s\", wants \"%s\"", msg, wants)
 	}
-	if _, ok := e.(ReaderException); !ok {
-		t.Fatalf("Type is not ReaderException")
+}
+
+func TestWrapFormatException(t *testing.T) {
+	base := errors.New("newformatexception")
+	var e error = WrapFormatException(base)
+
+	testFormatExceptionType(t, e)
+
+	if !errors.Is(e, base) {
+		t.Fatalf("err(%v) is not base(%v)", e, base)
 	}
-	if _, ok := e.(NotFoundException); ok {
-		t.Fatalf("Type must not be NotFoundException")
+
+	wants := "FormatException: newformatexception"
+	if msg := e.Error(); msg != wants {
+		t.Fatalf("e.Error() = \"%s\", wants \"%s\"", msg, wants)
 	}
-	if e.Error() != base.Error() {
-		t.Fatalf("e.Error() = %v, expect %v", e.Error(), base.Error())
+	e = WrapFormatException(e)
+	if msg := e.Error(); msg != wants {
+		t.Fatalf("e.Error() = \"%s\", wants \"%s\"", msg, wants)
 	}
 }

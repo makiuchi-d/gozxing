@@ -83,11 +83,11 @@ func (this *code39RowDecoder) decodeRow(rowNumber int, row *gozxing.BitArray, hi
 	for {
 		e := recordPattern(row, nextStart, theCounters)
 		if e != nil {
-			return nil, e
+			return nil, gozxing.WrapNotFoundException(e)
 		}
 		pattern := code39ToNarrowWidePattern(theCounters)
 		if pattern < 0 {
-			return nil, gozxing.GetNotFoundExceptionInstance()
+			return nil, gozxing.NewNotFoundException("counters = %v", theCounters)
 		}
 		decodedChar, e := code39PatternToChar(pattern)
 		if e != nil {
@@ -115,7 +115,9 @@ func (this *code39RowDecoder) decodeRow(rowNumber int, row *gozxing.BitArray, hi
 	// If 50% of last pattern size, following last pattern, is not whitespace, fail
 	// (but if it's whitespace to the very end of the image, that's OK)
 	if nextStart != end && (whiteSpaceAfterEnd*2) < lastPatternSize {
-		return nil, gozxing.GetNotFoundExceptionInstance()
+		return nil, gozxing.NewNotFoundException(
+			"nextStart=%d, end=%d, whiteSpaceAfterEnd=%d, lastPatternSize=%d",
+			nextStart, end, whiteSpaceAfterEnd, lastPatternSize)
 	}
 
 	if this.usingCheckDigit {
@@ -124,15 +126,15 @@ func (this *code39RowDecoder) decodeRow(rowNumber int, row *gozxing.BitArray, hi
 		for i := 0; i < max; i++ {
 			total += strings.Index(code39AlphabetString, string(result[i]))
 		}
-		if result[max] != code39AlphabetString[total%43] {
-			return nil, gozxing.GetChecksumExceptionInstance()
+		if s, t := result[max], code39AlphabetString[total%43]; s != t {
+			return nil, gozxing.NewChecksumException("lastchar=0x%02x, wants 0x%02x", s, t)
 		}
 		result = result[:max]
 	}
 
 	if len(result) == 0 {
 		// false positive
-		return nil, gozxing.GetNotFoundExceptionInstance()
+		return nil, gozxing.NewNotFoundException("empty result")
 	}
 
 	var resultString string
@@ -190,7 +192,7 @@ func code39FindAsteriskPattern(row *gozxing.BitArray, counters []int) (int, int,
 			isWhite = !isWhite
 		}
 	}
-	return 0, 0, gozxing.GetNotFoundExceptionInstance()
+	return 0, 0, gozxing.NewNotFoundException()
 }
 
 // For efficiency, returns -1 on failure. Not throwing here saved as many as 700 exceptions
@@ -250,7 +252,7 @@ func code39PatternToChar(pattern int) (byte, error) {
 	if pattern == code39AsteriskEncoding {
 		return '*', nil
 	}
-	return 0, gozxing.GetNotFoundExceptionInstance()
+	return 0, gozxing.NewNotFoundException("pattern = %d", pattern)
 }
 
 func code39DecodeExtended(encoded []byte) (string, error) {
@@ -267,7 +269,7 @@ func code39DecodeExtended(encoded []byte) (string, error) {
 				if next >= 'A' && next <= 'Z' {
 					decodedChar = next + 32
 				} else {
-					return string(decoded), gozxing.GetFormatExceptionInstance()
+					return string(decoded), gozxing.NewFormatException("encoded = '+'0x%02x", next)
 				}
 				break
 			case '$':
@@ -275,7 +277,7 @@ func code39DecodeExtended(encoded []byte) (string, error) {
 				if next >= 'A' && next <= 'Z' {
 					decodedChar = next - 64
 				} else {
-					return string(decoded), gozxing.GetFormatExceptionInstance()
+					return string(decoded), gozxing.NewFormatException("encoded = '$'0x%02x", next)
 				}
 				break
 			case '%':
@@ -297,7 +299,7 @@ func code39DecodeExtended(encoded []byte) (string, error) {
 				} else if next == 'X' || next == 'Y' || next == 'Z' {
 					decodedChar = 127
 				} else {
-					return string(decoded), gozxing.GetFormatExceptionInstance()
+					return string(decoded), gozxing.NewFormatException("encoded = '%%'0x%02x", next)
 				}
 				break
 			case '/':
@@ -307,7 +309,7 @@ func code39DecodeExtended(encoded []byte) (string, error) {
 				} else if next == 'Z' {
 					decodedChar = ':'
 				} else {
-					return string(decoded), gozxing.GetFormatExceptionInstance()
+					return string(decoded), gozxing.NewFormatException("encoded = '/'0x%02x", next)
 				}
 				break
 			}

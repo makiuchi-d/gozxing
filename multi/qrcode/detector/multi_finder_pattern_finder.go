@@ -76,7 +76,7 @@ func (this *MultiFinderPatternFinder) selectMultipleBestPatterns() ([][]*detecto
 
 	if size < 3 {
 		// Couldn't find enough finder patterns
-		return nil, gozxing.GetNotFoundExceptionInstance()
+		return nil, gozxing.NewNotFoundException("Couldn't find enough finder patterns (%d)", size)
 	}
 
 	// Begin HE modifications to safely detect multiple codes of equal size
@@ -190,7 +190,7 @@ func (this *MultiFinderPatternFinder) selectMultipleBestPatterns() ([][]*detecto
 	}
 
 	// Nothing found!
-	return nil, gozxing.GetNotFoundExceptionInstance()
+	return nil, gozxing.NewNotFoundException()
 }
 
 func (this *MultiFinderPatternFinder) FindMulti(hints map[gozxing.DecodeHintType]interface{}) ([]*detector.FinderPatternInfo, error) {

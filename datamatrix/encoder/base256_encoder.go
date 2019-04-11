@@ -1,7 +1,7 @@
 package encoder
 
 import (
-	"fmt"
+	"github.com/makiuchi-d/gozxing"
 )
 
 type Base256Encoder struct{}
@@ -35,7 +35,7 @@ func (this Base256Encoder) encode(context *EncoderContext) error {
 	currentSize := context.GetCodewordCount() + dataCount + lengthFieldSize
 	e := context.UpdateSymbolInfoByLength(currentSize)
 	if e != nil {
-		return e
+		return gozxing.WrapWriterException(e)
 	}
 	mustPad := (context.GetSymbolInfo().GetDataCapacity() - currentSize) > 0
 	if context.HasMoreCharacters() || mustPad {
@@ -46,7 +46,8 @@ func (this Base256Encoder) encode(context *EncoderContext) error {
 			buffer[0] = byte((dataCount / 250) + 249)
 			buffer[1] = byte(dataCount % 250)
 		} else {
-			return fmt.Errorf("IllegalStateException: Message length not in valid ranges: %v", dataCount)
+			return gozxing.NewWriterException(
+				"IllegalStateException: Message length not in valid ranges: %v", dataCount)
 		}
 	}
 	for i, c := 0, len(buffer); i < c; i++ {

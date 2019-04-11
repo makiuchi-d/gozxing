@@ -1,7 +1,6 @@
 package oned
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/makiuchi-d/gozxing"
@@ -16,7 +15,7 @@ func NewCode39Writer() gozxing.Writer {
 func (code39Encoder) encode(contents string) ([]bool, error) {
 	length := len(contents)
 	if length > 80 {
-		return nil, fmt.Errorf("IllegalArgumentException: "+
+		return nil, gozxing.NewWriterException("IllegalArgumentException: "+
 			"Requested contents should be less than 80 digits long, but got %v", length)
 	}
 	for i := 0; i < length; i++ {
@@ -29,7 +28,7 @@ func (code39Encoder) encode(contents string) ([]bool, error) {
 			}
 			length = len(contents)
 			if length > 80 {
-				return nil, fmt.Errorf("IllegalArgumentException: "+
+				return nil, gozxing.NewWriterException("IllegalArgumentException: "+
 					"Requested contents should be less than 80 digits long, but got %v (extended full ASCII mode)", length)
 			}
 			break
@@ -111,7 +110,7 @@ func code39TryToConvertToExtendedMode(contents string) (string, error) {
 				extendedContent = append(extendedContent, '%')
 				extendedContent = append(extendedContent, 'P'+(character-123))
 			} else {
-				return string(extendedContent), fmt.Errorf(
+				return string(extendedContent), gozxing.NewWriterException(
 					"IllegalArgumentException: Requested content contains a non-encodable character: '%v'", contents[i])
 			}
 			break

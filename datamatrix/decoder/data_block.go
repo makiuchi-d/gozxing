@@ -1,7 +1,7 @@
 package decoder
 
 import (
-	"errors"
+	"github.com/makiuchi-d/gozxing"
 )
 
 // DataBlock Encapsulates a block of data within a Data Matrix Code.
@@ -93,7 +93,8 @@ func DataBlocks_getDataBlocks(rawCodewords []byte, version *Version) ([]DataBloc
 	}
 
 	if rawCodewordsOffset != len(rawCodewords) {
-		return nil, errors.New("IllegalArgumentException")
+		return nil, gozxing.NewFormatException(
+			"rawCodewordsOffset=%v, len(rawCodewords)=%v", rawCodewordsOffset, len(rawCodewords))
 	}
 
 	return result, nil

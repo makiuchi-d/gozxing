@@ -1,27 +1,25 @@
 package gozxing
 
-import (
-	"errors"
-)
-
 type FormatException interface {
 	ReaderException
-	FormatException()
+	formatException()
 }
 
 type formatException struct {
-	error
+	exception
 }
 
-func (formatException) ReaderException() {}
-func (formatException) FormatException() {}
+func (formatException) readerException() {}
+func (formatException) formatException() {}
 
-var formatInstance = formatException{errors.New("FormatException")}
-
-func GetFormatExceptionInstance() FormatException {
-	return formatInstance
+func NewFormatException(args ...interface{}) FormatException {
+	return formatException{
+		newException("FormatException", args...),
+	}
 }
 
-func NewFormatExceptionInstance(e error) FormatException {
-	return formatException{e}
+func WrapFormatException(e error) FormatException {
+	return formatException{
+		wrapException("FormatException", e),
+	}
 }

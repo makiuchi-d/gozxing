@@ -1,7 +1,7 @@
 package encoder
 
 import (
-	"errors"
+	"github.com/makiuchi-d/gozxing"
 )
 
 type EdifactEncoder struct{}
@@ -60,7 +60,7 @@ func edifactHandleEOD(context *EncoderContext, buffer []byte) error {
 		//Only an unlatch at the end
 		e := context.UpdateSymbolInfo()
 		if e != nil {
-			return e
+			return gozxing.WrapWriterException(e)
 		}
 
 		available := context.GetSymbolInfo().GetDataCapacity() - context.GetCodewordCount()
@@ -69,7 +69,7 @@ func edifactHandleEOD(context *EncoderContext, buffer []byte) error {
 		if remaining > available {
 			e := context.UpdateSymbolInfoByLength(context.GetCodewordCount() + 1)
 			if e != nil {
-				return e
+				return gozxing.WrapWriterException(e)
 			}
 			available = context.GetSymbolInfo().GetDataCapacity() - context.GetCodewordCount()
 		}
@@ -79,7 +79,7 @@ func edifactHandleEOD(context *EncoderContext, buffer []byte) error {
 	}
 
 	if count > 4 {
-		return errors.New("IllegalStateException: Count must not exceed 4")
+		return gozxing.NewWriterException("IllegalStateException: Count must not exceed 4, %v", count)
 	}
 	restChars := count - 1
 	encoded, _ := edifactEncodeToCodewords(buffer, 0)
@@ -89,14 +89,14 @@ func edifactHandleEOD(context *EncoderContext, buffer []byte) error {
 	if restChars <= 2 {
 		e := context.UpdateSymbolInfoByLength(context.GetCodewordCount() + restChars)
 		if e != nil {
-			return e
+			return gozxing.WrapWriterException(e)
 		}
 		available := context.GetSymbolInfo().GetDataCapacity() - context.GetCodewordCount()
 		if available >= 3 {
 			restInAscii = false
 			e := context.UpdateSymbolInfoByLength(context.GetCodewordCount() + len(encoded))
 			if e != nil {
-				return e
+				return gozxing.WrapWriterException(e)
 			}
 			//available = context.symbolInfo.dataCapacity - context.getCodewordCount();
 		}
@@ -118,7 +118,7 @@ func edifactEncodeChar(c byte, sb []byte) ([]byte, error) {
 	} else if c >= '@' && c <= '^' {
 		sb = append(sb, c-64)
 	} else {
-		return sb, illegalCharacter(c)
+		return sb, gozxing.NewWriterException("Illegal character: %v (0x%04x)", c, c)
 	}
 	return sb, nil
 }
@@ -126,7 +126,7 @@ func edifactEncodeChar(c byte, sb []byte) ([]byte, error) {
 func edifactEncodeToCodewords(sb []byte, startPos int) ([]byte, error) {
 	len := len(sb) - startPos
 	if len == 0 {
-		return sb, errors.New("IllegalStateException: StringBuilder must not be empty")
+		return sb, gozxing.NewWriterException("IllegalStateException: StringBuilder must not be empty")
 	}
 	c1 := int(sb[startPos])
 	c2 := 0

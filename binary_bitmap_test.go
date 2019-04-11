@@ -1,8 +1,9 @@
 package gozxing
 
 import (
-	"errors"
 	"testing"
+
+	errors "golang.org/x/xerrors"
 )
 
 type testBinarizer struct {
@@ -134,7 +135,7 @@ type notFoundBinarizer struct {
 }
 
 func (this *notFoundBinarizer) GetBlackMatrix() (*BitMatrix, error) {
-	return nil, GetNotFoundExceptionInstance()
+	return nil, NewNotFoundException()
 }
 
 type illegalBinarizer struct {

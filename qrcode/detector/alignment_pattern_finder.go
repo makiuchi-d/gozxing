@@ -32,7 +32,7 @@ func NewAlignmentPatternFinder(image *gozxing.BitMatrix, startX, startY, width, 
 	}
 }
 
-func (this *AlignmentPatternFinder) Find() (*AlignmentPattern, error) {
+func (this *AlignmentPatternFinder) Find() (*AlignmentPattern, gozxing.NotFoundException) {
 	startX := this.startX
 	height := this.height
 	maxJ := startX + this.width
@@ -104,7 +104,7 @@ func (this *AlignmentPatternFinder) Find() (*AlignmentPattern, error) {
 		return this.possibleCenters[0], nil
 	}
 
-	return nil, gozxing.GetNotFoundExceptionInstance()
+	return nil, gozxing.NewNotFoundException()
 }
 
 func AlignmentPatternFinder_centerFromEnd(stateCount []int, end int) float64 {

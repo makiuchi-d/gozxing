@@ -90,7 +90,7 @@ func (this *QRCodeReader) extractPureBits(image *gozxing.BitMatrix) (*gozxing.Bi
 	leftTopBlack := image.GetTopLeftOnBit()
 	rightBottomBlack := image.GetBottomRightOnBit()
 	if leftTopBlack == nil || rightBottomBlack == nil {
-		return nil, gozxing.GetNotFoundExceptionInstance()
+		return nil, gozxing.NewNotFoundException()
 	}
 
 	moduleSize, e := this.moduleSize(leftTopBlack, image)
@@ -105,7 +105,8 @@ func (this *QRCodeReader) extractPureBits(image *gozxing.BitMatrix) (*gozxing.Bi
 
 	// Sanity check!
 	if left >= right || top >= bottom {
-		return nil, gozxing.GetNotFoundExceptionInstance()
+		return nil, gozxing.NewNotFoundException(
+			"(left,right)=(%v,%v), (top,bottom)=(%v,%v)", left, right, top, bottom)
 	}
 
 	if bottom-top != right-left {
@@ -114,18 +115,18 @@ func (this *QRCodeReader) extractPureBits(image *gozxing.BitMatrix) (*gozxing.Bi
 		right = left + (bottom - top)
 		if right >= image.GetWidth() {
 			// Abort if that would not make sense -- off image
-			return nil, gozxing.GetNotFoundExceptionInstance()
+			return nil, gozxing.NewNotFoundException("right = %v, width = %v", right, image.GetWidth())
 		}
 	}
 
 	matrixWidth := util.MathUtils_Round(float64(right-left+1) / moduleSize)
 	matrixHeight := util.MathUtils_Round(float64(bottom-top+1) / moduleSize)
 	if matrixWidth <= 0 || matrixHeight <= 0 {
-		return nil, gozxing.GetNotFoundExceptionInstance()
+		return nil, gozxing.NewNotFoundException("matrixWidth/Height = %v, %v", matrixWidth, matrixHeight)
 	}
 	if matrixHeight != matrixWidth {
 		// Only possibly decode square regions
-		return nil, gozxing.GetNotFoundExceptionInstance()
+		return nil, gozxing.NewNotFoundException("matrixWidth/Height = %v, %v", matrixWidth, matrixHeight)
 	}
 
 	// Push in the "border" by half the module width so that we start
@@ -142,7 +143,7 @@ func (this *QRCodeReader) extractPureBits(image *gozxing.BitMatrix) (*gozxing.Bi
 	if nudgedTooFarRight > 0 {
 		if nudgedTooFarRight > nudge {
 			// Neither way fits; abort
-			return nil, gozxing.GetNotFoundExceptionInstance()
+			return nil, gozxing.NewNotFoundException("Neither way fits")
 		}
 		left -= nudgedTooFarRight
 	}
@@ -151,7 +152,7 @@ func (this *QRCodeReader) extractPureBits(image *gozxing.BitMatrix) (*gozxing.Bi
 	if nudgedTooFarDown > 0 {
 		if nudgedTooFarDown > nudge {
 			// Neither way fits; abort
-			return nil, gozxing.GetNotFoundExceptionInstance()
+			return nil, gozxing.NewNotFoundException("Neither way fits")
 		}
 		top -= nudgedTooFarDown
 	}
@@ -188,7 +189,7 @@ func (this *QRCodeReader) moduleSize(leftTopBlack []int, image *gozxing.BitMatri
 		y++
 	}
 	if x == width || y == height {
-		return 0, gozxing.GetNotFoundExceptionInstance()
+		return 0, gozxing.NewNotFoundException()
 	}
 	return float64(x-leftTopBlack[0]) / 7.0, nil
 }

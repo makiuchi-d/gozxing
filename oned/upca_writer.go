@@ -1,8 +1,6 @@
 package oned
 
 import (
-	"fmt"
-
 	"github.com/makiuchi-d/gozxing"
 )
 
@@ -22,7 +20,8 @@ func (this *upcAWriter) EncodeWithoutHint(contents string, format gozxing.Barcod
 
 func (this *upcAWriter) Encode(contents string, format gozxing.BarcodeFormat, width, height int, hints map[gozxing.EncodeHintType]interface{}) (*gozxing.BitMatrix, error) {
 	if format != gozxing.BarcodeFormat_UPC_A {
-		return nil, fmt.Errorf("IllegalArgumentException: Can only encode UPC-A, but got %v", format)
+		return nil, gozxing.NewWriterException(
+			"IllegalArgumentException: Can only encode UPC-A, but got %v", format)
 	}
 	return this.subWriter.Encode("0"+contents, gozxing.BarcodeFormat_EAN_13, width, height, hints)
 }

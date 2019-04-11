@@ -1,41 +1,74 @@
 package gozxing
 
 import (
-	"errors"
+	"fmt"
+	"strings"
 	"testing"
+
+	errors "golang.org/x/xerrors"
 )
 
-func TestChecksumException(t *testing.T) {
-	var e error = GetChecksumExceptionInstance()
+func testChecksumExceptionType(t *testing.T, e error) {
+	var ce ChecksumException
+	if !errors.As(e, &ce) {
+		t.Fatalf("Type must be FormatException")
+	}
+	var re ReaderException
+	if !errors.As(e, &re) {
+		t.Fatalf("Type must be ReaderException")
+	}
+	var fe FormatException
+	if errors.As(e, &fe) {
+		t.Fatalf("Type must not be FormatException")
+	}
 
 	if _, ok := e.(ChecksumException); !ok {
-		t.Fatalf("Type is not ChecksumException")
+		t.Fatalf("Type must be ChecksumException")
 	}
 	if _, ok := e.(ReaderException); !ok {
-		t.Fatalf("Type is not ReaderException")
+		t.Fatalf("Type must be ReaderException")
 	}
 	if _, ok := e.(NotFoundException); ok {
 		t.Fatalf("Type must not be NotFoundException")
 	}
 
-	e.(ChecksumException).ChecksumException()
-	e.(ChecksumException).ReaderException()
+	ce.checksumException()
+	ce.readerException()
 }
 
 func TestNewChecksumException(t *testing.T) {
-	base := errors.New("newchecksumexceptionstring")
-	var e error = NewChecksumExceptionInstance(base)
+	var e error = NewChecksumException()
+	testChecksumExceptionType(t, e)
 
-	if _, ok := e.(ChecksumException); !ok {
-		t.Fatalf("Type is not ChecksumException")
+	s := fmt.Sprintf("%+v", e)
+	cases := []string{
+		"ChecksumException",
+		"TestNewChecksumException",
+		"checksum_exception_test.go:",
 	}
-	if _, ok := e.(ReaderException); !ok {
-		t.Fatalf("Type is not ReaderException")
+	for _, c := range cases {
+		if strings.Index(s, c) < 0 {
+			t.Fatalf("error message must contains \"%s\"", c)
+		}
 	}
-	if _, ok := e.(NotFoundException); ok {
-		t.Fatalf("Type must not be NotFoundException")
+}
+
+func TestWrapChecksumException(t *testing.T) {
+	base := errors.New("newchecksumexceptionstring")
+	var e error = WrapChecksumException(base)
+
+	testChecksumExceptionType(t, e)
+
+	if !errors.Is(e, base) {
+		t.Fatalf("err(%v) is not base(%v)", e, base)
 	}
-	if e.Error() != base.Error() {
-		t.Fatalf("e.Error() = %v, expect %v", e.Error(), base.Error())
+
+	wants := "ChecksumException: newchecksumexceptionstring"
+	if msg := e.Error(); msg != wants {
+		t.Fatalf("e.Error() = \"%s\", wants \"%s\"", msg, wants)
+	}
+	e = WrapChecksumException(e)
+	if msg := e.Error(); msg != wants {
+		t.Fatalf("e.Error() = \"%s\", wants \"%s\"", msg, wants)
 	}
 }

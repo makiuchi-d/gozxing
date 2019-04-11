@@ -1,8 +1,6 @@
 package encoder
 
 import (
-	"fmt"
-
 	"golang.org/x/text/encoding/charmap"
 
 	"github.com/makiuchi-d/gozxing"
@@ -24,7 +22,8 @@ func NewEncoderContext(msg string) (*EncoderContext, error) {
 	//From this point on Strings are not Unicode anymore!
 	msgBinary, e := charmap.ISO8859_1.NewEncoder().Bytes([]byte(msg))
 	if e != nil {
-		return nil, fmt.Errorf("Message contains characters outside ISO-8859-1 encoding. %v", e)
+		return nil, gozxing.NewWriterException(
+			"Message contains characters outside ISO-8859-1 encoding. %v", e)
 	}
 	sb := make([]byte, 0, len(msgBinary))
 	for i, c := 0, len(msgBinary); i < c; i++ {

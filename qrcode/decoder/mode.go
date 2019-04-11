@@ -1,7 +1,7 @@
 package decoder
 
 import (
-	"errors"
+	errors "golang.org/x/xerrors"
 )
 
 type Mode struct {

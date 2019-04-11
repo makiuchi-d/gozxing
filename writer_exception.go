@@ -1,24 +1,24 @@
 package gozxing
 
-import (
-	"errors"
-)
-
 type WriterException interface {
 	error
-	WriterException()
+	writerException()
 }
 
 type writerException struct {
-	error
+	exception
 }
 
-func (writerException) WriterException() {}
+func (writerException) writerException() {}
 
-func NewWriterException(message string) WriterException {
-	return writerException{errors.New(message)}
+func NewWriterException(args ...interface{}) WriterException {
+	return writerException{
+		newException("WriterException", args...),
+	}
 }
 
-func NewWriterExceptionWithError(err error) WriterException {
-	return writerException{err}
+func WrapWriterException(err error) WriterException {
+	return writerException{
+		wrapException("WriterException", err),
+	}
 }

@@ -1,8 +1,9 @@
 package gozxing
 
 import (
-	"errors"
 	"math/bits"
+
+	errors "golang.org/x/xerrors"
 )
 
 type BitMatrix struct {

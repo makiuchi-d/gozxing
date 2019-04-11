@@ -1,27 +1,25 @@
 package gozxing
 
-import (
-	"errors"
-)
-
 type ChecksumException interface {
 	ReaderException
-	ChecksumException()
+	checksumException()
 }
 
 type checksumException struct {
-	error
+	exception
 }
 
-func (checksumException) ReaderException()   {}
-func (checksumException) ChecksumException() {}
+func (checksumException) readerException()   {}
+func (checksumException) checksumException() {}
 
-var checksumInstance = checksumException{errors.New("ChecksumException")}
-
-func GetChecksumExceptionInstance() ChecksumException {
-	return checksumInstance
+func NewChecksumException(args ...interface{}) ChecksumException {
+	return checksumException{
+		newException("ChecksumException", args...),
+	}
 }
 
-func NewChecksumExceptionInstance(e error) ChecksumException {
-	return checksumException{e}
+func WrapChecksumException(e error) ChecksumException {
+	return checksumException{
+		wrapException("ChecksumException", e),
+	}
 }

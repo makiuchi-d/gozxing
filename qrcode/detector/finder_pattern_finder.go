@@ -38,7 +38,7 @@ func (f *FinderPatternFinder) GetPossibleCenters() []*FinderPattern {
 	return f.possibleCenters
 }
 
-func (f *FinderPatternFinder) Find(hints map[gozxing.DecodeHintType]interface{}) (*FinderPatternInfo, error) {
+func (f *FinderPatternFinder) Find(hints map[gozxing.DecodeHintType]interface{}) (*FinderPatternInfo, gozxing.NotFoundException) {
 	_, tryHarder := hints[gozxing.DecodeHintType_TRY_HARDER]
 	maxI := f.image.GetHeight()
 	maxJ := f.image.GetWidth()
@@ -443,10 +443,10 @@ func (f *FinderPatternFinder) HaveMultiplyConfirmedCenters() bool {
 	return totalDeviation <= 0.05*totalModuleSize
 }
 
-func (f *FinderPatternFinder) SelectBestPatterns() ([]*FinderPattern, error) {
+func (f *FinderPatternFinder) SelectBestPatterns() ([]*FinderPattern, gozxing.NotFoundException) {
 	startSize := float64(len(f.possibleCenters))
 	if startSize < 3 {
-		return nil, gozxing.GetNotFoundExceptionInstance()
+		return nil, gozxing.NewNotFoundException("startSize = %v", startSize)
 	}
 
 	if startSize > 3 {

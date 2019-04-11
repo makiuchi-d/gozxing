@@ -1,9 +1,10 @@
 package decoder
 
 import (
-	"errors"
 	"math"
 	"strconv"
+
+	errors "golang.org/x/xerrors"
 
 	"github.com/makiuchi-d/gozxing"
 )
@@ -71,18 +72,14 @@ func (v *Version) GetECBlocksForLevel(ecLevel ErrorCorrectionLevel) *ECBlocks {
 
 func Version_GetProvisionalVersionForDimension(dimension int) (*Version, error) {
 	if dimension%4 != 1 {
-		return nil, gozxing.GetFormatExceptionInstance()
+		return nil, errors.Errorf("dimengion = %v", dimension)
 	}
-	v, e := Version_GetVersionForNumber((dimension - 17) / 4)
-	if e != nil {
-		return nil, gozxing.GetFormatExceptionInstance()
-	}
-	return v, nil
+	return Version_GetVersionForNumber((dimension - 17) / 4)
 }
 
 func Version_GetVersionForNumber(versionNumber int) (*Version, error) {
 	if versionNumber < 1 || versionNumber > 40 {
-		return nil, errors.New("IllegalArgumentException")
+		return nil, errors.Errorf("IllegalArgumentException: versionNumber = %d", versionNumber)
 	}
 	return VERSIONS[versionNumber-1], nil
 }
@@ -105,7 +102,7 @@ func Version_decodeVersionInformation(versionBits int) (*Version, error) {
 		return Version_GetVersionForNumber(bestVersion)
 	}
 
-	return nil, errors.New("we didn't find a close enough match")
+	return nil, errors.Errorf("we didn't find a close enough match 0x%x", versionBits)
 }
 
 func (v *Version) buildFunctionPattern() (*gozxing.BitMatrix, error) {

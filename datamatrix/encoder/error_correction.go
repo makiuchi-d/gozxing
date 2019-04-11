@@ -1,7 +1,7 @@
 package encoder
 
 import (
-	"fmt"
+	"github.com/makiuchi-d/gozxing"
 )
 
 var (
@@ -79,7 +79,7 @@ func init() {
 //
 func ErrorCorrection_EncodeECC200(codewords []byte, symbolInfo *SymbolInfo) ([]byte, error) {
 	if len(codewords) != symbolInfo.GetDataCapacity() {
-		return nil, fmt.Errorf(
+		return nil, gozxing.NewWriterException(
 			"IllegalArgumentException: The number of codewords does not match the selected symbol")
 	}
 	sb := make([]byte, 0, symbolInfo.GetDataCapacity()+symbolInfo.GetErrorCodewords())
@@ -127,7 +127,7 @@ func createECCBlock(codewords []byte, numECWords int) ([]byte, error) {
 		}
 	}
 	if table < 0 {
-		return codewords, fmt.Errorf(
+		return codewords, gozxing.NewWriterException(
 			"IllegalArgumentException: Illegal number of error correction codewords specified: %d",
 			numECWords)
 	}

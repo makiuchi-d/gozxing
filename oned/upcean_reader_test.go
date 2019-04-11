@@ -138,7 +138,7 @@ type testMiddleDecoder struct {
 
 func (t *testMiddleDecoder) decodeMiddle(row *gozxing.BitArray, startRange []int, result []byte) (int, []byte, error) {
 	if len(t.data) == 0 {
-		return 0, result, gozxing.GetFormatExceptionInstance()
+		return 0, result, gozxing.NewFormatException()
 	}
 	result = append(result, t.data...)
 	return startRange[1] + len(t.data), result, nil

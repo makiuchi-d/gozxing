@@ -1,23 +1,25 @@
 package gozxing
 
-import (
-	"errors"
-)
-
 type NotFoundException interface {
 	ReaderException
-	NotFoundException()
+	notFoundException()
 }
 
 type notFoundException struct {
-	error
+	exception
 }
 
-func (notFoundException) ReaderException()   {}
-func (notFoundException) NotFoundException() {}
+func (notFoundException) readerException()   {}
+func (notFoundException) notFoundException() {}
 
-var notFoundInstance = notFoundException{errors.New("NotFoundException")}
+func NewNotFoundException(args ...interface{}) NotFoundException {
+	return notFoundException{
+		newException("NotFoundException", args...),
+	}
+}
 
-func GetNotFoundExceptionInstance() NotFoundException {
-	return notFoundInstance
+func WrapNotFoundException(e error) NotFoundException {
+	return notFoundException{
+		wrapException("NotFoundException", e),
+	}
 }

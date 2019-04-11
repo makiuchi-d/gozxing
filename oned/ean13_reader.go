@@ -62,7 +62,7 @@ func (this *ean13Reader) decodeMiddle(row *gozxing.BitArray, startRange []int, r
 	for x := 0; x < 6 && rowOffset < end; x++ {
 		bestMatch, e := upceanReader_decodeDigit(row, counters, rowOffset, UPCEANReader_L_AND_G_PATTERNS)
 		if e != nil {
-			return 0, resultString, e
+			return 0, resultString, gozxing.WrapNotFoundException(e)
 		}
 		resultString = append(resultString, byte('0'+bestMatch%10))
 		for _, counter := range counters {
@@ -81,14 +81,14 @@ func (this *ean13Reader) decodeMiddle(row *gozxing.BitArray, startRange []int, r
 
 	middleRange, e := upceanReader_findGuardPattern(row, rowOffset, true, UPCEANReader_MIDDLE_PATTERN)
 	if e != nil {
-		return 0, resultString, e
+		return 0, resultString, gozxing.WrapNotFoundException(e)
 	}
 	rowOffset = middleRange[1]
 
 	for x := 0; x < 6 && rowOffset < end; x++ {
 		bestMatch, e := upceanReader_decodeDigit(row, counters, rowOffset, UPCEANReader_L_PATTERNS)
 		if e != nil {
-			return 0, resultString, e
+			return 0, resultString, gozxing.WrapNotFoundException(e)
 		}
 		resultString = append(resultString, byte('0'+bestMatch))
 		for _, counter := range counters {
@@ -117,7 +117,7 @@ func ean13Reader_determineFirstDigit(lgPatternFound int) (byte, error) {
 			return byte(d), nil
 		}
 	}
-	return 0, gozxing.GetNotFoundExceptionInstance()
+	return 0, gozxing.NewNotFoundException()
 }
 
 func (this *ean13Reader) decodeEnd(row *gozxing.BitArray, endStart int) ([]int, error) {

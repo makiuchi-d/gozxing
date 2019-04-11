@@ -1,7 +1,7 @@
 package common
 
 import (
-	"fmt"
+	errors "golang.org/x/xerrors"
 )
 
 type BitSource struct {
@@ -26,7 +26,7 @@ func (this *BitSource) GetByteOffset() int {
 
 func (this *BitSource) ReadBits(numBits int) (int, error) {
 	if numBits < 1 || numBits > 32 || numBits > this.Available() {
-		return 0, fmt.Errorf("IllegalArgumentException: %v", numBits)
+		return 0, errors.Errorf("IllegalArgumentException: %v", numBits)
 	}
 
 	result := 0

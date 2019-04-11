@@ -55,6 +55,6 @@ func maybeReturnResult(result *gozxing.Result, e error) (*gozxing.Result, error)
 		}
 		return upcaResult, nil
 	} else {
-		return nil, gozxing.GetFormatExceptionInstance()
+		return nil, gozxing.NewFormatException()
 	}
 }

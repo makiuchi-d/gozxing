@@ -1,8 +1,6 @@
 package qrcode
 
 import (
-	"errors"
-	"fmt"
 	"strconv"
 
 	"github.com/makiuchi-d/gozxing"
@@ -30,15 +28,16 @@ func (this *QRCodeWriter) Encode(
 	hints map[gozxing.EncodeHintType]interface{}) (*gozxing.BitMatrix, error) {
 
 	if len(contents) == 0 {
-		return nil, errors.New("IllegalArgumentException: Found empty contents")
+		return nil, gozxing.NewWriterException("IllegalArgumentException: Found empty contents")
 	}
 
 	if format != gozxing.BarcodeFormat_QR_CODE {
-		return nil, fmt.Errorf("IllegalArgumentException: Can only encode QR_CODE, but got %v", format)
+		return nil, gozxing.NewWriterException(
+			"IllegalArgumentException: Can only encode QR_CODE, but got %v", format)
 	}
 
 	if width < 0 || height < 0 {
-		return nil, fmt.Errorf(
+		return nil, gozxing.NewWriterException(
 			"IllegalArgumentException: Requested dimensions are too small: %vx%v", width, height)
 	}
 
@@ -51,11 +50,11 @@ func (this *QRCodeWriter) Encode(
 			} else if str, ok := ec.(string); ok {
 				ecl, e := decoder.ErrorCorrectionLevel_ValueOf(str)
 				if e != nil {
-					return nil, e
+					return nil, gozxing.NewWriterException("EncodeHintType_ERROR_CORRECTION: %w", e)
 				}
 				errorCorrectionLevel = ecl
 			} else {
-				return nil, fmt.Errorf(
+				return nil, gozxing.NewWriterException(
 					"IllegalArgumentException: EncodeHintType_ERROR_CORRECTION %v", ec)
 			}
 		}
@@ -65,11 +64,12 @@ func (this *QRCodeWriter) Encode(
 			} else if str, ok := m.(string); ok {
 				qz, e := strconv.Atoi(str)
 				if e != nil {
-					return nil, e
+					return nil, gozxing.NewWriterException("EncodeHintType_MARGIN = \"%v\": %w", m, e)
 				}
 				quietZone = qz
 			} else {
-				return nil, fmt.Errorf("IllegalArgumentException: EncodeHintType_MARGIN %v", m)
+				return nil, gozxing.NewWriterException(
+					"IllegalArgumentException: EncodeHintType_MARGIN %v", m)
 			}
 		}
 	}
@@ -86,7 +86,7 @@ func (this *QRCodeWriter) Encode(
 func renderResult(code *encoder.QRCode, width, height, quietZone int) (*gozxing.BitMatrix, error) {
 	input := code.GetMatrix()
 	if input == nil {
-		return nil, errors.New("IllegalStateException")
+		return nil, gozxing.NewWriterException("IllegalStateException")
 	}
 	inputWidth := input.GetWidth()
 	inputHeight := input.GetHeight()
@@ -114,7 +114,7 @@ func renderResult(code *encoder.QRCode, width, height, quietZone int) (*gozxing.
 
 	output, e := gozxing.NewBitMatrix(outputWidth, outputHeight)
 	if e != nil {
-		return nil, e
+		return nil, gozxing.WrapWriterException(e)
 	}
 
 	for inputY, outputY := 0, topPadding; inputY < inputHeight; inputY, outputY = inputY+1, outputY+multiple {

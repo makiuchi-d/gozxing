@@ -1,7 +1,7 @@
 package reedsolomon
 
 import (
-	"errors"
+	errors "golang.org/x/xerrors"
 )
 
 type ReedSolomonEncoder struct {

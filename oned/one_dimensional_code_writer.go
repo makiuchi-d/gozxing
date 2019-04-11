@@ -1,8 +1,6 @@
 package oned
 
 import (
-	"errors"
-	"fmt"
 	"strconv"
 
 	"github.com/makiuchi-d/gozxing"
@@ -41,15 +39,17 @@ func (this *OneDimensionalCodeWriter) Encode(
 	hints map[gozxing.EncodeHintType]interface{}) (*gozxing.BitMatrix, error) {
 
 	if format != this.format {
-		return nil, fmt.Errorf("IllegalArgumentException: Can only encode %v, but got %v", this.format, format)
+		return nil, gozxing.NewWriterException(
+			"IllegalArgumentException: Can only encode %v, but got %v", this.format, format)
 	}
 
 	if len(contents) == 0 {
-		return nil, errors.New("IllegalArgumentException: Found empty contents")
+		return nil, gozxing.NewWriterException("IllegalArgumentException: Found empty contents")
 	}
 
 	if width < 0 || height < 0 {
-		return nil, fmt.Errorf("IllegalArgumentException: Negative size is not allowed. Input: %dx%d", width, height)
+		return nil, gozxing.NewWriterException(
+			"IllegalArgumentException: Negative size is not allowed. Input: %dx%d", width, height)
 	}
 
 	sidesMargin := this.defaultMargin
@@ -63,7 +63,8 @@ func (this *OneDimensionalCodeWriter) Encode(
 				return nil, e
 			}
 		} else {
-			return nil, fmt.Errorf("IllegalArgumentException: invalid type hints[EncodeHintType_MARGIN], %T", margin)
+			return nil, gozxing.NewWriterException(
+				"IllegalArgumentException: invalid type hints[EncodeHintType_MARGIN], %T", margin)
 		}
 	}
 
@@ -87,7 +88,7 @@ func onedWriter_renderResult(code []bool, width, height, sidesMargin int) (*gozx
 
 	output, e := gozxing.NewBitMatrix(outputWidth, outputHeight)
 	if e != nil {
-		return nil, e
+		return nil, gozxing.WrapWriterException(e)
 	}
 	for inputX, outputX := 0, leftPadding; inputX < inputWidth; inputX, outputX = inputX+1, outputX+multiple {
 		if code[inputX] {
@@ -101,7 +102,8 @@ func onedWriter_renderResult(code []bool, width, height, sidesMargin int) (*gozx
 func onedWriter_checkNumeric(contents string) error {
 	for _, c := range contents {
 		if c < '0' || c > '9' {
-			return errors.New("IllegalArgumentException: Input should only contain digits 0-9")
+			return gozxing.NewWriterException(
+				"IllegalArgumentException: Input should only contain digits 0-9, 0x%02x", c)
 		}
 	}
 	return nil

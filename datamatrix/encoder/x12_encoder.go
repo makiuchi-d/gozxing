@@ -1,5 +1,9 @@
 package encoder
 
+import (
+	"github.com/makiuchi-d/gozxing"
+)
+
 type X12Encoder struct{}
 
 func NewX12Encoder() Encoder {
@@ -54,7 +58,7 @@ func x12EncodeChar(c byte, sb []byte) ([]byte, error) {
 		} else if c >= 'A' && c <= 'Z' {
 			sb = append(sb, c-65+14)
 		} else {
-			return sb, illegalCharacter(c)
+			return sb, gozxing.NewWriterException("Illegal character: %v (0x%04x)", c, c)
 		}
 	}
 	return sb, nil
@@ -63,7 +67,7 @@ func x12EncodeChar(c byte, sb []byte) ([]byte, error) {
 func x12HandleEOD(context *EncoderContext, buffer []byte) error {
 	e := context.UpdateSymbolInfo()
 	if e != nil {
-		return e
+		return gozxing.WrapWriterException(e)
 	}
 	available := context.GetSymbolInfo().GetDataCapacity() - context.GetCodewordCount()
 	count := len(buffer)

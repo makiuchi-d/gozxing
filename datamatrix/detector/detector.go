@@ -35,7 +35,7 @@ func (this *Detector) Detect() (*common.DetectorResult, error) {
 	points = this.detectSolid2(points)
 	points[3] = this.correctTopRight(points)
 	if points[3] == nil {
-		return nil, gozxing.GetNotFoundExceptionInstance()
+		return nil, gozxing.NewNotFoundException("incorrect top-right, %v", points)
 	}
 	points = this.shiftToModuleCenter(points)
 

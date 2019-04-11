@@ -1,7 +1,7 @@
 package decoder
 
 import (
-	"errors"
+	errors "golang.org/x/xerrors"
 )
 
 type DataBlock struct {
@@ -18,7 +18,9 @@ func NewDataBlock(numDataCodewords int, codewords []byte) *DataBlock {
 
 func DataBlock_GetDataBlocks(rawCodewords []byte, version *Version, ecLevel ErrorCorrectionLevel) ([]*DataBlock, error) {
 	if len(rawCodewords) != version.GetTotalCodewords() {
-		return nil, errors.New("IllegalArgumentException")
+		return nil, errors.Errorf(
+			"IllegalArgumentException: len(rawCodewords)=%v, totalCodewords=%v",
+			len(rawCodewords), version.GetTotalCodewords())
 	}
 
 	// Figure out the number and size of data blocks used by this version and

@@ -111,7 +111,7 @@ func SymbolInfo_Lookup(dataCodewords int, shape SymbolShapeHint,
 		}
 	}
 	if fail {
-		return nil, fmt.Errorf("IllegalArgumentException: "+
+		return nil, gozxing.NewWriterException("IllegalArgumentException: "+
 			"Can't find a symbol arrangement that matches the message. Data codewords: %d",
 			dataCodewords)
 	}

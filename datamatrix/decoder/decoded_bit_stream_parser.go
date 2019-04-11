@@ -1,7 +1,6 @@
 package decoder
 
 import (
-	"fmt"
 	"strconv"
 
 	"golang.org/x/text/encoding/charmap"
@@ -85,7 +84,7 @@ func DecodedBitStreamParser_decode(bytes []byte) (*common.DecoderResult, error) 
 			case Mode_BASE256_ENCODE:
 				result, byteSegments, e = decodeBase256Segment(bits, result, byteSegments)
 			default:
-				return nil, gozxing.GetFormatExceptionInstance()
+				return nil, gozxing.NewFormatException("mode = %v", mode)
 			}
 			mode = Mode_ASCII_ENCODE
 		}
@@ -109,7 +108,7 @@ func decodeAsciiSegment(bits *common.BitSource, result, resultTrailer []byte) (M
 	for bits.Available() > 0 {
 		oneByte, _ := bits.ReadBits(8)
 		if oneByte == 0 {
-			return Mode_ASCII_ENCODE, result, resultTrailer, gozxing.GetFormatExceptionInstance()
+			return Mode_ASCII_ENCODE, result, resultTrailer, gozxing.NewFormatException("oneByte == 0")
 		} else if oneByte <= 128 { // ASCII data (ASCII value + 1)
 			if upperShift {
 				oneByte += 128
@@ -164,7 +163,8 @@ func decodeAsciiSegment(bits *common.BitSource, result, resultTrailer []byte) (M
 				// Not to be used in ASCII encodation
 				// but work around encoders that end with 254, latch back to ASCII
 				if oneByte != 254 || bits.Available() != 0 {
-					return Mode_ASCII_ENCODE, result, resultTrailer, gozxing.GetFormatExceptionInstance()
+					return Mode_ASCII_ENCODE, result, resultTrailer, gozxing.NewFormatException(
+						"oneByte=%v, bits.Available()=%v", oneByte, bits.Available())
 				}
 				break
 			}
@@ -211,7 +211,7 @@ func decodeC40Segment(bits *common.BitSource, result []byte) ([]byte, error) {
 						result = append(result, c40char)
 					}
 				} else {
-					return result, gozxing.GetFormatExceptionInstance()
+					return result, gozxing.NewFormatException("cValue = %v", cValue)
 				}
 				break
 			case 1:
@@ -241,7 +241,7 @@ func decodeC40Segment(bits *common.BitSource, result []byte) ([]byte, error) {
 						upperShift = true
 						break
 					default:
-						return result, gozxing.GetFormatExceptionInstance()
+						return result, gozxing.NewFormatException("cValue = %v", cValue)
 					}
 				}
 				shift = 0
@@ -256,7 +256,7 @@ func decodeC40Segment(bits *common.BitSource, result []byte) ([]byte, error) {
 				shift = 0
 				break
 			default:
-				return result, gozxing.GetFormatExceptionInstance()
+				return result, gozxing.NewFormatException("cValue = %v", cValue)
 			}
 		}
 	}
@@ -300,7 +300,7 @@ func decodeTextSegment(bits *common.BitSource, result []byte) ([]byte, error) {
 						result = append(result, textChar)
 					}
 				} else {
-					return result, gozxing.GetFormatExceptionInstance()
+					return result, gozxing.NewFormatException("cValue = %v", cValue)
 				}
 				break
 			case 1:
@@ -331,7 +331,7 @@ func decodeTextSegment(bits *common.BitSource, result []byte) ([]byte, error) {
 						upperShift = true
 						break
 					default:
-						return result, gozxing.GetFormatExceptionInstance()
+						return result, gozxing.NewFormatException("cValue = %v", cValue)
 					}
 				}
 				shift = 0
@@ -347,11 +347,11 @@ func decodeTextSegment(bits *common.BitSource, result []byte) ([]byte, error) {
 					}
 					shift = 0
 				} else {
-					return result, gozxing.GetFormatExceptionInstance()
+					return result, gozxing.NewFormatException("cValue = %v", cValue)
 				}
 				break
 			default:
-				return result, gozxing.GetFormatExceptionInstance()
+				return result, gozxing.NewFormatException("shift = %v", shift)
 			}
 		}
 	}
@@ -398,7 +398,7 @@ func decodeAnsiX12Segment(bits *common.BitSource, result []byte) ([]byte, error)
 				} else if cValue < 40 { // A - Z
 					result = append(result, byte(cValue+51))
 				} else {
-					return result, gozxing.GetFormatExceptionInstance()
+					return result, gozxing.NewFormatException("cValue = %v", cValue)
 				}
 				break
 			}
@@ -467,14 +467,14 @@ func decodeBase256Segment(bits *common.BitSource, result []byte, byteSegments []
 
 	// We're seeing NegativeArraySizeException errors from users.
 	if count < 0 {
-		return result, byteSegments, gozxing.GetFormatExceptionInstance()
+		return result, byteSegments, gozxing.NewFormatException("count = %v", count)
 	}
 	bytes := make([]byte, count)
 	for i := 0; i < count; i++ {
 		// Have seen this particular error in the wild, such as at
 		// http://www.bcgen.com/demo/IDAutomationStreamingDataMatrix.aspx?MODE=3&D=Fred&PFMT=3&PT=F&X=0.3&O=0&LM=0.2
 		if bits.Available() < 8 {
-			return result, byteSegments, gozxing.GetFormatExceptionInstance()
+			return result, byteSegments, gozxing.NewFormatException("bits.Available = %v", bits.Available())
 		}
 		b, _ := bits.ReadBits(8)
 		bytes[i] = byte(unrandomize255State(b, codewordPosition))
@@ -484,7 +484,8 @@ func decodeBase256Segment(bits *common.BitSource, result []byte, byteSegments []
 
 	str, e := charmap.ISO8859_1.NewDecoder().Bytes(bytes)
 	if e != nil {
-		return result, byteSegments, fmt.Errorf("Platform does not support required encoding: %v", e)
+		return result, byteSegments, gozxing.NewFormatException(
+			"Platform does not support required encoding: %v", e)
 	}
 	result = append(result, str...)
 

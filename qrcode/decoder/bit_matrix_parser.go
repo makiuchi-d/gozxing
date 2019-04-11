@@ -14,7 +14,7 @@ type BitMatrixParser struct {
 func NewBitMatrixParser(bitMatrix *gozxing.BitMatrix) (*BitMatrixParser, error) {
 	dimension := bitMatrix.GetHeight()
 	if dimension < 21 || (dimension&0x03) != 1 {
-		return nil, gozxing.GetFormatExceptionInstance()
+		return nil, gozxing.NewFormatException("dimension = %v", dimension)
 	}
 	return &BitMatrixParser{bitMatrix: bitMatrix}, nil
 }
@@ -53,7 +53,7 @@ func (this *BitMatrixParser) ReadFormatInformation() (*FormatInformation, error)
 	if this.parsedFormatInfo != nil {
 		return this.parsedFormatInfo, nil
 	}
-	return nil, gozxing.GetFormatExceptionInstance()
+	return nil, gozxing.NewFormatException("failed to parse format info")
 }
 
 func (this *BitMatrixParser) ReadVersion() (*Version, error) {
@@ -95,7 +95,7 @@ func (this *BitMatrixParser) ReadVersion() (*Version, error) {
 		return theParsedVersion, nil
 	}
 
-	return nil, gozxing.GetFormatExceptionInstance()
+	return nil, gozxing.WrapFormatException(e)
 }
 
 func (this *BitMatrixParser) copyBit(i, j, versionBits int) int {
@@ -119,7 +119,7 @@ func (this *BitMatrixParser) ReadCodewords() ([]byte, error) {
 	}
 	version, e := this.ReadVersion()
 	if e != nil {
-		return nil, e
+		return nil, gozxing.WrapFormatException(e)
 	}
 
 	// Get the data mask for the format used in this QR Code. This will exclude
@@ -130,7 +130,7 @@ func (this *BitMatrixParser) ReadCodewords() ([]byte, error) {
 
 	functionPattern, e := version.buildFunctionPattern()
 	if e != nil {
-		return nil, e
+		return nil, gozxing.WrapFormatException(e)
 	}
 
 	readingUp := true
@@ -173,7 +173,8 @@ func (this *BitMatrixParser) ReadCodewords() ([]byte, error) {
 		readingUp = !readingUp // readingUp ^= true; // switch directions
 	}
 	if resultOffset != version.GetTotalCodewords() {
-		return nil, gozxing.GetFormatExceptionInstance()
+		return nil, gozxing.NewFormatException(
+			"resultOffset=%v, totalCodeWords=%v", resultOffset, version.GetTotalCodewords())
 	}
 	return result, nil
 }

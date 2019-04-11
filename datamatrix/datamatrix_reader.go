@@ -38,7 +38,7 @@ func (r *DataMatrixReader) Decode(image *gozxing.BinaryBitmap, hints map[gozxing
 	if _, ok := hints[gozxing.DecodeHintType_PURE_BARCODE]; ok {
 		blackm, e := image.GetBlackMatrix()
 		if e != nil {
-			return nil, e
+			return nil, gozxing.WrapReaderException(e)
 		}
 		bits, e := extractPureBits(blackm)
 		if e != nil {
@@ -52,7 +52,7 @@ func (r *DataMatrixReader) Decode(image *gozxing.BinaryBitmap, hints map[gozxing
 	} else {
 		blackm, e := image.GetBlackMatrix()
 		if e != nil {
-			return nil, e
+			return nil, gozxing.WrapReaderException(e)
 		}
 		detector, e := detector.NewDetector(blackm)
 		if e != nil {
@@ -94,7 +94,8 @@ func extractPureBits(image *gozxing.BitMatrix) (*gozxing.BitMatrix, error) {
 	leftTopBlack := image.GetTopLeftOnBit()
 	rightBottomBlack := image.GetBottomRightOnBit()
 	if leftTopBlack == nil || rightBottomBlack == nil {
-		return nil, gozxing.GetNotFoundExceptionInstance()
+		return nil, gozxing.NewNotFoundException(
+			"leftTopBlack=%v, rightBottomBlack=%v", leftTopBlack, rightBottomBlack)
 	}
 
 	moduleSize, e := moduleSize(leftTopBlack, image)
@@ -110,7 +111,8 @@ func extractPureBits(image *gozxing.BitMatrix) (*gozxing.BitMatrix, error) {
 	matrixWidth := (right - left + 1) / moduleSize
 	matrixHeight := (bottom - top + 1) / moduleSize
 	if matrixWidth <= 0 || matrixHeight <= 0 {
-		return nil, gozxing.GetNotFoundExceptionInstance()
+		return nil, gozxing.NewNotFoundException(
+			"matrixWidth=%v, matrixHeight=%v", matrixWidth, matrixHeight)
 	}
 
 	// Push in the "border" by half the module width so that we start
@@ -141,12 +143,12 @@ func moduleSize(leftTopBlack []int, image *gozxing.BitMatrix) (int, error) {
 		x++
 	}
 	if x == width {
-		return 0, gozxing.GetNotFoundExceptionInstance()
+		return 0, gozxing.NewNotFoundException("x == width, %v", x)
 	}
 
 	moduleSize := x - leftTopBlack[0]
 	if moduleSize == 0 {
-		return 0, gozxing.GetNotFoundExceptionInstance()
+		return 0, gozxing.NewNotFoundException("moduleSize == 0")
 	}
 	return moduleSize, nil
 }
