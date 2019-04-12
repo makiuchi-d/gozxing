@@ -382,7 +382,7 @@ func embedTimingPatterns(matrix *ByteMatrix) {
 	// -8 is for skipping position detection patterns (size 7), and two horizontal/vertical
 	// separation patterns (size 1). Thus, 8 = 7 + 1.
 	for i := 8; i < matrix.GetWidth()-8; i++ {
-		bit := int8(i+1) % 2
+		bit := int8((i + 1) % 2)
 		// Horizontal line.
 		if isEmpty(matrix.Get(i, 6)) {
 			matrix.Set(i, 6, bit)

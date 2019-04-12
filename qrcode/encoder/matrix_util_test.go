@@ -515,3 +515,28 @@ func TestMatrixUtil_buildMatrix(t *testing.T) {
 		}
 	}
 }
+
+func TestEmbedTimingPatterns(t *testing.T) {
+	version, _ := decoder.Version_GetVersionForNumber(40)
+	dimension := version.GetDimensionForVersion()
+	matrix := NewByteMatrix(dimension, dimension)
+	matrix.Clear(-1)
+
+	embedTimingPatterns(matrix)
+
+	for i := 8; i < matrix.GetWidth()-8; i++ {
+		bit := matrix.Get(i, 6)
+		wants := (i + 1) % 2
+		if bit != int8(wants) {
+			t.Fatalf("matrix(%d,6) = %v, wants %v", i, bit, wants)
+		}
+	}
+
+	for i := 8; i < matrix.GetHeight()-8; i++ {
+		bit := matrix.Get(6, i)
+		wants := (i + 1) % 2
+		if bit != int8(wants) {
+			t.Fatalf("matrix(6, %d) = %v, wants %v", i, bit, wants)
+		}
+	}
+}
