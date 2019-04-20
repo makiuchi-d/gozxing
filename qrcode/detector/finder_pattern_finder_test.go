@@ -374,6 +374,17 @@ func TestFinderPatternFinder_SelectBestPatterns(t *testing.T) {
 	}
 
 	f.possibleCenters = []*FinderPattern{
+		NewFinderPattern(20, 10, 4, 2),
+		NewFinderPattern(10, 10, 2, 2),
+		NewFinderPattern(10, 20, 2, 2),
+		NewFinderPattern(20, 20, 4, 2),
+	}
+	_, e = f.SelectBestPatterns()
+	if _, ok := e.(gozxing.NotFoundException); !ok {
+		t.Fatalf("SelectBestPatterns must be NotFoundException, %v", e)
+	}
+
+	f.possibleCenters = []*FinderPattern{
 		NewFinderPattern(20, 5, 2, 2),
 		NewFinderPattern(10, 10, 2, 2),
 		NewFinderPattern(10, 20, 2, 2),
@@ -386,13 +397,69 @@ func TestFinderPatternFinder_SelectBestPatterns(t *testing.T) {
 		t.Fatalf("SelectBestPatterns returns error, %v", e)
 	}
 
-	expect1 := NewFinderPattern(20, 5, 2, 2)
+	expect1 := NewFinderPattern(20, 10, 2, 1)
 	expect2 := NewFinderPattern(10, 10, 2, 2)
 	expect3 := NewFinderPattern(10, 20, 2, 2)
 
 	for _, fp := range r {
 		if *fp != *expect1 && *fp != *expect2 && *fp != *expect3 {
 			t.Fatalf("%v is not contained, [%v, %v, %v]", fp, expect1, expect2, expect3)
+		}
+	}
+}
+
+func TestFinderPatternFinder_SelectBestPatterns2(t *testing.T) {
+
+	tests := []struct {
+		input []*FinderPattern
+		wants []*FinderPattern
+	}{
+		{
+			input: []*FinderPattern{
+				NewFinderPattern(60, 60, 8, 2),
+				NewFinderPattern(1420, 60, 8, 2),
+				NewFinderPattern(304, 1352, 9.142857, 4),
+				NewFinderPattern(60, 1420, 8, 12),
+			},
+			wants: []*FinderPattern{
+				NewFinderPattern(60, 60, 8, 2),
+				NewFinderPattern(1420, 60, 8, 2),
+				NewFinderPattern(60, 1420, 8, 12),
+			},
+		},
+		{
+			input: []*FinderPattern{
+				NewFinderPattern(60, 63.5, 4.857142857142857, 2),
+				NewFinderPattern(203, 61.5, 3.6428571428571432, 2),
+				NewFinderPattern(74, 157, 7, 1),
+				NewFinderPattern(54.5, 216, 4.214285714285714, 6),
+			},
+			wants: []*FinderPattern{
+				NewFinderPattern(203, 61.5, 3.6428571428571432, 2),
+				NewFinderPattern(54.5, 216, 4.214285714285714, 6),
+				NewFinderPattern(60, 63.5, 4.857142857142857, 2),
+			},
+		},
+	}
+
+	for i, test := range tests {
+		finder := &FinderPatternFinder{
+			possibleCenters: test.input,
+		}
+
+		ptns, e := finder.SelectBestPatterns()
+		if e != nil {
+			t.Fatalf("[%d] SelectBestPatterns returns error: %v", i, e)
+		}
+		if len(ptns) != 3 {
+			t.Fatalf("[%d] result count = %v, wants 3", i, len(ptns))
+		}
+
+		for _, p := range test.wants {
+			if *ptns[0] != *p && *ptns[1] != *p && *ptns[2] != *p {
+				t.Fatalf("[%d] result = [%v, %v, %v], must contains %v",
+					i, ptns[0], ptns[1], ptns[2], p)
+			}
 		}
 	}
 }
@@ -466,8 +533,8 @@ func TestFinderPatternFinder_Find2(t *testing.T) {
 	}
 
 	// touch to edge
-	makePattern(image, 10, 36, 1)
-	makePattern(image, 36, 36, 1)
+	makePattern(image, 10, 32, 2)
+	makePattern(image, 32, 32, 2)
 
 	fi, e = f.Find(nil)
 	if e != nil {
@@ -475,8 +542,8 @@ func TestFinderPatternFinder_Find2(t *testing.T) {
 	}
 
 	expect := FinderPatternInfo{
-		bottomLeft: NewFinderPattern(36.5, 36.5, 1, 2),
-		topLeft:    NewFinderPattern(10.5, 36.5, 1, 2),
+		bottomLeft: NewFinderPattern(33, 33, 2, 2),
+		topLeft:    NewFinderPattern(11, 33, 2, 2),
 		topRight:   NewFinderPattern(11, 11, 2, 6),
 	}
 

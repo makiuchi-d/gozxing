@@ -443,63 +443,75 @@ func (f *FinderPatternFinder) HaveMultiplyConfirmedCenters() bool {
 	return totalDeviation <= 0.05*totalModuleSize
 }
 
+// squaredDistance get square of distance between a and b.
+func squaredDistance(a, b *FinderPattern) float64 {
+	x := a.GetX() - b.GetX()
+	y := a.GetY() - b.GetY()
+	return x*x + y*y
+}
+
+// SelectBestPatterns return the 3 best {@link FinderPattern}s from our list of candidates.
+// The "best" are those have similar module size and form a shape closer to a isosceles right triangle.
+// @throws NotFoundException if 3 such finder patterns do not exist
 func (f *FinderPatternFinder) SelectBestPatterns() ([]*FinderPattern, gozxing.NotFoundException) {
 	startSize := float64(len(f.possibleCenters))
 	if startSize < 3 {
 		return nil, gozxing.NewNotFoundException("startSize = %v", startSize)
 	}
 
-	if startSize > 3 {
-		totalModuleSize := 0.0
-		square := 0.0
-		for _, center := range f.possibleCenters {
-			size := center.GetEstimatedModuleSize()
-			totalModuleSize += size
-			square += size * size
-		}
-		average := totalModuleSize / startSize
-		stdDev := math.Sqrt(square/startSize - average*average)
+	sort.Slice(f.possibleCenters, estimatedModuleComparator(f.possibleCenters))
 
-		sort.Slice(f.possibleCenters, func(i, j int) bool {
-			a := math.Abs(f.possibleCenters[i].GetEstimatedModuleSize() - average)
-			b := math.Abs(f.possibleCenters[j].GetEstimatedModuleSize() - average)
-			return b < a
-		})
+	distortion := math.MaxFloat64
+	squares := sort.Float64Slice{0, 0, 0}
+	bestPatterns := []*FinderPattern{nil, nil, nil}
 
-		limit := math.Max(0.2*average, stdDev)
+	for i := 0; i < len(f.possibleCenters)-2; i++ {
+		fpi := f.possibleCenters[i]
+		minModuleSize := fpi.GetEstimatedModuleSize()
 
-		for i := 0; i < len(f.possibleCenters) && len(f.possibleCenters) > 3; i++ {
-			pattern := f.possibleCenters[i]
-			if math.Abs(pattern.GetEstimatedModuleSize()-average) > limit {
-				f.possibleCenters = append(f.possibleCenters[:i], f.possibleCenters[i+1:]...)
-				i--
+		for j := i + 1; j < len(f.possibleCenters)-1; j++ {
+			fpj := f.possibleCenters[j]
+			square0 := squaredDistance(fpi, fpj)
+
+			for k := j + 1; k < len(f.possibleCenters); k++ {
+				fpk := f.possibleCenters[k]
+				maxModuleSize := fpk.GetEstimatedModuleSize()
+				if maxModuleSize > minModuleSize*1.4 {
+					// module size is not similar
+					continue
+				}
+
+				squares[0] = square0
+				squares[1] = squaredDistance(fpj, fpk)
+				squares[2] = squaredDistance(fpi, fpk)
+				sort.Sort(squares)
+
+				// a^2 + b^2 = c^2 (Pythagorean theorem), and a = b (isosceles triangle).
+				// Since any right triangle satisfies the formula c^2 - b^2 - a^2 = 0,
+				// we need to check both two equal sides separately.
+				// The value of |c^2 - 2 * b^2| + |c^2 - 2 * a^2| increases as dissimilarity
+				// from isosceles right triangle.
+				d := math.Abs(squares[2]-2*squares[1]) + math.Abs(squares[2]-2*squares[0])
+				if d < distortion {
+					distortion = d
+					bestPatterns[0] = fpi
+					bestPatterns[1] = fpj
+					bestPatterns[2] = fpk
+				}
 			}
 		}
 	}
 
-	if len(f.possibleCenters) > 3 {
-		totalModuleSize := 0.0
-		for _, possibleCenter := range f.possibleCenters {
-			totalModuleSize += possibleCenter.GetEstimatedModuleSize()
-		}
-
-		average := totalModuleSize / float64(len(f.possibleCenters))
-
-		sort.Slice(f.possibleCenters, func(i, j int) bool {
-			center1 := f.possibleCenters[i]
-			center2 := f.possibleCenters[j]
-
-			countCompare := center2.GetCount() - center1.GetCount()
-			if countCompare == 0 {
-				a := math.Abs(f.possibleCenters[i].GetEstimatedModuleSize() - average)
-				b := math.Abs(f.possibleCenters[j].GetEstimatedModuleSize() - average)
-				return a < b
-			}
-			return countCompare < 0
-		})
-
-		f.possibleCenters = f.possibleCenters[:3]
+	if distortion == math.MaxFloat64 {
+		return nil, gozxing.NewNotFoundException("module size is too different")
 	}
 
-	return f.possibleCenters, nil
+	return bestPatterns, nil
+}
+
+// estimatedModuleComparator Orders by FinderPatternFinder#getEstimatedModuleSize()
+func estimatedModuleComparator(patterns []*FinderPattern) func(int, int) bool {
+	return func(i, j int) bool {
+		return patterns[j].GetEstimatedModuleSize() > patterns[i].GetEstimatedModuleSize()
+	}
 }
