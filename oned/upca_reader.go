@@ -27,6 +27,13 @@ func (this *upcAReader) decodeRow(rowNumber int, row *gozxing.BitArray, hints ma
 	return maybeReturnResult(this.OneDReader.decodeRow(rowNumber, row, hints))
 }
 
+func (this *upcAReader) decodeRowWithStartRange(
+	rowNumber int, row *gozxing.BitArray, startGuardRange []int,
+	hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
+	decoder := this.OneDReader.rowDecoder.(*upceanReader)
+	return maybeReturnResult(decoder.decodeRowWithStartRange(rowNumber, row, startGuardRange, hints))
+}
+
 func (this *upcAReader) DecodeWithoutHints(image *gozxing.BinaryBitmap) (*gozxing.Result, error) {
 	return maybeReturnResult(this.OneDReader.DecodeWithoutHints(image))
 }
