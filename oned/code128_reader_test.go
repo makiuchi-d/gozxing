@@ -89,8 +89,8 @@ func TestCode128DecodeCode(t *testing.T) {
 	}
 }
 
-func TestCode128RowDecoder_decodeRowFail(t *testing.T) {
-	dec := code128RowDecoder{}
+func TestCode128Reader_decodeRowFail(t *testing.T) {
+	dec := NewCode128Reader().(*code128Reader)
 
 	row := testutil.NewBitArrayFromString("00010000000110100100100100")
 	_, e := dec.decodeRow(10, row, nil)
@@ -138,8 +138,8 @@ func TestCode128RowDecoder_decodeRowFail(t *testing.T) {
 	}
 }
 
-func TestCode128RowDecoder_decodeRowCodeA(t *testing.T) {
-	dec := code128RowDecoder{}
+func TestCode128Reader_decodeRowCodeA(t *testing.T) {
+	dec := NewCode128Reader().(*code128Reader)
 	hint := map[gozxing.DecodeHintType]interface{}{
 		gozxing.DecodeHintType_ASSUME_GS1: true,
 	}
@@ -182,8 +182,8 @@ func TestCode128RowDecoder_decodeRowCodeA(t *testing.T) {
 	}
 }
 
-func TestCode128RowDecoder_decodeRowCodeB(t *testing.T) {
-	dec := code128RowDecoder{}
+func TestCode128Reader_decodeRowCodeB(t *testing.T) {
+	dec := NewCode128Reader().(*code128Reader)
 	hint := map[gozxing.DecodeHintType]interface{}{
 		gozxing.DecodeHintType_ASSUME_GS1: true,
 	}
@@ -226,8 +226,8 @@ func TestCode128RowDecoder_decodeRowCodeB(t *testing.T) {
 	}
 }
 
-func TestCode128RowDecoder_decodeRowCodeC(t *testing.T) {
-	dec := code128RowDecoder{}
+func TestCode128Reader_decodeRowCodeC(t *testing.T) {
+	dec := NewCode128Reader().(*code128Reader)
 	hint := map[gozxing.DecodeHintType]interface{}{
 		gozxing.DecodeHintType_ASSUME_GS1: true,
 	}

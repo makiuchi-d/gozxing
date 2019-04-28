@@ -7,7 +7,7 @@ import (
 )
 
 func TestEan8Reader_getBarcodeFormat(t *testing.T) {
-	reader := &ean8Reader{}
+	reader := NewEAN8Reader().(*ean8Reader)
 	f := reader.getBarcodeFormat()
 	if f != gozxing.BarcodeFormat_EAN_8 {
 		t.Fatalf("getBarcodeFormat = %v, expect EAN_8", f)
@@ -15,7 +15,7 @@ func TestEan8Reader_getBarcodeFormat(t *testing.T) {
 }
 
 func TestEan8Reader_decodeMiddle(t *testing.T) {
-	reader := &ean8Reader{make([]int, 4)}
+	reader := NewEAN8Reader().(*ean8Reader)
 	result := make([]byte, 0, 8)
 	row := gozxing.NewBitArray(70)
 	startRange := []int{3, 6}

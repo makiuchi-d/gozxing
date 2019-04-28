@@ -8,11 +8,7 @@ import (
 
 // OneDReader Encapsulates functionality and implementation that is common to all families
 // of one-dimensional barcodes.
-type OneDReader struct {
-	rowDecoder
-}
-
-type rowDecoder interface {
+type oneDReader struct {
 	// decodeRow Attempts to decode a one-dimensional barcode format given a single row of an image
 	// @param rowNumber row number from top of the row
 	// @param row the black/white pixel data of the row
@@ -21,21 +17,19 @@ type rowDecoder interface {
 	// @throws NotFoundException if no potential barcode is found
 	// @throws ChecksumException if a potential barcode is found but does not pass its checksum
 	// @throws FormatException if a potential barcode is found but format is invalid
-	decodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error)
+	decodeRow func(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error)
 }
 
-func NewOneDReader(decoder rowDecoder) *OneDReader {
-	return &OneDReader{
-		rowDecoder: decoder,
-	}
+func newOneDReader() *oneDReader {
+	return &oneDReader{}
 }
 
-func (this *OneDReader) DecodeWithoutHints(image *gozxing.BinaryBitmap) (*gozxing.Result, error) {
+func (this *oneDReader) DecodeWithoutHints(image *gozxing.BinaryBitmap) (*gozxing.Result, error) {
 	return this.Decode(image, nil)
 }
 
 // Decode Note that we don't try rotation without the try harder flag, even if rotation was supported.
-func (this *OneDReader) Decode(
+func (this *oneDReader) Decode(
 	image *gozxing.BinaryBitmap, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
 
 	result, e := this.doDecode(image, hints)
@@ -80,7 +74,7 @@ func (this *OneDReader) Decode(
 	return result, nil
 }
 
-func (this *OneDReader) Reset() {
+func (this *oneDReader) Reset() {
 	// do nothing
 }
 
@@ -96,7 +90,7 @@ func (this *OneDReader) Reset() {
 // @param hints Any hints that were requested
 // @return The contents of the decoded barcode
 // @throws NotFoundException Any spontaneous errors which occur
-func (this *OneDReader) doDecode(
+func (this *oneDReader) doDecode(
 	image *gozxing.BinaryBitmap, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
 
 	width := image.GetWidth()

@@ -89,8 +89,8 @@ func TestCode93ToPattern(t *testing.T) {
 	}
 }
 
-func TestCode93RowDecoder_findAsteriskPattern(t *testing.T) {
-	dec := &code93RowDecoder{make([]byte, 0, 20), make([]int, 6)}
+func TestCode93Reader_findAsteriskPattern(t *testing.T) {
+	dec := NewCode93Reader().(*code93Reader)
 
 	row := testutil.NewBitArrayFromString("00001000101101101111111")
 	_, _, e := dec.findAsteriskPattern(row)
@@ -108,8 +108,8 @@ func TestCode93RowDecoder_findAsteriskPattern(t *testing.T) {
 	}
 }
 
-func TestCode93RowDecoder_decodeRow(t *testing.T) {
-	dec := &code93RowDecoder{make([]byte, 0, 20), make([]int, 6)}
+func TestCode93Reader_decodeRow(t *testing.T) {
+	dec := NewCode93Reader().(*code93Reader)
 
 	// no start asterisk
 	row := testutil.NewBitArrayFromString("00001010100000")

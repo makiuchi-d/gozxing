@@ -8,7 +8,7 @@ import (
 )
 
 func TestMultiFormatUPCEANReader_decodeRow(t *testing.T) {
-	reader := NewMultiFormatUPCEANReader(nil).(*OneDReader).rowDecoder
+	reader := NewMultiFormatUPCEANReader(nil).(*multiFormatUPCEANReader)
 
 	row := gozxing.NewBitArray(30)
 

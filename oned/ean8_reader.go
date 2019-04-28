@@ -5,13 +5,20 @@ import (
 )
 
 type ean8Reader struct {
+	*upceanReader
 	decodeMiddleCounters []int
 }
 
 func NewEAN8Reader() gozxing.Reader {
-	return NewOneDReader(NewUPCEANReader(&ean8Reader{
+	this := &ean8Reader{
+		upceanReader:         newUPCEANReader(),
 		decodeMiddleCounters: make([]int, 4),
-	}))
+	}
+	this.upceanReader.getBarcodeFormat = this.getBarcodeFormat
+	this.upceanReader.decodeMiddle = this.decodeMiddle
+	this.upceanReader.decodeEnd = this.decodeEnd
+	this.upceanReader.checkChecksum = this.checkChecksum
+	return this
 }
 
 func (this *ean8Reader) decodeMiddle(row *gozxing.BitArray, startRange []int, result []byte) (int, []byte, error) {

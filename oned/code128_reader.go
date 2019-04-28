@@ -138,10 +138,16 @@ const (
 	code128CODE_STOP    = 106
 )
 
-type code128RowDecoder struct{}
+type code128Reader struct {
+	*oneDReader
+}
 
 func NewCode128Reader() gozxing.Reader {
-	return NewOneDReader(code128RowDecoder{})
+	this := &code128Reader{
+		oneDReader: newOneDReader(),
+	}
+	this.oneDReader.decodeRow = this.decodeRow
+	return this
 }
 
 func code128FindStartPattern(row *gozxing.BitArray) ([]int, error) {
@@ -213,7 +219,7 @@ func code128DecodeCode(row *gozxing.BitArray, counters []int, rowOffset int) (in
 	}
 }
 
-func (code128RowDecoder) decodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
+func (*code128Reader) decodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
 
 	_, convertFNC1 := hints[gozxing.DecodeHintType_ASSUME_GS1]
 

@@ -93,8 +93,8 @@ func TestCode39FindAsteriskPattern(t *testing.T) {
 	}
 }
 
-func TestCode39RowDecoder_decodeRow(t *testing.T) {
-	dec := &code39RowDecoder{false, false, make([]byte, 0, 20), make([]int, 9)}
+func TestCode39Reader_decodeRow(t *testing.T) {
+	dec := NewCode39Reader().(*code39Reader)
 
 	// no start asterisk
 	src := testutil.NewBitArrayFromString("0000000")
@@ -159,8 +159,8 @@ func TestCode39RowDecoder_decodeRow(t *testing.T) {
 	}
 }
 
-func TestCode39RowDecoder_decodeRowWithExtendedModeCheckDigit(t *testing.T) {
-	dec := &code39RowDecoder{true, true, make([]byte, 0, 20), make([]int, 9)}
+func TestCode39Reader_decodeRowWithExtendedModeCheckDigit(t *testing.T) {
+	dec := NewCode39ReaderWithFlags(true, true).(*code39Reader)
 
 	// *AA*, checkdigit=20 => 'K'
 	src := testutil.NewBitArrayFromString("000" + "1001011011010" +
@@ -170,7 +170,6 @@ func TestCode39RowDecoder_decodeRowWithExtendedModeCheckDigit(t *testing.T) {
 	if _, ok := e.(gozxing.ChecksumException); !ok {
 		t.Fatalf("decodeRow must be ChecksumException, %T", e)
 	}
-
 	// *+0* (invalid extended string), checkdigit=41 =>'+'
 	src = testutil.NewBitArrayFromString("000" + "1001011011010" +
 		"1001010010010" + "1010011011010" + "1001010010010" + // +0+

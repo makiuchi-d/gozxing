@@ -27,19 +27,23 @@ var code93CharacterEncodings = []int{
 
 var code93AsteriskEncoding = code93CharacterEncodings[47]
 
-type code93RowDecoder struct {
+type code93Reader struct {
+	*oneDReader
 	decodeRowResult []byte
 	counters        []int
 }
 
 func NewCode93Reader() gozxing.Reader {
-	return NewOneDReader(&code93RowDecoder{
+	this := &code93Reader{
+		oneDReader:      newOneDReader(),
 		decodeRowResult: make([]byte, 0, 20),
 		counters:        make([]int, 6),
-	})
+	}
+	this.oneDReader.decodeRow = this.decodeRow
+	return this
 }
 
-func (this *code93RowDecoder) decodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
+func (this *code93Reader) decodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
 
 	startLeft, startRight, e := this.findAsteriskPattern(row)
 	if e != nil {
@@ -120,7 +124,7 @@ func (this *code93RowDecoder) decodeRow(rowNumber int, row *gozxing.BitArray, hi
 		gozxing.BarcodeFormat_CODE_93), nil
 }
 
-func (this *code93RowDecoder) findAsteriskPattern(row *gozxing.BitArray) (int, int, error) {
+func (this *code93Reader) findAsteriskPattern(row *gozxing.BitArray) (int, int, error) {
 	width := row.GetSize()
 	rowOffset := row.GetNextSet(0)
 

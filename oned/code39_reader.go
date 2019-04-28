@@ -24,7 +24,8 @@ var code39CharacterEncodings = []int{
 
 const code39AsteriskEncoding = 0x094
 
-type code39RowDecoder struct {
+type code39Reader struct {
+	*oneDReader
 	usingCheckDigit bool
 	extendedMode    bool
 	decodeRowResult []byte
@@ -55,15 +56,18 @@ func NewCode39ReaderWithCheckDigitFlag(usingCheckDigit bool) gozxing.Reader {
 // @param extendedMode if true, will attempt to decode extended Code 39 sequences in the
 // text.
 func NewCode39ReaderWithFlags(usingCheckDigit, extendedMode bool) gozxing.Reader {
-	return NewOneDReader(&code39RowDecoder{
+	this := &code39Reader{
+		oneDReader:      newOneDReader(),
 		usingCheckDigit: usingCheckDigit,
 		extendedMode:    extendedMode,
 		decodeRowResult: make([]byte, 0, 20),
 		counters:        make([]int, 9),
-	})
+	}
+	this.oneDReader.decodeRow = this.decodeRow
+	return this
 }
 
-func (this *code39RowDecoder) decodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
+func (this *code39Reader) decodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
 
 	theCounters := this.counters
 	for i := range theCounters {

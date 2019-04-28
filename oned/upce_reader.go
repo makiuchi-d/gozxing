@@ -43,13 +43,20 @@ var upce_NUMSYS_AND_CHECK_DIGIT_PATTERNS = [][]int{
 }
 
 type upcEReader struct {
+	*upceanReader
 	decodeMiddleCounters []int
 }
 
 func NewUPCEReader() gozxing.Reader {
-	return NewOneDReader(NewUPCEANReader(&upcEReader{
+	this := &upcEReader{
+		upceanReader:         newUPCEANReader(),
 		decodeMiddleCounters: make([]int, 4),
-	}))
+	}
+	this.upceanReader.getBarcodeFormat = this.getBarcodeFormat
+	this.upceanReader.decodeMiddle = this.decodeMiddle
+	this.upceanReader.decodeEnd = this.decodeEnd
+	this.upceanReader.checkChecksum = this.checkChecksum
+	return this
 }
 
 func (this *upcEReader) decodeMiddle(row *gozxing.BitArray, startRange []int, result []byte) (int, []byte, error) {

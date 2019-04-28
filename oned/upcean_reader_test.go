@@ -132,8 +132,20 @@ func TestUPCEANReader_decodeDigit(t *testing.T) {
 }
 
 type testMiddleDecoder struct {
+	*upceanReader
 	data  []byte
 	ean13 bool
+}
+
+func newTestMiddleDecoder(data []byte, ean13 bool) *testMiddleDecoder {
+	this := &testMiddleDecoder{
+		newUPCEANReader(), data, ean13,
+	}
+	this.upceanReader.getBarcodeFormat = this.getBarcodeFormat
+	this.upceanReader.decodeMiddle = this.decodeMiddle
+	this.upceanReader.decodeEnd = this.decodeEnd
+	this.upceanReader.checkChecksum = this.checkChecksum
+	return this
 }
 
 func (t *testMiddleDecoder) decodeMiddle(row *gozxing.BitArray, startRange []int, result []byte) (int, []byte, error) {
@@ -157,10 +169,9 @@ func (this *testMiddleDecoder) checkChecksum(s string) (bool, error) {
 }
 
 func TestUPCEANReader_decodeRow(t *testing.T) {
-
 	// no start guard
 	row := gozxing.NewBitArray(13)
-	reader := NewUPCEANReader(&testMiddleDecoder{[]byte{}, false})
+	reader := newTestMiddleDecoder([]byte{}, false)
 	_, e := reader.decodeRow(5, row, nil)
 	if e == nil {
 		t.Fatalf("decodeRow must be error")
@@ -176,7 +187,7 @@ func TestUPCEANReader_decodeRow(t *testing.T) {
 
 	// no end guard
 	data := []byte{'0', '1', '2'}
-	reader = NewUPCEANReader(&testMiddleDecoder{data, false})
+	reader = newTestMiddleDecoder(data, false)
 	_, e = reader.decodeRow(5, row, nil)
 	if e == nil {
 		t.Fatalf("decodeRow must be error")
@@ -211,7 +222,7 @@ func TestUPCEANReader_decodeRow(t *testing.T) {
 
 	// checksum calc error
 	data = []byte("a1234567")
-	reader = NewUPCEANReader(&testMiddleDecoder{data, false})
+	reader = newTestMiddleDecoder(data, false)
 	row.Set(15)
 	row.Set(17)
 	_, e = reader.decodeRow(5, row, nil)
@@ -221,7 +232,7 @@ func TestUPCEANReader_decodeRow(t *testing.T) {
 
 	// checksum error
 	data = []byte("01234567")
-	reader = NewUPCEANReader(&testMiddleDecoder{data, false})
+	reader = newTestMiddleDecoder(data, false)
 	_, e = reader.decodeRow(5, row, nil)
 	if _, ok := e.(gozxing.ChecksumException); !ok {
 		t.Fatalf("decodeRow must be ChecksumException, %T", e)
@@ -229,7 +240,7 @@ func TestUPCEANReader_decodeRow(t *testing.T) {
 
 	// success
 	data = []byte("01234565")
-	reader = NewUPCEANReader(&testMiddleDecoder{data, false})
+	reader = newTestMiddleDecoder(data, false)
 	result, e := reader.decodeRow(5, row, nil)
 	if e != nil {
 		t.Fatalf("decodeRow returns error, %v", e)
@@ -256,7 +267,7 @@ func TestUPCEANReader_decodeRowWithResultPointCallback(t *testing.T) {
 	row.Set(15)
 	row.Set(17)
 	data := []byte("01234565")
-	reader := NewUPCEANReader(&testMiddleDecoder{data, false})
+	reader := newTestMiddleDecoder(data, false)
 
 	points := make([]gozxing.ResultPoint, 0)
 	callback := gozxing.ResultPointCallback(func(p gozxing.ResultPoint) {
@@ -303,7 +314,7 @@ func TestUPCEANReader_decodeRowWithExtension(t *testing.T) {
 	row.Set(50)
 
 	data := []byte("01234565")
-	reader := NewUPCEANReader(&testMiddleDecoder{data, false})
+	reader := newTestMiddleDecoder(data, false)
 
 	hints := make(map[gozxing.DecodeHintType]interface{})
 	hints[gozxing.DecodeHintType_ALLOWED_EAN_EXTENSIONS] = []int{5}
@@ -342,7 +353,7 @@ func TestUPCEANReader_decodeRowEAN13(t *testing.T) {
 	row.Set(31)
 
 	data := []byte("0123456789012")
-	reader := NewUPCEANReader(&testMiddleDecoder{data, true})
+	reader := newTestMiddleDecoder(data, true)
 	result, e := reader.decodeRow(7, row, nil)
 	if e != nil {
 		t.Fatalf("decodeRow returns error, %v", e)

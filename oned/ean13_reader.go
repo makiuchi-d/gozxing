@@ -38,13 +38,20 @@ var ean13Reader_FIRST_DIGIT_ENCODINGS = []int{
 }
 
 type ean13Reader struct {
+	*upceanReader
 	decodeMiddleCounters []int
 }
 
 func NewEAN13Reader() gozxing.Reader {
-	return NewOneDReader(NewUPCEANReader(&ean13Reader{
+	this := &ean13Reader{
+		upceanReader:         newUPCEANReader(),
 		decodeMiddleCounters: make([]int, 4),
-	}))
+	}
+	this.upceanReader.getBarcodeFormat = this.getBarcodeFormat
+	this.upceanReader.decodeMiddle = this.decodeMiddle
+	this.upceanReader.decodeEnd = this.decodeEnd
+	this.upceanReader.checkChecksum = this.checkChecksum
+	return this
 }
 
 func (this *ean13Reader) decodeMiddle(row *gozxing.BitArray, startRange []int, resultString []byte) (int, []byte, error) {

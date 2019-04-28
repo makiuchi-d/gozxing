@@ -15,6 +15,7 @@ type upceanDecoder interface {
 }
 
 type multiFormatUPCEANReader struct {
+	*oneDReader
 	readers []upceanDecoder
 }
 
@@ -24,28 +25,31 @@ func NewMultiFormatUPCEANReader(hints map[gozxing.DecodeHintType]interface{}) go
 	var readers []upceanDecoder
 	for _, format := range possibleFormats {
 		if format == gozxing.BarcodeFormat_EAN_13 {
-			readers = append(readers, NewEAN13Reader().(*OneDReader).rowDecoder.(*upceanReader))
+			readers = append(readers, NewEAN13Reader().(*ean13Reader))
 		} else if format == gozxing.BarcodeFormat_UPC_A {
 			readers = append(readers, NewUPCAReader().(*upcAReader))
 		} else if format == gozxing.BarcodeFormat_EAN_8 {
-			readers = append(readers, NewEAN8Reader().(*OneDReader).rowDecoder.(*upceanReader))
+			readers = append(readers, NewEAN8Reader().(*ean8Reader))
 		} else if format == gozxing.BarcodeFormat_UPC_E {
-			readers = append(readers, NewUPCEReader().(*OneDReader).rowDecoder.(*upceanReader))
+			readers = append(readers, NewUPCEReader().(*upcEReader))
 		}
 	}
 
 	if len(readers) == 0 {
 		readers = []upceanDecoder{
-			NewEAN13Reader().(*OneDReader).rowDecoder.(*upceanReader),
+			NewEAN13Reader().(*ean13Reader),
 			// UPC-A is covered by EAN-13
-			NewEAN8Reader().(*OneDReader).rowDecoder.(*upceanReader),
-			NewUPCEReader().(*OneDReader).rowDecoder.(*upceanReader),
+			NewEAN8Reader().(*ean8Reader),
+			NewUPCEReader().(*upcEReader),
 		}
 	}
 
-	return NewOneDReader(&multiFormatUPCEANReader{
-		readers: readers,
-	})
+	this := &multiFormatUPCEANReader{
+		oneDReader: newOneDReader(),
+		readers:    readers,
+	}
+	this.oneDReader.decodeRow = this.decodeRow
+	return this
 }
 
 func (this *multiFormatUPCEANReader) decodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
