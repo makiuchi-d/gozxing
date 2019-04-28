@@ -49,7 +49,7 @@ This project is a port of ZXing core library to pure Go.
 | ByQuadrantReader             |                    |
 | GenericMultipleBarcodeReader |                    |
 | QRCodeMultiReader            | :heavy_check_mark: |
-| MultiFormatUPCEANReader      |                    |
+| MultiFormatUPCEANReader      | :heavy_check_mark: |
 | MultiFormatOneDReader        |                    |
 
 ## Usage Examples
