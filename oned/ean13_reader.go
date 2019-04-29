@@ -44,13 +44,9 @@ type ean13Reader struct {
 
 func NewEAN13Reader() gozxing.Reader {
 	this := &ean13Reader{
-		upceanReader:         newUPCEANReader(),
 		decodeMiddleCounters: make([]int, 4),
 	}
-	this.upceanReader.getBarcodeFormat = this.getBarcodeFormat
-	this.upceanReader.decodeMiddle = this.decodeMiddle
-	this.upceanReader.decodeEnd = this.decodeEnd
-	this.upceanReader.checkChecksum = this.checkChecksum
+	this.upceanReader = newUPCEANReader(this)
 	return this
 }
 

@@ -35,11 +35,10 @@ type code93Reader struct {
 
 func NewCode93Reader() gozxing.Reader {
 	this := &code93Reader{
-		oneDReader:      newOneDReader(),
 		decodeRowResult: make([]byte, 0, 20),
 		counters:        make([]int, 6),
 	}
-	this.oneDReader.decodeRow = this.decodeRow
+	this.oneDReader = newOneDReader(this)
 	return this
 }
 

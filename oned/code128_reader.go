@@ -143,10 +143,8 @@ type code128Reader struct {
 }
 
 func NewCode128Reader() gozxing.Reader {
-	this := &code128Reader{
-		oneDReader: newOneDReader(),
-	}
-	this.oneDReader.decodeRow = this.decodeRow
+	this := &code128Reader{}
+	this.oneDReader = newOneDReader(this)
 	return this
 }
 

@@ -53,15 +53,12 @@ func init() {
 	}
 }
 
-type upceanReader struct {
-	*oneDReader
-
-	decodeRowStringBuffer []byte
-	extensionReader       *UPCEANExtensionSupport
+type upceanRowDecoder interface{
+	rowDecoder
 
 	// getBarcodeFormat Get the format of this decoder.
 	// @return The 1D format.
-	getBarcodeFormat func() gozxing.BarcodeFormat
+	getBarcodeFormat() gozxing.BarcodeFormat
 
 	// decodeMiddle Subclasses override this to decode the portion of a barcode between the start
 	// and end guard patterns.
@@ -71,24 +68,31 @@ type upceanReader struct {
 	// @param resultString {@link StringBuilder} to append decoded chars to
 	// @return horizontal offset of first pixel after the "middle" that was decoded
 	// @throws NotFoundException if decoding could not complete successfully
-	decodeMiddle func(row *gozxing.BitArray, startRange []int, result []byte) (int, []byte, error)
+	decodeMiddle(row *gozxing.BitArray, startRange []int, result []byte) (int, []byte, error)
 
-	decodeEnd func(row *gozxing.BitArray, endStart int) ([]int, error)
+	decodeEnd(row *gozxing.BitArray, endStart int) ([]int, error)
 
 	// checkChecksum Check checksum
 	// @param s string of digits to check
 	// @return {@link #checkStandardUPCEANChecksum(CharSequence)}
 	// @throws FormatException if the string does not contain only digits
-	checkChecksum func(s string) (bool, error)
+	checkChecksum(s string) (bool, error)
 }
 
-func newUPCEANReader() *upceanReader {
+type upceanReader struct {
+	upceanRowDecoder
+	*oneDReader
+	decodeRowStringBuffer []byte
+	extensionReader       *UPCEANExtensionSupport
+}
+
+func newUPCEANReader(rowDecoder upceanRowDecoder) *upceanReader {
 	this := &upceanReader{
-		oneDReader:            newOneDReader(),
+		upceanRowDecoder:      rowDecoder,
 		decodeRowStringBuffer: make([]byte, 13),
 		extensionReader:       NewUPCEANExtensionSupport(),
 	}
-	this.oneDReader.decodeRow = this.decodeRow
+	this.oneDReader = newOneDReader(rowDecoder)
 	return this
 }
 

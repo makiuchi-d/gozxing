@@ -6,9 +6,7 @@ import (
 	"github.com/makiuchi-d/gozxing"
 )
 
-// OneDReader Encapsulates functionality and implementation that is common to all families
-// of one-dimensional barcodes.
-type oneDReader struct {
+type rowDecoder interface {
 	// decodeRow Attempts to decode a one-dimensional barcode format given a single row of an image
 	// @param rowNumber row number from top of the row
 	// @param row the black/white pixel data of the row
@@ -17,11 +15,17 @@ type oneDReader struct {
 	// @throws NotFoundException if no potential barcode is found
 	// @throws ChecksumException if a potential barcode is found but does not pass its checksum
 	// @throws FormatException if a potential barcode is found but format is invalid
-	decodeRow func(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error)
+	decodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error)
 }
 
-func newOneDReader() *oneDReader {
-	return &oneDReader{}
+// OneDReader Encapsulates functionality and implementation that is common to all families
+// of one-dimensional barcodes.
+type oneDReader struct {
+	rowDecoder
+}
+
+func newOneDReader(rowDecoder rowDecoder) *oneDReader {
+	return &oneDReader{rowDecoder}
 }
 
 func (this *oneDReader) DecodeWithoutHints(image *gozxing.BinaryBitmap) (*gozxing.Result, error) {

@@ -45,10 +45,9 @@ func NewMultiFormatUPCEANReader(hints map[gozxing.DecodeHintType]interface{}) go
 	}
 
 	this := &multiFormatUPCEANReader{
-		oneDReader: newOneDReader(),
 		readers:    readers,
 	}
-	this.oneDReader.decodeRow = this.decodeRow
+	this.oneDReader = newOneDReader(this)
 	return this
 }
 

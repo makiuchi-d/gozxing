@@ -139,12 +139,10 @@ type testMiddleDecoder struct {
 
 func newTestMiddleDecoder(data []byte, ean13 bool) *testMiddleDecoder {
 	this := &testMiddleDecoder{
-		newUPCEANReader(), data, ean13,
+		data:  data,
+		ean13: ean13,
 	}
-	this.upceanReader.getBarcodeFormat = this.getBarcodeFormat
-	this.upceanReader.decodeMiddle = this.decodeMiddle
-	this.upceanReader.decodeEnd = this.decodeEnd
-	this.upceanReader.checkChecksum = this.checkChecksum
+	this.upceanReader = newUPCEANReader(this)
 	return this
 }
 

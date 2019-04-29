@@ -49,13 +49,9 @@ type upcEReader struct {
 
 func NewUPCEReader() gozxing.Reader {
 	this := &upcEReader{
-		upceanReader:         newUPCEANReader(),
 		decodeMiddleCounters: make([]int, 4),
 	}
-	this.upceanReader.getBarcodeFormat = this.getBarcodeFormat
-	this.upceanReader.decodeMiddle = this.decodeMiddle
-	this.upceanReader.decodeEnd = this.decodeEnd
-	this.upceanReader.checkChecksum = this.checkChecksum
+	this.upceanReader = newUPCEANReader(this)
 	return this
 }
 

@@ -57,13 +57,12 @@ func NewCode39ReaderWithCheckDigitFlag(usingCheckDigit bool) gozxing.Reader {
 // text.
 func NewCode39ReaderWithFlags(usingCheckDigit, extendedMode bool) gozxing.Reader {
 	this := &code39Reader{
-		oneDReader:      newOneDReader(),
 		usingCheckDigit: usingCheckDigit,
 		extendedMode:    extendedMode,
 		decodeRowResult: make([]byte, 0, 20),
 		counters:        make([]int, 9),
 	}
-	this.oneDReader.decodeRow = this.decodeRow
+	this.oneDReader = newOneDReader(this)
 	return this
 }
 
