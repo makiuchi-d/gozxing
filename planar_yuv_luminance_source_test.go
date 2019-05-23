@@ -112,13 +112,13 @@ func TestPlanarYUVLuminanceSource_GetCroppedMatrix(t *testing.T) {
 	}
 }
 
-func TestPlanarYUVLuminanceSource_ReaderThumbnail(t *testing.T) {
+func TestPlanarYUVLuminanceSource_RenderThumbnail(t *testing.T) {
 	src := makeYUVSource(10, 10)
 
 	thumb := src.RenderThumbnail()
-	expect := make([]int, 5*5)
-	for j := 0; j < 5; j++ {
-		for i := 0; i < 5; i++ {
+	expect := make([]uint, 5*5)
+	for j := uint(0); j < 5; j++ {
+		for i := uint(0); i < 5; i++ {
 			y := (i + j) * 2 * 255 / 18
 			expect[j*5+i] = 0xff000000 | y*0x00010101
 		}

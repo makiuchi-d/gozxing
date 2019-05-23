@@ -103,17 +103,17 @@ func (this *PlanarYUVLuminanceSource) Crop(left, top, width, height int) (Lumina
 		false)
 }
 
-func (this *PlanarYUVLuminanceSource) RenderThumbnail() []int {
+func (this *PlanarYUVLuminanceSource) RenderThumbnail() []uint {
 	width := this.GetThumbnailWidth()
 	height := this.GetThumbnailHeight()
-	pixels := make([]int, width*height)
+	pixels := make([]uint, width*height)
 	yuv := this.yuvData
 	inputOffset := this.top*this.dataWidth + this.left
 
 	for y := 0; y < height; y++ {
 		outputOffset := y * width
 		for x := 0; x < width; x++ {
-			grey := int(yuv[inputOffset+x*thumbnailScaleFactor]) & 0xff
+			grey := uint(yuv[inputOffset+x*thumbnailScaleFactor]) & 0xff
 			pixels[outputOffset+x] = 0xFF000000 | (grey * 0x00010101)
 		}
 		inputOffset += this.dataWidth * thumbnailScaleFactor

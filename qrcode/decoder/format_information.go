@@ -68,7 +68,7 @@ func FormatInformation_DecodeFormatInformation(maskedFormatInfo1, maskedFormatIn
 }
 
 func doDecodeFormatInformation(maskedFormatInfo1, maskedFormatInfo2 uint) *FormatInformation {
-	bestDifference := math.MaxUint32
+	bestDifference := math.MaxInt32
 	bestFormatInfo := uint(0)
 	for _, decodeInfo := range formatInfoDecodeLookup {
 		targetInfo := decodeInfo[0]
