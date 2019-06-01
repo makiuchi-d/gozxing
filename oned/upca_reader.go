@@ -11,7 +11,7 @@ type upcAReader struct {
 
 func NewUPCAReader() gozxing.Reader {
 	this := &upcAReader{
-		ean13Reader:  NewEAN13Reader().(*ean13Reader),
+		ean13Reader: NewEAN13Reader().(*ean13Reader),
 	}
 	this.upceanReader = newUPCEANReader(this)
 	return this

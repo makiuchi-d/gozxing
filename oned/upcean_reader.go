@@ -53,7 +53,7 @@ func init() {
 	}
 }
 
-type upceanRowDecoder interface{
+type upceanRowDecoder interface {
 	rowDecoder
 
 	// getBarcodeFormat Get the format of this decoder.
