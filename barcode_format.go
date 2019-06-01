@@ -1,6 +1,7 @@
 package gozxing
 
 type BarcodeFormat int
+type BarcodeFormats []BarcodeFormat
 
 const (
 	/** Aztec 2D barcode format. */
@@ -94,4 +95,13 @@ func (f BarcodeFormat) String() string {
 	default:
 		return "unknown format"
 	}
+}
+
+func (barcodes BarcodeFormats) Contains(c BarcodeFormat) bool {
+	for _, bc := range barcodes {
+		if bc == c {
+			return true
+		}
+	}
+	return false
 }

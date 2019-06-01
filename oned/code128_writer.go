@@ -41,7 +41,11 @@ func (ctype code128CType) String() string {
 type code128Encoder struct{}
 
 func NewCode128Writer() gozxing.Writer {
-	return NewOneDimensionalCodeWriter(code128Encoder{}, gozxing.BarcodeFormat_CODE_128)
+	return NewOneDimensionalCodeWriter(code128Encoder{})
+}
+
+func (code128Encoder) getSupportedWriteFormats() gozxing.BarcodeFormats {
+	return gozxing.BarcodeFormats{gozxing.BarcodeFormat_CODE_128}
 }
 
 func (code128Encoder) encode(contents string) ([]bool, error) {

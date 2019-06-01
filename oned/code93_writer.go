@@ -9,7 +9,11 @@ import (
 type code93Encoder struct{}
 
 func NewCode93Writer() gozxing.Writer {
-	return NewOneDimensionalCodeWriter(code93Encoder{}, gozxing.BarcodeFormat_CODE_93)
+	return NewOneDimensionalCodeWriter(code93Encoder{})
+}
+
+func (code93Encoder) getSupportedWriteFormats() gozxing.BarcodeFormats {
+	return gozxing.BarcodeFormats{gozxing.BarcodeFormat_CODE_93}
 }
 
 // @param contents barcode contents to encode. It should not be encoded for extended characters.

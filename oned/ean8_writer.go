@@ -17,7 +17,11 @@ const (
 type ean8Encoder struct{}
 
 func NewEAN8Writer() gozxing.Writer {
-	return NewUPCEANWriter(ean8Encoder{}, gozxing.BarcodeFormat_EAN_8)
+	return NewUPCEANWriter(ean8Encoder{})
+}
+
+func (ean8Encoder) getSupportedWriteFormats() gozxing.BarcodeFormats {
+	return gozxing.BarcodeFormats{gozxing.BarcodeFormat_EAN_8}
 }
 
 // encode encode contents string

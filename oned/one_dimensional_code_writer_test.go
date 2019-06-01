@@ -11,6 +11,10 @@ import (
 
 type dummyEncoder struct{}
 
+func (dummyEncoder) getSupportedWriteFormats() gozxing.BarcodeFormats {
+	return gozxing.BarcodeFormats{gozxing.BarcodeFormat_UPC_A}
+}
+
 func (dummyEncoder) encode(contents string) ([]bool, error) {
 	code := make([]bool, 0)
 	for _, c := range contents {
@@ -77,9 +81,9 @@ func TestOnedWriter_appendPattern(t *testing.T) {
 }
 
 func TestOnedWriter_encode(t *testing.T) {
-	writer := NewOneDimensionalCodeWriter(dummyEncoder{}, gozxing.BarcodeFormat_UPC_A)
+	writer := NewOneDimensionalCodeWriter(dummyEncoder{})
 
-	_, e := writer.EncodeWithoutHint("", gozxing.BarcodeFormat_EAN_13, 10, 1)
+	_, e := writer.EncodeWithoutHint("000", gozxing.BarcodeFormat_EAN_13, 10, 1)
 	if e == nil {
 		t.Fatalf("Encode must be error")
 	}

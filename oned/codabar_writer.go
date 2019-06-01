@@ -18,7 +18,11 @@ var (
 type codabarEncoder struct{}
 
 func NewCodaBarWriter() gozxing.Writer {
-	return NewOneDimensionalCodeWriter(codabarEncoder{}, gozxing.BarcodeFormat_CODABAR)
+	return NewOneDimensionalCodeWriter(codabarEncoder{})
+}
+
+func (codabarEncoder) getSupportedWriteFormats() gozxing.BarcodeFormats {
+	return gozxing.BarcodeFormats{gozxing.BarcodeFormat_CODABAR}
 }
 
 func (codabarEncoder) encode(contents string) ([]bool, error) {

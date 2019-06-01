@@ -6,20 +6,20 @@ import (
 	"github.com/makiuchi-d/gozxing"
 )
 
+
 type encoder interface {
 	encode(contents string) ([]bool, error)
+	getSupportedWriteFormats() gozxing.BarcodeFormats
 }
 
 type OneDimensionalCodeWriter struct {
 	encoder
-	format        gozxing.BarcodeFormat
 	defaultMargin int
 }
 
-func NewOneDimensionalCodeWriter(enc encoder, format gozxing.BarcodeFormat) *OneDimensionalCodeWriter {
+func NewOneDimensionalCodeWriter(enc encoder) *OneDimensionalCodeWriter {
 	return &OneDimensionalCodeWriter{
 		encoder:       enc,
-		format:        format,
 		defaultMargin: 10,
 	}
 }
@@ -38,11 +38,6 @@ func (this *OneDimensionalCodeWriter) Encode(
 	contents string, format gozxing.BarcodeFormat, width, height int,
 	hints map[gozxing.EncodeHintType]interface{}) (*gozxing.BitMatrix, error) {
 
-	if format != this.format {
-		return nil, gozxing.NewWriterException(
-			"IllegalArgumentException: Can only encode %v, but got %v", this.format, format)
-	}
-
 	if len(contents) == 0 {
 		return nil, gozxing.NewWriterException("IllegalArgumentException: Found empty contents")
 	}
@@ -50,6 +45,11 @@ func (this *OneDimensionalCodeWriter) Encode(
 	if width < 0 || height < 0 {
 		return nil, gozxing.NewWriterException(
 			"IllegalArgumentException: Negative size is not allowed. Input: %dx%d", width, height)
+	}
+	supportedFormats := this.getSupportedWriteFormats();
+	if !supportedFormats.Contains(format) {
+		return nil, gozxing.NewWriterException(
+			"IllegalArgumentException: Can only encode %v, but got %v", supportedFormats, format)
 	}
 
 	sidesMargin := this.defaultMargin

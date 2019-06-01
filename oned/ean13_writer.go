@@ -17,7 +17,11 @@ const (
 type ean13Encoder struct{}
 
 func NewEAN13Writer() gozxing.Writer {
-	return NewUPCEANWriter(ean13Encoder{}, gozxing.BarcodeFormat_EAN_13)
+	return NewUPCEANWriter(ean13Encoder{})
+}
+
+func (ean13Encoder) getSupportedWriteFormats() gozxing.BarcodeFormats {
+	return gozxing.BarcodeFormats{gozxing.BarcodeFormat_EAN_13}
 }
 
 func (ean13Encoder) encode(contents string) ([]bool, error) {

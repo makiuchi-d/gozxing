@@ -9,7 +9,11 @@ import (
 type code39Encoder struct{}
 
 func NewCode39Writer() gozxing.Writer {
-	return NewOneDimensionalCodeWriter(code39Encoder{}, gozxing.BarcodeFormat_CODE_39)
+	return NewOneDimensionalCodeWriter(code39Encoder{})
+}
+
+func (code39Encoder) getSupportedWriteFormats() gozxing.BarcodeFormats {
+	return gozxing.BarcodeFormats{gozxing.BarcodeFormat_CODE_39}
 }
 
 func (code39Encoder) encode(contents string) ([]bool, error) {

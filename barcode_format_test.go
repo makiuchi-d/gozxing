@@ -32,3 +32,18 @@ func TestBarcodeFormatStringer(t *testing.T) {
 
 	testBarcodeFormatString(t, -1, "unknown format")
 }
+
+func TestBarcodeFormats_Contains(t *testing.T) {
+	formats := BarcodeFormats{
+		BarcodeFormat_AZTEC,
+		BarcodeFormat_CODABAR,
+	}
+
+	if formats.Contains(BarcodeFormat_CODE_39) {
+		t.Fatalf("CODE_39 is not contained")
+	}
+
+	if !formats.Contains(BarcodeFormat_CODABAR) {
+		t.Fatalf("CODE_CODABAR is contained")
+	}
+}
