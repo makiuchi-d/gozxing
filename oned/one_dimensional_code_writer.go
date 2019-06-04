@@ -6,7 +6,6 @@ import (
 	"github.com/makiuchi-d/gozxing"
 )
 
-
 type encoder interface {
 	encode(contents string) ([]bool, error)
 	getSupportedWriteFormats() gozxing.BarcodeFormats
@@ -46,7 +45,7 @@ func (this *OneDimensionalCodeWriter) Encode(
 		return nil, gozxing.NewWriterException(
 			"IllegalArgumentException: Negative size is not allowed. Input: %dx%d", width, height)
 	}
-	supportedFormats := this.getSupportedWriteFormats();
+	supportedFormats := this.getSupportedWriteFormats()
 	if !supportedFormats.Contains(format) {
 		return nil, gozxing.NewWriterException(
 			"IllegalArgumentException: Can only encode %v, but got %v", supportedFormats, format)
