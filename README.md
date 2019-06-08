@@ -36,7 +36,7 @@ This project is a port of ZXing core library to pure Go.
 | Code 93      | :heavy_check_mark: | :heavy_check_mark: |
 | Code 128     | :heavy_check_mark: | :heavy_check_mark: |
 | Codabar      | :heavy_check_mark: | :heavy_check_mark: |
-| ITF          | :heavy_check_mark: |                    |
+| ITF          | :heavy_check_mark: | :heavy_check_mark: |
 | RSS-14       |                    |                    |
 | RSS-Expanded |                    |                    |
 
