@@ -81,7 +81,7 @@ type upceanRowDecoder interface {
 
 type upceanReader struct {
 	upceanRowDecoder
-	*oneDReader
+	*OneDReader
 	decodeRowStringBuffer []byte
 	extensionReader       *UPCEANExtensionSupport
 }
@@ -92,7 +92,7 @@ func newUPCEANReader(rowDecoder upceanRowDecoder) *upceanReader {
 		decodeRowStringBuffer: make([]byte, 13),
 		extensionReader:       NewUPCEANExtensionSupport(),
 	}
-	this.oneDReader = newOneDReader(rowDecoder)
+	this.OneDReader = NewOneDReader(rowDecoder)
 	return this
 }
 
@@ -343,7 +343,7 @@ func upceanReader_findGuardPatternWithCounters(
 			counters[counterPosition]++
 		} else {
 			if counterPosition == patternLength-1 {
-				if patternMatchVariance(counters, pattern, UPCEANReader_MAX_INDIVIDUAL_VARIANCE) < UPCEANReader_MAX_AVG_VARIANCE {
+				if PatternMatchVariance(counters, pattern, UPCEANReader_MAX_INDIVIDUAL_VARIANCE) < UPCEANReader_MAX_AVG_VARIANCE {
 					return []int{patternStart, x}, nil
 				}
 				patternStart += counters[0] + counters[1]
@@ -372,7 +372,7 @@ func upceanReader_findGuardPatternWithCounters(
 // @return horizontal offset of first pixel beyond the decoded digit
 // @throws NotFoundException if digit cannot be decoded
 func upceanReader_decodeDigit(row *gozxing.BitArray, counters []int, rowOffset int, patterns [][]int) (int, error) {
-	e := recordPattern(row, rowOffset, counters)
+	e := RecordPattern(row, rowOffset, counters)
 	if e != nil {
 		return 0, e
 	}
@@ -381,7 +381,7 @@ func upceanReader_decodeDigit(row *gozxing.BitArray, counters []int, rowOffset i
 	max := len(patterns)
 	for i := 0; i < max; i++ {
 		pattern := patterns[i]
-		variance := patternMatchVariance(counters, pattern, UPCEANReader_MAX_INDIVIDUAL_VARIANCE)
+		variance := PatternMatchVariance(counters, pattern, UPCEANReader_MAX_INDIVIDUAL_VARIANCE)
 		if variance < bestVariance {
 			bestVariance = variance
 			bestMatch = i

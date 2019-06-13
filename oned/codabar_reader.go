@@ -39,7 +39,7 @@ var codabarReader_STARTEND_ENCODING = []byte{'A', 'B', 'C', 'D'}
 // for more information see : http://www.mecsw.com/specs/codabar.html
 
 type codabarReader struct {
-	*oneDReader
+	*OneDReader
 
 	// Keep some instance variables to avoid reallocations
 	decodeRowResult []byte
@@ -53,7 +53,7 @@ func NewCodaBarReader() gozxing.Reader {
 		counters:        make([]int, 0, 80),
 		counterLength:   0,
 	}
-	reader.oneDReader = newOneDReader(reader)
+	reader.OneDReader = NewOneDReader(reader)
 	return reader
 }
 

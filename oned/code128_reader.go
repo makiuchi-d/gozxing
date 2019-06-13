@@ -139,12 +139,12 @@ const (
 )
 
 type code128Reader struct {
-	*oneDReader
+	*OneDReader
 }
 
 func NewCode128Reader() gozxing.Reader {
 	this := &code128Reader{}
-	this.oneDReader = newOneDReader(this)
+	this.OneDReader = NewOneDReader(this)
 	return this
 }
 
@@ -166,7 +166,7 @@ func code128FindStartPattern(row *gozxing.BitArray) ([]int, error) {
 				bestVariance := float64(code128MAX_AVG_VARIANCE)
 				bestMatch := -1
 				for startCode := code128CODE_START_A; startCode <= code128CODE_START_C; startCode++ {
-					variance := patternMatchVariance(counters, code128CODE_PATTERNS[startCode],
+					variance := PatternMatchVariance(counters, code128CODE_PATTERNS[startCode],
 						code128MAX_INDIVIDUAL_VARIANCE)
 					if variance < bestVariance {
 						bestVariance = variance
@@ -195,7 +195,7 @@ func code128FindStartPattern(row *gozxing.BitArray) ([]int, error) {
 }
 
 func code128DecodeCode(row *gozxing.BitArray, counters []int, rowOffset int) (int, error) {
-	e := recordPattern(row, rowOffset, counters)
+	e := RecordPattern(row, rowOffset, counters)
 	if e != nil {
 		return 0, gozxing.WrapNotFoundException(e)
 	}
@@ -203,7 +203,7 @@ func code128DecodeCode(row *gozxing.BitArray, counters []int, rowOffset int) (in
 	bestMatch := -1
 	for d := 0; d < len(code128CODE_PATTERNS); d++ {
 		pattern := code128CODE_PATTERNS[d]
-		variance := patternMatchVariance(counters, pattern, code128MAX_INDIVIDUAL_VARIANCE)
+		variance := PatternMatchVariance(counters, pattern, code128MAX_INDIVIDUAL_VARIANCE)
 		if variance < bestVariance {
 			bestVariance = variance
 			bestMatch = d

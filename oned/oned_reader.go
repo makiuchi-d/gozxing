@@ -20,20 +20,20 @@ type rowDecoder interface {
 
 // OneDReader Encapsulates functionality and implementation that is common to all families
 // of one-dimensional barcodes.
-type oneDReader struct {
+type OneDReader struct {
 	rowDecoder
 }
 
-func newOneDReader(rowDecoder rowDecoder) *oneDReader {
-	return &oneDReader{rowDecoder}
+func NewOneDReader(rowDecoder rowDecoder) *OneDReader {
+	return &OneDReader{rowDecoder}
 }
 
-func (this *oneDReader) DecodeWithoutHints(image *gozxing.BinaryBitmap) (*gozxing.Result, error) {
+func (this *OneDReader) DecodeWithoutHints(image *gozxing.BinaryBitmap) (*gozxing.Result, error) {
 	return this.Decode(image, nil)
 }
 
 // Decode Note that we don't try rotation without the try harder flag, even if rotation was supported.
-func (this *oneDReader) Decode(
+func (this *OneDReader) Decode(
 	image *gozxing.BinaryBitmap, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
 
 	result, e := this.doDecode(image, hints)
@@ -78,7 +78,7 @@ func (this *oneDReader) Decode(
 	return result, nil
 }
 
-func (this *oneDReader) Reset() {
+func (this *OneDReader) Reset() {
 	// do nothing
 }
 
@@ -94,7 +94,7 @@ func (this *oneDReader) Reset() {
 // @param hints Any hints that were requested
 // @return The contents of the decoded barcode
 // @throws NotFoundException Any spontaneous errors which occur
-func (this *oneDReader) doDecode(
+func (this *OneDReader) doDecode(
 	image *gozxing.BinaryBitmap, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
 
 	width := image.GetWidth()
@@ -192,7 +192,8 @@ func (this *oneDReader) doDecode(
 	return nil, gozxing.NewNotFoundException()
 }
 
-// Records the size of successive runs of white and black pixels in a row, starting at a given point.
+//RecordPattern Records the size of successive runs of white and black pixels in a row,
+// starting at a given point.
 // The values are recorded in the given array, and the number of runs recorded is equal to the size
 // of the array. If the row starts on a white pixel at the given start point, then the first count
 // recorded is the run of white pixels starting from that point; likewise it is the count of a run
@@ -203,7 +204,7 @@ func (this *oneDReader) doDecode(
 // @param counters array into which to record counts
 // @throws NotFoundException if counters cannot be filled entirely from row before running out
 //  of pixels
-func recordPattern(row *gozxing.BitArray, start int, counters []int) error {
+func RecordPattern(row *gozxing.BitArray, start int, counters []int) error {
 	numCounters := len(counters)
 	for i := range counters {
 		counters[i] = 0
@@ -237,7 +238,7 @@ func recordPattern(row *gozxing.BitArray, start int, counters []int) error {
 	return nil
 }
 
-func recordPatternInReverse(row *gozxing.BitArray, start int, counters []int) error {
+func RecordPatternInReverse(row *gozxing.BitArray, start int, counters []int) error {
 	// This could be more efficient I guess
 	numTransitionsLeft := len(counters)
 	last := row.Get(start)
@@ -251,10 +252,10 @@ func recordPatternInReverse(row *gozxing.BitArray, start int, counters []int) er
 	if numTransitionsLeft >= 0 {
 		return gozxing.NewNotFoundException("numTransitionsLeft = %v", numTransitionsLeft)
 	}
-	return recordPattern(row, start+1, counters)
+	return RecordPattern(row, start+1, counters)
 }
 
-//patternMatchVariance Determines how closely a set of observed counts of runs of
+//PatternMatchVariance Determines how closely a set of observed counts of runs of
 // black/white values matches a given target pattern.
 // This is reported as the ratio of the total variance from the expected pattern
 // proportions across all pattern elements, to the length of the pattern.
@@ -263,7 +264,7 @@ func recordPatternInReverse(row *gozxing.BitArray, start int, counters []int) er
 // @param pattern expected pattern
 // @param maxIndividualVariance The most any counter can differ before we give up
 // @return ratio of total variance between counters and pattern compared to total pattern size
-func patternMatchVariance(counters, pattern []int, maxIndividualVariance float64) float64 {
+func PatternMatchVariance(counters, pattern []int, maxIndividualVariance float64) float64 {
 	numCounters := len(counters)
 	total := 0
 	patternLength := 0

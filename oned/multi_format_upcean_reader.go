@@ -15,7 +15,7 @@ type upceanDecoder interface {
 }
 
 type multiFormatUPCEANReader struct {
-	*oneDReader
+	*OneDReader
 	readers []upceanDecoder
 }
 
@@ -47,7 +47,7 @@ func NewMultiFormatUPCEANReader(hints map[gozxing.DecodeHintType]interface{}) go
 	this := &multiFormatUPCEANReader{
 		readers: readers,
 	}
-	this.oneDReader = newOneDReader(this)
+	this.OneDReader = NewOneDReader(this)
 	return this
 }
 

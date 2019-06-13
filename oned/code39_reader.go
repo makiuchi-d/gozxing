@@ -25,7 +25,7 @@ var code39CharacterEncodings = []int{
 const code39AsteriskEncoding = 0x094
 
 type code39Reader struct {
-	*oneDReader
+	*OneDReader
 	usingCheckDigit bool
 	extendedMode    bool
 	decodeRowResult []byte
@@ -62,7 +62,7 @@ func NewCode39ReaderWithFlags(usingCheckDigit, extendedMode bool) gozxing.Reader
 		decodeRowResult: make([]byte, 0, 20),
 		counters:        make([]int, 9),
 	}
-	this.oneDReader = newOneDReader(this)
+	this.OneDReader = NewOneDReader(this)
 	return this
 }
 
@@ -84,7 +84,7 @@ func (this *code39Reader) decodeRow(rowNumber int, row *gozxing.BitArray, hints 
 
 	var lastStart int
 	for {
-		e := recordPattern(row, nextStart, theCounters)
+		e := RecordPattern(row, nextStart, theCounters)
 		if e != nil {
 			return nil, gozxing.WrapNotFoundException(e)
 		}

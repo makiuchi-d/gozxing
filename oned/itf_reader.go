@@ -71,7 +71,7 @@ var (
 )
 
 type itfReader struct {
-	*oneDReader
+	*OneDReader
 
 	// Stores the actual narrow line width of the image being decoded.
 	narrowLineWidth int
@@ -81,7 +81,7 @@ func NewITFReader() gozxing.Reader {
 	reader := &itfReader{
 		narrowLineWidth: -1,
 	}
-	reader.oneDReader = newOneDReader(reader)
+	reader.OneDReader = NewOneDReader(reader)
 	return reader
 }
 
@@ -161,7 +161,7 @@ func (*itfReader) decodeMiddle(row *gozxing.BitArray, payloadStart, payloadEnd i
 	for payloadStart < payloadEnd {
 
 		// Get 10 runs of black/white.
-		e := recordPattern(row, payloadStart, counterDigitPair)
+		e := RecordPattern(row, payloadStart, counterDigitPair)
 		if e != nil {
 			return resultString, gozxing.WrapNotFoundException(e)
 		}
@@ -332,7 +332,7 @@ func itfReader_findGuardPattern(row *gozxing.BitArray, rowOffset int, pattern []
 			counters[counterPosition]++
 		} else {
 			if counterPosition == patternLength-1 {
-				if patternMatchVariance(counters, pattern, itfReader_MAX_INDIVIDUAL_VARIANCE) < itfReader_MAX_AVG_VARIANCE {
+				if PatternMatchVariance(counters, pattern, itfReader_MAX_INDIVIDUAL_VARIANCE) < itfReader_MAX_AVG_VARIANCE {
 					return []int{patternStart, x}, nil
 				}
 				patternStart += counters[0] + counters[1]
@@ -362,7 +362,7 @@ func itfReader_decodeDigit(counters []int) (int, error) {
 	max := len(itfReader_PATTERNS)
 	for i := 0; i < max; i++ {
 		pattern := itfReader_PATTERNS[i]
-		variance := patternMatchVariance(counters, pattern, itfReader_MAX_INDIVIDUAL_VARIANCE)
+		variance := PatternMatchVariance(counters, pattern, itfReader_MAX_INDIVIDUAL_VARIANCE)
 		if variance < bestVariance {
 			bestVariance = variance
 			bestMatch = i

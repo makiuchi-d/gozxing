@@ -29,9 +29,9 @@ func TestRecordPattern(t *testing.T) {
 	row := gozxing.NewBitArray(20)
 	counters := make([]int, 4)
 
-	e := recordPattern(row, 20, counters)
+	e := RecordPattern(row, 20, counters)
 	if e == nil {
-		t.Fatalf("recordPattern must be error")
+		t.Fatalf("RecordPattern must be error")
 	}
 
 	// [1-7] 0011001 (UPC/EAN 1L)
@@ -44,20 +44,20 @@ func TestRecordPattern(t *testing.T) {
 	row.Set(14)
 	row.Set(18)
 
-	e = recordPattern(row, 1, counters)
+	e = RecordPattern(row, 1, counters)
 	if e != nil {
-		t.Fatalf("recordPattern returns error, %v", e)
+		t.Fatalf("RecordPattern returns error, %v", e)
 	}
 	if !reflect.DeepEqual(counters, []int{2, 2, 2, 1}) {
-		t.Fatalf("recordPattern = %v, expect [2 2 2 1]", counters)
+		t.Fatalf("RecordPattern = %v, expect [2 2 2 1]", counters)
 	}
 
-	e = recordPattern(row, 11, counters)
+	e = RecordPattern(row, 11, counters)
 	if e != nil {
-		t.Fatalf("recordPattern returns error, %v", e)
+		t.Fatalf("RecordPattern returns error, %v", e)
 	}
 	if !reflect.DeepEqual(counters, []int{1, 2, 1, 3}) {
-		t.Fatalf("recordPattern = %v, expect [1 2 1 3]", counters)
+		t.Fatalf("RecordPattern = %v, expect [1 2 1 3]", counters)
 	}
 }
 
@@ -75,25 +75,25 @@ func TestRecordPatternInReverse(t *testing.T) {
 	row.Set(14)
 	row.Set(18)
 
-	e := recordPatternInReverse(row, 3, counters)
+	e := RecordPatternInReverse(row, 3, counters)
 	if _, ok := e.(gozxing.NotFoundException); !ok {
-		t.Fatalf("recordPatternInReverse must be NotFoundException, %T", e)
+		t.Fatalf("RecordPatternInReverse must be NotFoundException, %T", e)
 	}
 
-	e = recordPatternInReverse(row, 8, counters)
+	e = RecordPatternInReverse(row, 8, counters)
 	if e != nil {
-		t.Fatalf("recordPattern returns error, %v", e)
+		t.Fatalf("RecordPatternInReverse returns error, %v", e)
 	}
 	if !reflect.DeepEqual(counters, []int{2, 2, 2, 1}) {
-		t.Fatalf("recordPattern = %v, expect [2 2 2 1]", counters)
+		t.Fatalf("RecordPatternInReverse = %v, expect [2 2 2 1]", counters)
 	}
 
-	e = recordPatternInReverse(row, 18, counters)
+	e = RecordPatternInReverse(row, 18, counters)
 	if e != nil {
-		t.Fatalf("recordPattern returns error, %v", e)
+		t.Fatalf("RecordPatternInReverse returns error, %v", e)
 	}
 	if !reflect.DeepEqual(counters, []int{1, 2, 1, 3}) {
-		t.Fatalf("recordPattern = %v, expect [1 2 1 3]", counters)
+		t.Fatalf("RecordPatternInReverse = %v, expect [1 2 1 3]", counters)
 	}
 }
 
