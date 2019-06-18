@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/makiuchi-d/gozxing"
+	"github.com/makiuchi-d/gozxing/testutil"
 )
 
 func TestUPCEReader_decodeMiddle(t *testing.T) {
@@ -96,7 +97,15 @@ func TestUPCEReader(t *testing.T) {
 	reader := NewUPCEReader()
 	format := gozxing.BarcodeFormat_UPC_E
 
-	testFile(t, reader, "testdata/upce/1.png", "01234565", format, nil)
-	testFile(t, reader, "testdata/upce/2.png", "00123457", format, nil)
-	testFile(t, reader, "testdata/upce/4.png", "01234531", format, nil)
+	tests := []struct {
+		file  string
+		wants string
+	}{
+		{"testdata/upce/1.png", "01234565"},
+		{"testdata/upce/2.png", "00123457"},
+		{"testdata/upce/4.png", "01234531"},
+	}
+	for _, test := range tests {
+		testutil.TestFile(t, reader, test.file, test.wants, format, nil)
+	}
 }

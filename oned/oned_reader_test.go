@@ -7,23 +7,7 @@ import (
 	errors "golang.org/x/xerrors"
 
 	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/testutil"
 )
-
-func testFile(t *testing.T, reader gozxing.Reader, file, expectText string,
-	expectFormat gozxing.BarcodeFormat, hints map[gozxing.DecodeHintType]interface{}) {
-	bmp := testutil.NewBinaryBitmapFromFile(file)
-	result, e := reader.Decode(bmp, hints)
-	if e != nil {
-		t.Fatalf("testFail(%v) reader.Decode failed: %v", file, e)
-	}
-	if txt := result.GetText(); txt != expectText {
-		t.Fatalf("testFile(%v) = %v, expect %v", file, txt, expectText)
-	}
-	if format := result.GetBarcodeFormat(); format != expectFormat {
-		t.Fatalf("testFile(%v) format = %v, expect %v", file, format, expectFormat)
-	}
-}
 
 func TestRecordPattern(t *testing.T) {
 	row := gozxing.NewBitArray(20)

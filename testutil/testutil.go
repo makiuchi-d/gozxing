@@ -5,6 +5,7 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 	"os"
+	"testing"
 
 	errors "golang.org/x/xerrors"
 
@@ -119,4 +120,19 @@ func (s DummyGridSampler) SampleGrid(image *gozxing.BitMatrix, dimensionX, dimen
 func (s DummyGridSampler) SampleGridWithTransform(image *gozxing.BitMatrix,
 	dimensionX, dimensionY int, transform *common.PerspectiveTransform) (*gozxing.BitMatrix, error) {
 	return nil, errors.New("dummy sampler")
+}
+
+func TestFile(t *testing.T, reader gozxing.Reader, file, expectText string,
+	expectFormat gozxing.BarcodeFormat, hints map[gozxing.DecodeHintType]interface{}) {
+	bmp := NewBinaryBitmapFromFile(file)
+	result, e := reader.Decode(bmp, hints)
+	if e != nil {
+		t.Fatalf("TestFail(%v) reader.Decode failed: %v", file, e)
+	}
+	if txt := result.GetText(); txt != expectText {
+		t.Fatalf("TestFile(%v) = \"%v\", wants \"%v\"", file, txt, expectText)
+	}
+	if format := result.GetBarcodeFormat(); format != expectFormat {
+		t.Fatalf("TestFile(%v) format = %v, wants %v", file, format, expectFormat)
+	}
 }

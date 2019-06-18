@@ -205,7 +205,15 @@ func TestCode93Reader(t *testing.T) {
 	reader := NewCode93Reader()
 	format := gozxing.BarcodeFormat_CODE_93
 
-	testFile(t, reader, "testdata/code93/1.png", "1234567890", format, nil)
-	testFile(t, reader, "testdata/code93/2.png", "CODE 93", format, nil)
-	testFile(t, reader, "testdata/code93/3.png", "DATA", format, nil)
+	tests := []struct {
+		file  string
+		wants string
+	}{
+		{"testdata/code93/1.png", "1234567890"},
+		{"testdata/code93/2.png", "CODE 93"},
+		{"testdata/code93/3.png", "DATA"},
+	}
+	for _, test := range tests {
+		testutil.TestFile(t, reader, test.file, test.wants, format, nil)
+	}
 }

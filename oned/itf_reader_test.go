@@ -312,6 +312,6 @@ func TestITFReader(t *testing.T) {
 		{"testdata/itf/17.png", "3018108390"},
 	}
 	for _, test := range tests {
-		testFile(t, reader, test.file, test.wants, gozxing.BarcodeFormat_ITF, nil)
+		testutil.TestFile(t, reader, test.file, test.wants, gozxing.BarcodeFormat_ITF, nil)
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/makiuchi-d/gozxing"
+	"github.com/makiuchi-d/gozxing/testutil"
 )
 
 func TestEan8Reader_getBarcodeFormat(t *testing.T) {
@@ -89,12 +90,20 @@ func TestEAN8Reader(t *testing.T) {
 	reader := NewEAN8Reader()
 	format := gozxing.BarcodeFormat_EAN_8
 
-	testFile(t, reader, "testdata/ean8/1.png", "48512343", format, nil)
-	testFile(t, reader, "testdata/ean8/2.png", "12345670", format, nil)
-	testFile(t, reader, "testdata/ean8/3.png", "12345670", format, nil)
-	testFile(t, reader, "testdata/ean8/4.png", "67678983", format, nil)
-	testFile(t, reader, "testdata/ean8/5.png", "80674313", format, nil)
-	testFile(t, reader, "testdata/ean8/6.png", "59001270", format, nil)
-	testFile(t, reader, "testdata/ean8/7.png", "50487066", format, nil)
-	testFile(t, reader, "testdata/ean8/8.png", "55123457", format, nil)
+	tests := []struct {
+		file  string
+		wants string
+	}{
+		{"testdata/ean8/1.png", "48512343"},
+		{"testdata/ean8/2.png", "12345670"},
+		{"testdata/ean8/3.png", "12345670"},
+		{"testdata/ean8/4.png", "67678983"},
+		{"testdata/ean8/5.png", "80674313"},
+		{"testdata/ean8/6.png", "59001270"},
+		{"testdata/ean8/7.png", "50487066"},
+		{"testdata/ean8/8.png", "55123457"},
+	}
+	for _, test := range tests {
+		testutil.TestFile(t, reader, test.file, test.wants, format, nil)
+	}
 }

@@ -245,6 +245,6 @@ func TestCodaBarReader(t *testing.T) {
 		{"testdata/codabar/15.png", "123456789012"},
 	}
 	for _, test := range tests {
-		testFile(t, reader, test.file, test.wants, gozxing.BarcodeFormat_CODABAR, nil)
+		testutil.TestFile(t, reader, test.file, test.wants, gozxing.BarcodeFormat_CODABAR, nil)
 	}
 }

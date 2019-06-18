@@ -273,45 +273,54 @@ func TestCode128Reader(t *testing.T) {
 		gozxing.DecodeHintType_TRY_HARDER: true,
 	}
 
-	testFile(t, reader, "testdata/code128/01.png", "005-3379497200006", format, nil)
-	testFile(t, reader, "testdata/code128/02.png", "005-3379497200006", format, nil)
-	testFile(t, reader, "testdata/code128/03.png", "005-3379497200006", format, nil)
-	testFile(t, reader, "testdata/code128/04.png", "005-3379497200006", format, nil)
-	testFile(t, reader, "testdata/code128/05.png", "15182881", format, nil)
-	testFile(t, reader, "testdata/code128/06.png", "15182881", format, nil)
-	testFile(t, reader, "testdata/code128/07.png", "15182881", format, nil)
-	testFile(t, reader, "testdata/code128/08.png", "15182881", format, nil)
-	testFile(t, reader, "testdata/code128/09.png", "CNK8181G2C", format, harder)
-	testFile(t, reader, "testdata/code128/10.png", "CNK8181G2C", format, nil)
-	testFile(t, reader, "testdata/code128/11.png", "CNK8181G2C", format, nil)
-	testFile(t, reader, "testdata/code128/12.png", "CNK8181G2C", format, harder)
-	testFile(t, reader, "testdata/code128/13.png", "1PEF224A4", format, nil)
-	testFile(t, reader, "testdata/code128/14.png", "1PEF224A4", format, nil)
-	testFile(t, reader, "testdata/code128/15.png", "1PEF224A4", format, nil)
-	testFile(t, reader, "testdata/code128/16.png", "1PEF224A4", format, nil)
-	testFile(t, reader, "testdata/code128/17.png", "FW727", format, nil)
-	testFile(t, reader, "testdata/code128/18.png", "FW727", format, nil)
-	testFile(t, reader, "testdata/code128/19.png", "FW727", format, nil)
-	testFile(t, reader, "testdata/code128/20.png", "FW727", format, nil)
-	testFile(t, reader, "testdata/code128/21.png", "005-3354174500018", format, nil)
-	testFile(t, reader, "testdata/code128/22.png", "005-3354174500018", format, nil)
-	testFile(t, reader, "testdata/code128/23.png", "005-3354174500018", format, nil)
-	testFile(t, reader, "testdata/code128/24.png", "005-3354174500018", format, nil)
-	testFile(t, reader, "testdata/code128/25.png", "31001171800000017989625355702636", format, nil)
-	testFile(t, reader, "testdata/code128/26.png", "31001171800000017989625355702636", format, nil)
-	testFile(t, reader, "testdata/code128/27.png", "31001171800000017989625355702636", format, nil)
-	testFile(t, reader, "testdata/code128/28.png", "31001171800000017989625355702636", format, nil)
-	testFile(t, reader, "testdata/code128/29.png", "42094043", format, nil)
-	// original zxing could not read too.
-	// testFile(t, reader, "testdata/code128/30.png", "42094043", format, harder)
-	testFile(t, reader, "testdata/code128/31.png", "42094043", format, nil)
-	testFile(t, reader, "testdata/code128/32.png", "42094043", format, nil)
-	testFile(t, reader, "testdata/code128/33.png", "30885909173823", format, nil)
-	testFile(t, reader, "testdata/code128/34.png", "30885909173823", format, nil)
-	testFile(t, reader, "testdata/code128/35.png", "30885909173823", format, nil)
-	testFile(t, reader, "testdata/code128/36.png", "30885909173823", format, nil)
-	testFile(t, reader, "testdata/code128/37.png", "FGGQ6D1", format, harder)
-	testFile(t, reader, "testdata/code128/38.png", "FGGQ6D1", format, nil)
-	testFile(t, reader, "testdata/code128/39.png", "FGGQ6D1", format, nil)
-	testFile(t, reader, "testdata/code128/40.png", "FGGQ6D1", format, nil)
+	tests := []struct {
+		file   string
+		wants  string
+		harder map[gozxing.DecodeHintType]interface{}
+	}{
+		{"testdata/code128/01.png", "005-3379497200006", nil},
+		{"testdata/code128/02.png", "005-3379497200006", nil},
+		{"testdata/code128/03.png", "005-3379497200006", nil},
+		{"testdata/code128/04.png", "005-3379497200006", nil},
+		{"testdata/code128/05.png", "15182881", nil},
+		{"testdata/code128/06.png", "15182881", nil},
+		{"testdata/code128/07.png", "15182881", nil},
+		{"testdata/code128/08.png", "15182881", nil},
+		{"testdata/code128/09.png", "CNK8181G2C", harder},
+		{"testdata/code128/10.png", "CNK8181G2C", nil},
+		{"testdata/code128/11.png", "CNK8181G2C", nil},
+		{"testdata/code128/12.png", "CNK8181G2C", harder},
+		{"testdata/code128/13.png", "1PEF224A4", nil},
+		{"testdata/code128/14.png", "1PEF224A4", nil},
+		{"testdata/code128/15.png", "1PEF224A4", nil},
+		{"testdata/code128/16.png", "1PEF224A4", nil},
+		{"testdata/code128/17.png", "FW727", nil},
+		{"testdata/code128/18.png", "FW727", nil},
+		{"testdata/code128/19.png", "FW727", nil},
+		{"testdata/code128/20.png", "FW727", nil},
+		{"testdata/code128/21.png", "005-3354174500018", nil},
+		{"testdata/code128/22.png", "005-3354174500018", nil},
+		{"testdata/code128/23.png", "005-3354174500018", nil},
+		{"testdata/code128/24.png", "005-3354174500018", nil},
+		{"testdata/code128/25.png", "31001171800000017989625355702636", nil},
+		{"testdata/code128/26.png", "31001171800000017989625355702636", nil},
+		{"testdata/code128/27.png", "31001171800000017989625355702636", nil},
+		{"testdata/code128/28.png", "31001171800000017989625355702636", nil},
+		{"testdata/code128/29.png", "42094043", nil},
+		// original zxing could not read too.
+		// {"testdata/code128/30.png", "42094043", harder},
+		{"testdata/code128/31.png", "42094043", nil},
+		{"testdata/code128/32.png", "42094043", nil},
+		{"testdata/code128/33.png", "30885909173823", nil},
+		{"testdata/code128/34.png", "30885909173823", nil},
+		{"testdata/code128/35.png", "30885909173823", nil},
+		{"testdata/code128/36.png", "30885909173823", nil},
+		{"testdata/code128/37.png", "FGGQ6D1", harder},
+		{"testdata/code128/38.png", "FGGQ6D1", nil},
+		{"testdata/code128/39.png", "FGGQ6D1", nil},
+		{"testdata/code128/40.png", "FGGQ6D1", nil},
+	}
+	for _, test := range tests {
+		testutil.TestFile(t, reader, test.file, test.wants, format, test.harder)
+	}
 }
