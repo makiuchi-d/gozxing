@@ -85,7 +85,7 @@ func NewITFReader() gozxing.Reader {
 	return reader
 }
 
-func (this *itfReader) decodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
+func (this *itfReader) DecodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
 
 	// Find out where the Middle section (payload) starts & ends
 	startRange, e := this.decodeStart(row)

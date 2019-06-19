@@ -89,56 +89,56 @@ func TestCode128DecodeCode(t *testing.T) {
 	}
 }
 
-func TestCode128Reader_decodeRowFail(t *testing.T) {
+func TestCode128Reader_DecodeRowFail(t *testing.T) {
 	dec := NewCode128Reader().(*code128Reader)
 
 	row := testutil.NewBitArrayFromString("00010000000110100100100100")
-	_, e := dec.decodeRow(10, row, nil)
+	_, e := dec.DecodeRow(10, row, nil)
 	if e == nil {
-		t.Fatalf("decodeRow must be error")
+		t.Fatalf("DecodeRow must be error")
 	}
 
 	// error in code128decodeCode
 	row = testutil.NewBitArrayFromString("00010000011010000100101010101")
-	_, e = dec.decodeRow(10, row, nil)
+	_, e = dec.DecodeRow(10, row, nil)
 	if e == nil {
-		t.Fatalf("decodeRow must be error")
+		t.Fatalf("DecodeRow must be error")
 	}
 
 	// start code after started
 	row = testutil.NewBitArrayFromString("00010000011010010000110100001001")
-	_, e = dec.decodeRow(10, row, nil)
+	_, e = dec.DecodeRow(10, row, nil)
 	if _, ok := e.(gozxing.FormatException); !ok {
-		t.Fatalf("decodeRow must be FormatException, %T", e)
+		t.Fatalf("DecodeRow must be FormatException, %T", e)
 	}
 
 	// less tailing space
 	row = testutil.NewBitArrayFromString("0000000" + "11010000100" +
 		"1100011101011" + "000001")
-	_, e = dec.decodeRow(10, row, nil)
+	_, e = dec.DecodeRow(10, row, nil)
 	if _, ok := e.(gozxing.NotFoundException); !ok {
-		t.Fatalf("decodeRow must be NotFoundException, %T", e)
+		t.Fatalf("DecodeRow must be NotFoundException, %T", e)
 	}
 
 	// checksum error
 	row = testutil.NewBitArrayFromString("0000000" + "11010000100" +
 		"11001101100" + // 1
 		"1100011101011" + "00000001")
-	_, e = dec.decodeRow(10, row, nil)
+	_, e = dec.DecodeRow(10, row, nil)
 	if _, ok := e.(gozxing.ChecksumException); !ok {
-		t.Fatalf("decodeRow must be ChecksumException, %T", e)
+		t.Fatalf("DecodeRow must be ChecksumException, %T", e)
 	}
 
 	// empty result
 	row = testutil.NewBitArrayFromString("0000000" + "11010000100" +
 		"1100011101011" + "00000001")
-	_, e = dec.decodeRow(10, row, nil)
+	_, e = dec.DecodeRow(10, row, nil)
 	if _, ok := e.(gozxing.NotFoundException); !ok {
-		t.Fatalf("decodeRow must be NotFoundException, %T", e)
+		t.Fatalf("DecodeRow must be NotFoundException, %T", e)
 	}
 }
 
-func TestCode128Reader_decodeRowCodeA(t *testing.T) {
+func TestCode128Reader_DecodeRowCodeA(t *testing.T) {
 	dec := NewCode128Reader().(*code128Reader)
 	hint := map[gozxing.DecodeHintType]interface{}{
 		gozxing.DecodeHintType_ASSUME_GS1: true,
@@ -154,14 +154,14 @@ func TestCode128Reader_decodeRowCodeA(t *testing.T) {
 		"10111011110" + "11011001100" + "11101011110" + //CodeC 00 CodeA
 		"10001111010" + // Checksum=79
 		"1100011101011" + "00000001")
-	r, e := dec.decodeRow(10, row, hint)
+	r, e := dec.DecodeRow(10, row, hint)
 	expTxt := "]C1!\n\x1d\xa1\x81!aa00"
 	expRaw := []byte{
 		103, 102, 1, 74, 102, 97, 96, 101, 101, 1, 65, 101, 101, 1,
 		98, 65, 100, 65, 101, 99, 0, 101, 79, 106,
 	}
 	if e != nil {
-		t.Fatalf("decodeRow returns error: %v", e)
+		t.Fatalf("DecodeRow returns error: %v", e)
 	}
 	if format := r.GetBarcodeFormat(); format != gozxing.BarcodeFormat_CODE_128 {
 		t.Fatalf("format = %v, expect %v", format, gozxing.BarcodeFormat_CODE_128)
@@ -182,7 +182,7 @@ func TestCode128Reader_decodeRowCodeA(t *testing.T) {
 	}
 }
 
-func TestCode128Reader_decodeRowCodeB(t *testing.T) {
+func TestCode128Reader_DecodeRowCodeB(t *testing.T) {
 	dec := NewCode128Reader().(*code128Reader)
 	hint := map[gozxing.DecodeHintType]interface{}{
 		gozxing.DecodeHintType_ASSUME_GS1: true,
@@ -198,14 +198,14 @@ func TestCode128Reader_decodeRowCodeB(t *testing.T) {
 		"10111011110" + "11011001100" + "10111101110" + // CodeC 00 CodeB
 		"11001011100" + // Checksum=19
 		"1100011101011" + "00000001")
-	r, e := dec.decodeRow(10, row, hint)
+	r, e := dec.DecodeRow(10, row, hint)
 	expTxt := "]C1!a\x1d\xa1!\n\n00"
 	expRaw := []byte{
 		104, 102, 1, 65, 102, 97, 96, 100, 100, 1, 100, 100, 1,
 		98, 74, 101, 74, 100, 99, 0, 100, 19, 106,
 	}
 	if e != nil {
-		t.Fatalf("decodeRow returns error: %v", e)
+		t.Fatalf("DecodeRow returns error: %v", e)
 	}
 	if format := r.GetBarcodeFormat(); format != gozxing.BarcodeFormat_CODE_128 {
 		t.Fatalf("format = %v, expect %v", format, gozxing.BarcodeFormat_CODE_128)
@@ -226,7 +226,7 @@ func TestCode128Reader_decodeRowCodeB(t *testing.T) {
 	}
 }
 
-func TestCode128Reader_decodeRowCodeC(t *testing.T) {
+func TestCode128Reader_DecodeRowCodeC(t *testing.T) {
 	dec := NewCode128Reader().(*code128Reader)
 	hint := map[gozxing.DecodeHintType]interface{}{
 		gozxing.DecodeHintType_ASSUME_GS1: true,
@@ -238,13 +238,13 @@ func TestCode128Reader_decodeRowCodeC(t *testing.T) {
 		"10111101110" + "10010110000" + "10111011110" + // CodeB a CodeC
 		"10110000100" + // Checksum=70
 		"1100011101011" + "00000001")
-	r, e := dec.decodeRow(10, row, hint)
+	r, e := dec.DecodeRow(10, row, hint)
 	expTxt := "]C199\x1d\na"
 	expRaw := []byte{
 		105, 102, 99, 102, 101, 74, 99, 100, 65, 99, 70, 106,
 	}
 	if e != nil {
-		t.Fatalf("decodeRow returns error: %v", e)
+		t.Fatalf("DecodeRow returns error: %v", e)
 	}
 	if format := r.GetBarcodeFormat(); format != gozxing.BarcodeFormat_CODE_128 {
 		t.Fatalf("format = %v, expect %v", format, gozxing.BarcodeFormat_CODE_128)

@@ -17,8 +17,8 @@ func NewUPCAReader() gozxing.Reader {
 	return this
 }
 
-func (this *upcAReader) decodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
-	return maybeReturnResult(this.ean13Reader.decodeRow(rowNumber, row, hints))
+func (this *upcAReader) DecodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
+	return maybeReturnResult(this.ean13Reader.DecodeRow(rowNumber, row, hints))
 }
 
 func (this *upcAReader) decodeRowWithStartRange(

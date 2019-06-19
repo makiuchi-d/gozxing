@@ -66,7 +66,7 @@ func NewCode39ReaderWithFlags(usingCheckDigit, extendedMode bool) gozxing.Reader
 	return this
 }
 
-func (this *code39Reader) decodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
+func (this *code39Reader) DecodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
 
 	theCounters := this.counters
 	for i := range theCounters {

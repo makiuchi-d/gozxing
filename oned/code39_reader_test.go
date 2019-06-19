@@ -93,56 +93,56 @@ func TestCode39FindAsteriskPattern(t *testing.T) {
 	}
 }
 
-func TestCode39Reader_decodeRow(t *testing.T) {
+func TestCode39Reader_DecodeRow(t *testing.T) {
 	dec := NewCode39Reader().(*code39Reader)
 
 	// no start asterisk
 	src := testutil.NewBitArrayFromString("0000000")
-	_, e := dec.decodeRow(1, src, nil)
+	_, e := dec.DecodeRow(1, src, nil)
 	if e == nil {
-		t.Fatalf("decodeRow must be error")
+		t.Fatalf("DecodeRow must be error")
 	}
 
 	// error on recordPattern
 	src = testutil.NewBitArrayFromString("000" + "1001011011010")
-	_, e = dec.decodeRow(1, src, nil)
+	_, e = dec.DecodeRow(1, src, nil)
 	if e == nil {
-		t.Fatalf("decodeRow must be error")
+		t.Fatalf("DecodeRow must be error")
 	}
 
 	// error on code39ToNarrowWidePattern
 	src = testutil.NewBitArrayFromString("000" + "1001011011010" + "1010101010")
-	_, e = dec.decodeRow(1, src, nil)
+	_, e = dec.DecodeRow(1, src, nil)
 	if _, ok := e.(gozxing.NotFoundException); !ok {
-		t.Fatalf("decodeRow must be NotFoundException, %T", e)
+		t.Fatalf("DecodeRow must be NotFoundException, %T", e)
 	}
 
 	// error on code39PatternToChar
 	src = testutil.NewBitArrayFromString("000" + "1001011011010" + "1101101101010")
-	_, e = dec.decodeRow(1, src, nil)
+	_, e = dec.DecodeRow(1, src, nil)
 	if e == nil {
-		t.Fatalf("decodeRow must be error")
+		t.Fatalf("DecodeRow must be error")
 	}
 
 	// less whitespace after end asterisk
 	src = testutil.NewBitArrayFromString("000" + "1001011011010" + "1001011011010" + "001")
-	_, e = dec.decodeRow(1, src, nil)
+	_, e = dec.DecodeRow(1, src, nil)
 	if _, ok := e.(gozxing.NotFoundException); !ok {
-		t.Fatalf("decodeRow must be NotFoundException, %T", e)
+		t.Fatalf("DecodeRow must be NotFoundException, %T", e)
 	}
 
 	// empty result
 	src = testutil.NewBitArrayFromString("000" + "1001011011010" + "1001011011010" + "00")
-	_, e = dec.decodeRow(1, src, nil)
+	_, e = dec.DecodeRow(1, src, nil)
 	if _, ok := e.(gozxing.NotFoundException); !ok {
-		t.Fatalf("decodeRow must be NotFoundException, %T", e)
+		t.Fatalf("DecodeRow must be NotFoundException, %T", e)
 	}
 
 	// *A*
 	src = testutil.NewBitArrayFromString("000" + "1001011011010" + "1101010010110" + "1001011011010" + "000")
-	r, e := dec.decodeRow(1, src, nil)
+	r, e := dec.DecodeRow(1, src, nil)
 	if e != nil {
-		t.Fatalf("decodeRow returns error: %v", e)
+		t.Fatalf("DecodeRow returns error: %v", e)
 	}
 	if txt := r.GetText(); txt != "A" {
 		t.Fatalf("text = \"%v\", expect \"A\"", txt)
@@ -159,24 +159,24 @@ func TestCode39Reader_decodeRow(t *testing.T) {
 	}
 }
 
-func TestCode39Reader_decodeRowWithExtendedModeCheckDigit(t *testing.T) {
+func TestCode39Reader_DecodeRowWithExtendedModeCheckDigit(t *testing.T) {
 	dec := NewCode39ReaderWithFlags(true, true).(*code39Reader)
 
 	// *AA*, checkdigit=20 => 'K'
 	src := testutil.NewBitArrayFromString("000" + "1001011011010" +
 		"1101010010110" + "1101010010110" + "1101010010110" + // AAA
 		"1001011011010" + "000")
-	_, e := dec.decodeRow(1, src, nil)
+	_, e := dec.DecodeRow(1, src, nil)
 	if _, ok := e.(gozxing.ChecksumException); !ok {
-		t.Fatalf("decodeRow must be ChecksumException, %T", e)
+		t.Fatalf("DecodeRow must be ChecksumException, %T", e)
 	}
 	// *+0* (invalid extended string), checkdigit=41 =>'+'
 	src = testutil.NewBitArrayFromString("000" + "1001011011010" +
 		"1001010010010" + "1010011011010" + "1001010010010" + // +0+
 		"1001011011010" + "000")
-	_, e = dec.decodeRow(1, src, nil)
+	_, e = dec.DecodeRow(1, src, nil)
 	if _, ok := e.(gozxing.FormatException); !ok {
-		t.Fatalf("decodeRow must be FormatException, %T", e)
+		t.Fatalf("DecodeRow must be FormatException, %T", e)
 	}
 
 	// 1+A%V => "1a@", checkdigit=39 => '$'
@@ -185,9 +185,9 @@ func TestCode39Reader_decodeRowWithExtendedModeCheckDigit(t *testing.T) {
 		"1101001010110" + "1001010010010" + "1101010010110" + // 1+A
 		"1010010010010" + "1001101010110" + "1001001001010" + // %V$
 		"1001011011010" + "000")
-	r, e := dec.decodeRow(1, src, nil)
+	r, e := dec.DecodeRow(1, src, nil)
 	if e != nil {
-		t.Fatalf("decodeRow returns error: %v", e)
+		t.Fatalf("DecodeRow returns error: %v", e)
 	}
 	if txt := r.GetText(); txt != expect {
 		t.Fatalf("text = \"%v\", expect \"%v\"", txt, expect)

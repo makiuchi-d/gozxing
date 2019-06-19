@@ -171,7 +171,7 @@ func TestCodabarReader_validatePattern(t *testing.T) {
 	}
 }
 
-func TestCodabarReader_decodeRow(t *testing.T) {
+func TestCodabarReader_DecodeRow(t *testing.T) {
 	reader := NewCodaBarReader().(*codabarReader)
 
 	tests := []struct {
@@ -188,9 +188,9 @@ func TestCodabarReader_decodeRow(t *testing.T) {
 	}
 	for _, test := range tests {
 		row := testutil.NewBitArrayFromString(test.row)
-		_, e := reader.decodeRow(10, row, nil)
+		_, e := reader.DecodeRow(10, row, nil)
 		if _, ok := e.(gozxing.NotFoundException); !ok {
-			t.Fatalf("decodeRow[%v] must be NotFoundException, %T", test.label, e)
+			t.Fatalf("DecodeRow[%v] must be NotFoundException, %T", test.label, e)
 		}
 	}
 
@@ -199,9 +199,9 @@ func TestCodabarReader_decodeRow(t *testing.T) {
 		"00000" + "10100110010" + "1100101010" + "1011001010" + "10110110110" + "10100100110" + "00000")
 	points := []gozxing.ResultPoint{gozxing.NewResultPoint(5, 10), gozxing.NewResultPoint(57, 10)}
 
-	r, e := reader.decodeRow(10, row, nil)
+	r, e := reader.DecodeRow(10, row, nil)
 	if e != nil {
-		t.Fatalf("decodeRow returns error: %v", e)
+		t.Fatalf("DecodeRow returns error: %v", e)
 	}
 	if txt, wants := r.GetText(), "3$+"; txt != wants {
 		t.Fatalf("text = \"%v\", wants \"%v\"", txt, wants)
@@ -213,9 +213,9 @@ func TestCodabarReader_decodeRow(t *testing.T) {
 	hints := map[gozxing.DecodeHintType]interface{}{
 		gozxing.DecodeHintType_RETURN_CODABAR_START_END: true,
 	}
-	r, e = reader.decodeRow(10, row, hints)
+	r, e = reader.DecodeRow(10, row, hints)
 	if e != nil {
-		t.Fatalf("decodeRow returns error: %v", e)
+		t.Fatalf("DecodeRow returns error: %v", e)
 	}
 	if txt, wants := r.GetText(), "D3$+C"; txt != wants {
 		t.Fatalf("text = \"%v\", wants \"%v\"", txt, wants)

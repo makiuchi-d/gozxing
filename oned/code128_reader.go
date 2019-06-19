@@ -217,7 +217,7 @@ func code128DecodeCode(row *gozxing.BitArray, counters []int, rowOffset int) (in
 	}
 }
 
-func (*code128Reader) decodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
+func (*code128Reader) DecodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
 
 	_, convertFNC1 := hints[gozxing.DecodeHintType_ASSUME_GS1]
 

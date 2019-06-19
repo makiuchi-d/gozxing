@@ -222,7 +222,7 @@ func TestITFReader_decodeMiddle(t *testing.T) {
 	}
 }
 
-func TestITFReader_decodeRow(t *testing.T) {
+func TestITFReader_DecodeRow(t *testing.T) {
 	reader := NewITFReader().(*itfReader)
 
 	failtests := []string{
@@ -232,9 +232,9 @@ func TestITFReader_decodeRow(t *testing.T) {
 	}
 	for _, str := range failtests {
 		row := testutil.NewBitArrayFromString(str)
-		_, e := reader.decodeRow(10, row, nil)
+		_, e := reader.DecodeRow(10, row, nil)
 		if _, ok := e.(gozxing.NotFoundException); !ok {
-			t.Fatalf("decodeRow(%v) must NotFoundException, %T", str, e)
+			t.Fatalf("DecodeRow(%v) must NotFoundException, %T", str, e)
 		}
 	}
 
@@ -247,17 +247,17 @@ func TestITFReader_decodeRow(t *testing.T) {
 	end := float64(22)
 	row := testutil.NewBitArrayFromString(rowstr)
 
-	_, e := reader.decodeRow(10, row, nil) // length (=2) is not allowed
+	_, e := reader.DecodeRow(10, row, nil) // length (=2) is not allowed
 	if _, ok := e.(gozxing.FormatException); !ok {
-		t.Fatalf("decodeRow must FormatException, %T", e)
+		t.Fatalf("DecodeRow must FormatException, %T", e)
 	}
 
-	r, e := reader.decodeRow(10, row, hint)
+	r, e := reader.DecodeRow(10, row, hint)
 	if e != nil {
-		t.Fatalf("decodeRow returns error: %v", e)
+		t.Fatalf("DecodeRow returns error: %v", e)
 	}
 	if txt := r.GetText(); txt != wants {
-		t.Fatalf("decodeRow = \"%v\", wants \"%v\"", txt, wants)
+		t.Fatalf("DecodeRow = \"%v\", wants \"%v\"", txt, wants)
 	}
 	pts := r.GetResultPoints()
 	if x, y := pts[0].GetX(), pts[0].GetY(); x != start || y != 10 {
@@ -273,12 +273,12 @@ func TestITFReader_decodeRow(t *testing.T) {
 	end = float64(78)
 	row = testutil.NewBitArrayFromString(rowstr)
 
-	r, e = reader.decodeRow(10, row, hint)
+	r, e = reader.DecodeRow(10, row, hint)
 	if e != nil {
-		t.Fatalf("decodeRow returns error: %v", e)
+		t.Fatalf("DecodeRow returns error: %v", e)
 	}
 	if txt := r.GetText(); txt != wants {
-		t.Fatalf("decodeRow = \"%v\", wants \"%v\"", txt, wants)
+		t.Fatalf("DecodeRow = \"%v\", wants \"%v\"", txt, wants)
 	}
 	pts = r.GetResultPoints()
 	if x, y := pts[0].GetX(), pts[0].GetY(); x != start || y != 10 {

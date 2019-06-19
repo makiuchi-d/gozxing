@@ -51,7 +51,7 @@ func NewMultiFormatUPCEANReader(hints map[gozxing.DecodeHintType]interface{}) go
 	return this
 }
 
-func (this *multiFormatUPCEANReader) decodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
+func (this *multiFormatUPCEANReader) DecodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
 	// Compute this location once and reuse it on multiple implementations
 	startGuardPattern, e := upceanReader_findStartGuardPattern(row)
 	if e != nil {

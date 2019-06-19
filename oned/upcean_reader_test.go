@@ -166,37 +166,37 @@ func (this *testMiddleDecoder) checkChecksum(s string) (bool, error) {
 	return upceanReader_checkChecksum(s)
 }
 
-func TestUPCEANReader_decodeRow(t *testing.T) {
+func TestUPCEANReader_DecodeRow(t *testing.T) {
 	// no start guard
 	row := gozxing.NewBitArray(13)
 	reader := newTestMiddleDecoder([]byte{}, false)
-	_, e := reader.decodeRow(5, row, nil)
+	_, e := reader.DecodeRow(5, row, nil)
 	if e == nil {
-		t.Fatalf("decodeRow must be error")
+		t.Fatalf("DecodeRow must be error")
 	}
 
 	// decodeMiddle error
 	row.Set(3)
 	row.Set(5)
-	_, e = reader.decodeRow(5, row, nil)
+	_, e = reader.DecodeRow(5, row, nil)
 	if e == nil {
-		t.Fatalf("decodeRow must be error")
+		t.Fatalf("DecodeRow must be error")
 	}
 
 	// no end guard
 	data := []byte{'0', '1', '2'}
 	reader = newTestMiddleDecoder(data, false)
-	_, e = reader.decodeRow(5, row, nil)
+	_, e = reader.DecodeRow(5, row, nil)
 	if e == nil {
-		t.Fatalf("decodeRow must be error")
+		t.Fatalf("DecodeRow must be error")
 	}
 
 	// less end quiet
 	row.Set(9)
 	row.Set(11)
-	_, e = reader.decodeRow(5, row, nil)
+	_, e = reader.DecodeRow(5, row, nil)
 	if _, ok := e.(gozxing.NotFoundException); !ok {
-		t.Fatalf("decodeRow must be NotFoundException, %T", e)
+		t.Fatalf("DecodeRow must be NotFoundException, %T", e)
 	}
 
 	// black on end quiet
@@ -206,16 +206,16 @@ func TestUPCEANReader_decodeRow(t *testing.T) {
 	row.Set(9)
 	row.Set(11)
 	row.Set(13)
-	_, e = reader.decodeRow(5, row, nil)
+	_, e = reader.DecodeRow(5, row, nil)
 	if _, ok := e.(gozxing.NotFoundException); !ok {
-		t.Fatalf("decodeRow must be NotFoundException, %T", e)
+		t.Fatalf("DecodeRow must be NotFoundException, %T", e)
 	}
 
 	// less result length
 	row.Flip(13)
-	_, e = reader.decodeRow(5, row, nil)
+	_, e = reader.DecodeRow(5, row, nil)
 	if _, ok := e.(gozxing.FormatException); !ok {
-		t.Fatalf("decodeRow must be FormatException, %T", e)
+		t.Fatalf("DecodeRow must be FormatException, %T", e)
 	}
 
 	// checksum calc error
@@ -223,25 +223,25 @@ func TestUPCEANReader_decodeRow(t *testing.T) {
 	reader = newTestMiddleDecoder(data, false)
 	row.Set(15)
 	row.Set(17)
-	_, e = reader.decodeRow(5, row, nil)
+	_, e = reader.DecodeRow(5, row, nil)
 	if e == nil {
-		t.Fatalf("decodeRow must be error")
+		t.Fatalf("DecodeRow must be error")
 	}
 
 	// checksum error
 	data = []byte("01234567")
 	reader = newTestMiddleDecoder(data, false)
-	_, e = reader.decodeRow(5, row, nil)
+	_, e = reader.DecodeRow(5, row, nil)
 	if _, ok := e.(gozxing.ChecksumException); !ok {
-		t.Fatalf("decodeRow must be ChecksumException, %T", e)
+		t.Fatalf("DecodeRow must be ChecksumException, %T", e)
 	}
 
 	// success
 	data = []byte("01234565")
 	reader = newTestMiddleDecoder(data, false)
-	result, e := reader.decodeRow(5, row, nil)
+	result, e := reader.DecodeRow(5, row, nil)
 	if e != nil {
-		t.Fatalf("decodeRow returns error, %v", e)
+		t.Fatalf("DecodeRow returns error, %v", e)
 	}
 	if str := result.GetText(); str != "01234565" {
 		t.Fatalf("result text = \"%v\", expect \"01234565\"", str)
@@ -258,7 +258,7 @@ func TestUPCEANReader_decodeRow(t *testing.T) {
 	}
 }
 
-func TestUPCEANReader_decodeRowWithResultPointCallback(t *testing.T) {
+func TestUPCEANReader_DecodeRowWithResultPointCallback(t *testing.T) {
 	row := gozxing.NewBitArray(25)
 	row.Set(3)
 	row.Set(5)
@@ -274,9 +274,9 @@ func TestUPCEANReader_decodeRowWithResultPointCallback(t *testing.T) {
 
 	hints := make(map[gozxing.DecodeHintType]interface{})
 	hints[gozxing.DecodeHintType_NEED_RESULT_POINT_CALLBACK] = callback
-	_, e := reader.decodeRow(7, row, hints)
+	_, e := reader.DecodeRow(7, row, hints)
 	if e != nil {
-		t.Fatalf("decodeRow returns error, %v", e)
+		t.Fatalf("DecodeRow returns error, %v", e)
 	}
 
 	if len(points) != 3 {
@@ -293,7 +293,7 @@ func TestUPCEANReader_decodeRowWithResultPointCallback(t *testing.T) {
 	}
 }
 
-func TestUPCEANReader_decodeRowWithExtension(t *testing.T) {
+func TestUPCEANReader_DecodeRowWithExtension(t *testing.T) {
 	row := gozxing.NewBitArray(55)
 	row.Set(3)
 	row.Set(5)
@@ -316,15 +316,15 @@ func TestUPCEANReader_decodeRowWithExtension(t *testing.T) {
 
 	hints := make(map[gozxing.DecodeHintType]interface{})
 	hints[gozxing.DecodeHintType_ALLOWED_EAN_EXTENSIONS] = []int{5}
-	_, e := reader.decodeRow(7, row, hints)
+	_, e := reader.DecodeRow(7, row, hints)
 	if _, ok := e.(gozxing.NotFoundException); !ok {
-		t.Fatalf("decodeRow must be NotFoundException, %T", e)
+		t.Fatalf("DecodeRow must be NotFoundException, %T", e)
 	}
 
 	hints[gozxing.DecodeHintType_ALLOWED_EAN_EXTENSIONS] = []int{2, 5}
-	result, e := reader.decodeRow(7, row, hints)
+	result, e := reader.DecodeRow(7, row, hints)
 	if e != nil {
-		t.Fatalf("decodeRow returns error, %v", e)
+		t.Fatalf("DecodeRow returns error, %v", e)
 	}
 	meta := result.GetResultMetadata()
 	ext, ok := meta[gozxing.ResultMetadataType_UPC_EAN_EXTENSION]
@@ -343,7 +343,7 @@ func TestUPCEANReader_decodeRowWithExtension(t *testing.T) {
 	}
 }
 
-func TestUPCEANReader_decodeRowEAN13(t *testing.T) {
+func TestUPCEANReader_DecodeRowEAN13(t *testing.T) {
 	row := gozxing.NewBitArray(36)
 	row.Set(3)
 	row.Set(5)
@@ -352,9 +352,9 @@ func TestUPCEANReader_decodeRowEAN13(t *testing.T) {
 
 	data := []byte("0123456789012")
 	reader := newTestMiddleDecoder(data, true)
-	result, e := reader.decodeRow(7, row, nil)
+	result, e := reader.DecodeRow(7, row, nil)
 	if e != nil {
-		t.Fatalf("decodeRow returns error, %v", e)
+		t.Fatalf("DecodeRow returns error, %v", e)
 	}
 	meta := result.GetResultMetadata()
 	country, ok := meta[gozxing.ResultMetadataType_POSSIBLE_COUNTRY]

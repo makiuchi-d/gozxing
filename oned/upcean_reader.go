@@ -54,7 +54,7 @@ func init() {
 }
 
 type upceanRowDecoder interface {
-	rowDecoder
+	RowDecoder
 
 	// getBarcodeFormat Get the format of this decoder.
 	// @return The 1D format.
@@ -124,7 +124,7 @@ func upceanReader_findStartGuardPattern(row *gozxing.BitArray) ([]int, error) {
 	return startRange, nil
 }
 
-func (this *upceanReader) decodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
+func (this *upceanReader) DecodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
 	start, e := upceanReader_findStartGuardPattern(row)
 	if e != nil {
 		return nil, gozxing.WrapNotFoundException(e)

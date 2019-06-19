@@ -57,7 +57,7 @@ func NewCodaBarReader() gozxing.Reader {
 	return reader
 }
 
-func (this *codabarReader) decodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
+func (this *codabarReader) DecodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
 
 	this.counters = this.counters[:0]
 	e := this.setCounters(row)

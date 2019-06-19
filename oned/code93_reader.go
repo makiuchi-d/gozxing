@@ -42,7 +42,7 @@ func NewCode93Reader() gozxing.Reader {
 	return this
 }
 
-func (this *code93Reader) decodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
+func (this *code93Reader) DecodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
 
 	startLeft, startRight, e := this.findAsteriskPattern(row)
 	if e != nil {

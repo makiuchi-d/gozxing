@@ -108,49 +108,49 @@ func TestCode93Reader_findAsteriskPattern(t *testing.T) {
 	}
 }
 
-func TestCode93Reader_decodeRow(t *testing.T) {
+func TestCode93Reader_DecodeRow(t *testing.T) {
 	dec := NewCode93Reader().(*code93Reader)
 
 	// no start asterisk
 	row := testutil.NewBitArrayFromString("00001010100000")
-	_, e := dec.decodeRow(1, row, nil)
+	_, e := dec.DecodeRow(1, row, nil)
 	if e == nil {
-		t.Fatalf("decodeRow must be error")
+		t.Fatalf("DecodeRow must be error")
 	}
 
 	// error in recordPattern
 	row = testutil.NewBitArrayFromString("0001010111101000")
-	_, e = dec.decodeRow(1, row, nil)
+	_, e = dec.DecodeRow(1, row, nil)
 	if e == nil {
-		t.Fatalf("decodeRow must be error")
+		t.Fatalf("DecodeRow must be error")
 	}
 
 	// error in toPattern
 	row = testutil.NewBitArrayFromString("000101011110101011111010111")
-	_, e = dec.decodeRow(1, row, nil)
+	_, e = dec.DecodeRow(1, row, nil)
 	if e == nil {
-		t.Fatalf("decodeRow must be error")
+		t.Fatalf("DecodeRow must be error")
 	}
 
 	// error in patternToChar
 	row = testutil.NewBitArrayFromString("000101011110101111010")
-	_, e = dec.decodeRow(1, row, nil)
+	_, e = dec.DecodeRow(1, row, nil)
 	if e == nil {
-		t.Fatalf("decodeRow must be error")
+		t.Fatalf("DecodeRow must be error")
 	}
 
 	// no guard black module at end
 	row = testutil.NewBitArrayFromString("000101011110" + "100010100" + "101011110")
-	_, e = dec.decodeRow(1, row, nil)
+	_, e = dec.DecodeRow(1, row, nil)
 	if _, ok := e.(gozxing.NotFoundException); !ok {
-		t.Fatalf("decodeRow must be NotFoundException, %T", e)
+		t.Fatalf("DecodeRow must be NotFoundException, %T", e)
 	}
 
 	// short result
 	row = testutil.NewBitArrayFromString("000101011110" + "100010100" + "101011110" + "1111")
-	_, e = dec.decodeRow(1, row, nil)
+	_, e = dec.DecodeRow(1, row, nil)
 	if _, ok := e.(gozxing.NotFoundException); !ok {
-		t.Fatalf("decodeRow must be NotFoundException, %T", e)
+		t.Fatalf("DecodeRow must be NotFoundException, %T", e)
 	}
 
 	// invalid checksum
@@ -158,9 +158,9 @@ func TestCode93Reader_decodeRow(t *testing.T) {
 		"110100010" + // C
 		"100010100" + "100010100" + // checksum 0,0
 		"1010111101111")
-	_, e = dec.decodeRow(1, row, nil)
+	_, e = dec.DecodeRow(1, row, nil)
 	if e == nil {
-		t.Fatalf("decodeRow must be error")
+		t.Fatalf("DecodeRow must be error")
 	}
 
 	// invalid extented code
@@ -168,9 +168,9 @@ func TestCode93Reader_decodeRow(t *testing.T) {
 		"100100110" + "100010100" + // ($)0
 		"111001010" + "110110010" + // checksum $,R
 		"1010111101111")
-	_, e = dec.decodeRow(1, row, nil)
+	_, e = dec.DecodeRow(1, row, nil)
 	if e == nil {
-		t.Fatalf("decodeRow must be error")
+		t.Fatalf("DecodeRow must be error")
 	}
 
 	row = testutil.NewBitArrayFromString("000101011110" +
@@ -181,9 +181,9 @@ func TestCode93Reader_decodeRow(t *testing.T) {
 		"100001010" + "101000010" + // 93
 		"110101000" + "111010110" + //Checksum A (/)
 		"1010111101111")
-	r, e := dec.decodeRow(1, row, nil)
+	r, e := dec.DecodeRow(1, row, nil)
 	if e != nil {
-		t.Fatalf("decodeRow returns error: %v", e)
+		t.Fatalf("DecodeRow returns error: %v", e)
 	}
 	if txt := r.GetText(); txt != "Code93" {
 		t.Fatalf("text = \"%v\", expect \"Code93\"", txt)

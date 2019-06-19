@@ -7,13 +7,13 @@ import (
 	"github.com/makiuchi-d/gozxing/testutil"
 )
 
-func TestUPCAReader_decodeRow(t *testing.T) {
+func TestUPCAReader_DecodeRow(t *testing.T) {
 	reader := NewUPCAReader().(*upcAReader)
 	row := gozxing.NewBitArray(105)
 
-	_, e := reader.decodeRow(10, row, nil)
+	_, e := reader.DecodeRow(10, row, nil)
 	if e == nil {
-		t.Fatalf("decodeRow must be error")
+		t.Fatalf("DecodeRow must be error")
 	}
 
 	// invalid UPCA (EAN13:1234567890128)
@@ -23,9 +23,9 @@ func TestUPCAReader_decodeRow(t *testing.T) {
 		}
 	}
 
-	_, e = reader.decodeRow(10, row, nil)
+	_, e = reader.DecodeRow(10, row, nil)
 	if _, ok := e.(gozxing.FormatException); !ok {
-		t.Fatalf("decodeRow must be FormatException, %T", e)
+		t.Fatalf("DecodeRow must be FormatException, %T", e)
 	}
 
 	// valid UPCA:123456789012
@@ -37,15 +37,15 @@ func TestUPCAReader_decodeRow(t *testing.T) {
 		}
 	}
 
-	result, e := reader.decodeRow(10, row, nil)
+	result, e := reader.DecodeRow(10, row, nil)
 	if e != nil {
-		t.Fatalf("decodeRow returns error, %v", e)
+		t.Fatalf("DecodeRow returns error, %v", e)
 	}
 	if format := result.GetBarcodeFormat(); format != gozxing.BarcodeFormat_UPC_A {
-		t.Fatalf("decodeRow format = %v, expect UPC_A", format)
+		t.Fatalf("DecodeRow format = %v, expect UPC_A", format)
 	}
 	if text := result.GetText(); text != "123456789012" {
-		t.Fatalf("decodeRow text = \"%v\",  expect \"123456789012\"", text)
+		t.Fatalf("DecodeRow text = \"%v\",  expect \"123456789012\"", text)
 	}
 }
 

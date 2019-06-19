@@ -6,7 +6,7 @@ import (
 	"github.com/makiuchi-d/gozxing"
 )
 
-type rowDecoder interface {
+type RowDecoder interface {
 	// decodeRow Attempts to decode a one-dimensional barcode format given a single row of an image
 	// @param rowNumber row number from top of the row
 	// @param row the black/white pixel data of the row
@@ -15,16 +15,16 @@ type rowDecoder interface {
 	// @throws NotFoundException if no potential barcode is found
 	// @throws ChecksumException if a potential barcode is found but does not pass its checksum
 	// @throws FormatException if a potential barcode is found but format is invalid
-	decodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error)
+	DecodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error)
 }
 
 // OneDReader Encapsulates functionality and implementation that is common to all families
 // of one-dimensional barcodes.
 type OneDReader struct {
-	rowDecoder
+	RowDecoder
 }
 
-func NewOneDReader(rowDecoder rowDecoder) *OneDReader {
+func NewOneDReader(rowDecoder RowDecoder) *OneDReader {
 	return &OneDReader{rowDecoder}
 }
 
@@ -162,7 +162,7 @@ func (this *OneDReader) doDecode(
 			}
 
 			// Look for a barcode
-			result, e := this.decodeRow(rowNumber, row, hints)
+			result, e := this.DecodeRow(rowNumber, row, hints)
 
 			if e == nil && attempt == 1 {
 				// We found our barcode

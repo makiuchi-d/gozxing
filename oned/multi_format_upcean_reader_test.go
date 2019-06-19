@@ -7,18 +7,18 @@ import (
 	"github.com/makiuchi-d/gozxing/testutil"
 )
 
-func TestMultiFormatUPCEANReader_decodeRow(t *testing.T) {
+func TestMultiFormatUPCEANReader_DecodeRow(t *testing.T) {
 	reader := NewMultiFormatUPCEANReader(nil).(*multiFormatUPCEANReader)
 
 	row := gozxing.NewBitArray(30)
 
-	_, e := reader.decodeRow(0, row, nil)
+	_, e := reader.DecodeRow(0, row, nil)
 	if _, ok := e.(gozxing.NotFoundException); !ok {
 		t.Fatalf("error must be NotFoundException, %T, %+v", e, e)
 	}
 
 	row = testutil.NewBitArrayFromString("0000010100000000000000000")
-	_, e = reader.decodeRow(0, row, nil)
+	_, e = reader.DecodeRow(0, row, nil)
 	if _, ok := e.(gozxing.NotFoundException); !ok {
 		t.Fatalf("error must be NotFoundException, %T, %+v", e, e)
 	}
@@ -26,9 +26,9 @@ func TestMultiFormatUPCEANReader_decodeRow(t *testing.T) {
 	// valid UPCA:123456789012
 	row = testutil.NewBitArrayFromString(
 		"000101001100100100110111101010001101100010101111010101000100100100011101001110010110011011011001010000")
-	r, e := reader.decodeRow(0, row, nil)
+	r, e := reader.DecodeRow(0, row, nil)
 	if e != nil {
-		t.Fatalf("decodeRow returns error: %+v", e)
+		t.Fatalf("DecodeRow returns error: %+v", e)
 	}
 	if txt, wants := r.GetText(), "0123456789012"; txt != wants {
 		t.Fatalf("result text = \"%v\", wants \"%v\"", txt, wants)
@@ -42,9 +42,9 @@ func TestMultiFormatUPCEANReader_decodeRow(t *testing.T) {
 			gozxing.BarcodeFormat_EAN_13, gozxing.BarcodeFormat_UPC_A,
 		},
 	}
-	r, e = reader.decodeRow(0, row, hints)
+	r, e = reader.DecodeRow(0, row, hints)
 	if e != nil {
-		t.Fatalf("decodeRow returns error: %+v", e)
+		t.Fatalf("DecodeRow returns error: %+v", e)
 	}
 	if txt, wants := r.GetText(), "123456789012"; txt != wants {
 		t.Fatalf("result text = \"%v\", wants \"%v\"", txt, wants)

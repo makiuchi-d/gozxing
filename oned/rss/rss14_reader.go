@@ -48,7 +48,7 @@ func NewRSS14Reader() gozxing.Reader {
 	return reader
 }
 
-func (this *rss14Reader) decodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
+func (this *rss14Reader) DecodeRow(rowNumber int, row *gozxing.BitArray, hints map[gozxing.DecodeHintType]interface{}) (*gozxing.Result, error) {
 	leftPair := this.decodePair(row, false, rowNumber, hints)
 	this.possibleLeftPairs = this.addOrTally(this.possibleLeftPairs, leftPair)
 	row.Reverse()
