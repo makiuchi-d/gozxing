@@ -4,7 +4,8 @@ import (
 	"testing"
 )
 
-func testLookupCountryIdentifier(t *testing.T, productCode, expect string) {
+func testLookupCountryIdentifier(t testing.TB, productCode, expect string) {
+	t.Helper()
 	r := eanManufacturerOrgSupportLookupCountryIdentifier(productCode)
 	if r != expect {
 		t.Fatalf("eanManufacturerOrgSupportList(%v) = \"%v\", expect \"%v\"", productCode, r, expect)

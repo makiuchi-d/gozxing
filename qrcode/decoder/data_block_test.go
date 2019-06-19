@@ -5,7 +5,8 @@ import (
 	"testing"
 )
 
-func testDataBlocks(t *testing.T, block *DataBlock, expectnum int, expectwords []byte) {
+func testDataBlocks(t testing.TB, block *DataBlock, expectnum int, expectwords []byte) {
+	t.Helper()
 	if n := block.GetNumDataCodewords(); n != expectnum {
 		t.Fatalf("NumDataCodeWords = %v, expect %v", n, expectnum)
 	}

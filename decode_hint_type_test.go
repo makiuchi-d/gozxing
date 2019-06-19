@@ -4,7 +4,8 @@ import (
 	"testing"
 )
 
-func testDecodeHintType_String(t *testing.T, d DecodeHintType, e string) {
+func testDecodeHintType_String(t testing.TB, d DecodeHintType, e string) {
+	t.Helper()
 	if s := d.String(); s != e {
 		t.Fatalf("DecodeHintType(%d) stringified \"%s\", expect \"%s\"", d, s, e)
 	}

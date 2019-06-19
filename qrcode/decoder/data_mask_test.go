@@ -6,7 +6,8 @@ import (
 	"github.com/makiuchi-d/gozxing"
 )
 
-func testMask(t *testing.T, mask DataMask, dimension int, condition func(int, int) bool) {
+func testMask(t testing.TB, mask DataMask, dimension int, condition func(int, int) bool) {
+	t.Helper()
 	bits, _ := gozxing.NewSquareBitMatrix(dimension)
 	mask.UnmaskBitMatrix(bits, dimension)
 	for i := 0; i < dimension; i++ {
@@ -18,7 +19,8 @@ func testMask(t *testing.T, mask DataMask, dimension int, condition func(int, in
 	}
 }
 
-func testMaskAcrossDimensions(t *testing.T, reference int, condition func(int, int) bool) {
+func testMaskAcrossDimensions(t testing.TB, reference int, condition func(int, int) bool) {
+	t.Helper()
 	mask := DataMaskValues[reference]
 	for version := 1; version <= 40; version++ {
 		dimension := 17 + 4*version

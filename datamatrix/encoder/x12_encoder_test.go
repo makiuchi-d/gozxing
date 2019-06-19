@@ -12,7 +12,8 @@ func TestX12Encoder_getEncodingMode(t *testing.T) {
 	}
 }
 
-func testX12EncodeChar(t *testing.T, c, expect byte) {
+func testX12EncodeChar(t testing.TB, c, expect byte) {
+	t.Helper()
 	sb, e := x12EncodeChar(c, []byte{})
 	if e != nil {
 		t.Fatalf("x12EncodeChar(%v) returns error: %v", c, e)

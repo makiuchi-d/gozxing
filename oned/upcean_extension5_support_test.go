@@ -6,7 +6,8 @@ import (
 	"github.com/makiuchi-d/gozxing"
 )
 
-func testUPCEANExtension5Support_parseExtension5String(t *testing.T, raw, expect string) {
+func testUPCEANExtension5Support_parseExtension5String(t testing.TB, raw, expect string) {
+	t.Helper()
 	e5s := NewUPCEANExtension5Support()
 	str := e5s.parseExtension5String(raw)
 	if str != expect {
@@ -70,7 +71,8 @@ func TestUPCEANExtension5Support_determineCheckDigit(t *testing.T) {
 	}
 }
 
-func testUPCEANExtension5Support_extensionChecksum(t *testing.T, str string, expect int) {
+func testUPCEANExtension5Support_extensionChecksum(t testing.TB, str string, expect int) {
+	t.Helper()
 	e5s := NewUPCEANExtension5Support()
 	sum := e5s.extensionChecksum(str)
 	if sum != expect {

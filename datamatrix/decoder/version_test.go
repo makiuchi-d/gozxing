@@ -7,9 +7,10 @@ import (
 	"github.com/makiuchi-d/gozxing"
 )
 
-func testVersion(t *testing.T, row, col int,
+func testVersion(t testing.TB, row, col int,
 	verNum, symbolRow, symbolCol, dataRegionRow, dataRegionCol, totalCW int,
 	ecCW int, ecbs []ECB, str string) {
+	t.Helper()
 
 	v, e := getVersionForDimensions(row, col)
 	if e != nil {

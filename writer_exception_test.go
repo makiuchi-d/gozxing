@@ -6,7 +6,8 @@ import (
 	errors "golang.org/x/xerrors"
 )
 
-func testWriterErrorType(t *testing.T, e error) {
+func testWriterErrorType(t testing.TB, e error) {
+	t.Helper()
 	var we WriterException
 	if !errors.As(e, &we) {
 		t.Fatalf("Type must be WriterException")

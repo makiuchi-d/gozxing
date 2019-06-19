@@ -4,7 +4,8 @@ import (
 	"testing"
 )
 
-func testResultMetadataTypeString(t *testing.T, metadataType ResultMetadataType, expect string) {
+func testResultMetadataTypeString(t testing.TB, metadataType ResultMetadataType, expect string) {
+	t.Helper()
 	if r := metadataType.String(); r != expect {
 		t.Fatalf("String = %v, expect %v", r, expect)
 	}

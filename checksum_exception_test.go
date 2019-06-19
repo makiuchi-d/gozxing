@@ -8,7 +8,8 @@ import (
 	errors "golang.org/x/xerrors"
 )
 
-func testChecksumExceptionType(t *testing.T, e error) {
+func testChecksumExceptionType(t testing.TB, e error) {
+	t.Helper()
 	var ce ChecksumException
 	if !errors.As(e, &ce) {
 		t.Fatalf("Type must be FormatException")

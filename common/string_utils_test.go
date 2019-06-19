@@ -16,7 +16,8 @@ func TestGessEncodingWithHint(t *testing.T) {
 	}
 }
 
-func doTest(t *testing.T, bytes []byte, charsetName string) {
+func doTest(t testing.TB, bytes []byte, charsetName string) {
+	t.Helper()
 	guessedName := StringUtils_guessEncoding(bytes, nil)
 	if guessedName != charsetName {
 		t.Fatalf("guessedName is %v, expect %v", guessedName, charsetName)

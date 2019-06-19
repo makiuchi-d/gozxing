@@ -4,7 +4,8 @@ import (
 	"testing"
 )
 
-func testErrorCorrectionLevel_ForBits(t *testing.T, bits uint, expect ErrorCorrectionLevel) {
+func testErrorCorrectionLevel_ForBits(t testing.TB, bits uint, expect ErrorCorrectionLevel) {
+	t.Helper()
 	r, e := ErrorCorrectionLevel_ForBits(bits)
 	if e != nil {
 		t.Fatalf("ForBits(0) returns error, %v", e)

@@ -39,7 +39,8 @@ func TestNewBitMatrix(t *testing.T) {
 	}
 }
 
-func testBitMatrixGet(t *testing.T, b *BitMatrix, x, y int, expect bool) {
+func testBitMatrixGet(t testing.TB, b *BitMatrix, x, y int, expect bool) {
+	t.Helper()
 	if r := b.Get(x, y); r != expect {
 		t.Fatalf("[%v,%v] = %v, expect %v", x, y, r, expect)
 	}

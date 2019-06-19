@@ -147,7 +147,8 @@ func TestOnedWriter_encode(t *testing.T) {
 	}
 }
 
-func testEncode(t *testing.T, writer gozxing.Writer, format gozxing.BarcodeFormat, contents, expect string) {
+func testEncode(t testing.TB, writer gozxing.Writer, format gozxing.BarcodeFormat, contents, expect string) {
+	t.Helper()
 	r, e := writer.Encode(contents, format, 0, 5, nil)
 	if e != nil {
 		t.Fatalf("Encode(\"%v\") returns error: %v", contents, e)

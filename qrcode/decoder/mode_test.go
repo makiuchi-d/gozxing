@@ -4,7 +4,8 @@ import (
 	"testing"
 )
 
-func testModeForBits(t *testing.T, bits int, expect *Mode) {
+func testModeForBits(t testing.TB, bits int, expect *Mode) {
+	t.Helper()
 	mode, e := ModeForBits(bits)
 	if e != nil {
 		t.Fatalf("ModeForBits(%v) returns error, %v", bits, e)
@@ -79,7 +80,8 @@ func TestModeAlphaNumeric(t *testing.T) {
 	}
 }
 
-func testMode_String(t *testing.T, mode *Mode, expect string) {
+func testMode_String(t testing.TB, mode *Mode, expect string) {
+	t.Helper()
 	str := mode.String()
 	if str != expect {
 		t.Fatalf("String = \"%v\", expect \"%v\"", str, expect)

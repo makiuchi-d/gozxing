@@ -4,7 +4,8 @@ import (
 	"testing"
 )
 
-func testBarcodeFormatString(t *testing.T, format BarcodeFormat, expect string) {
+func testBarcodeFormatString(t testing.TB, format BarcodeFormat, expect string) {
+	t.Helper()
 	str := format.String()
 	if str != expect {
 		t.Fatalf("String = \"%v\", expect \"%v\"", str, expect)

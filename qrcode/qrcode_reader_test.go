@@ -204,7 +204,8 @@ func TestQRCodeReader_Reset(t *testing.T) {
 	reader.Reset() // this method do nothing
 }
 
-func testDecodeImage(t *testing.T, file, expect string) *gozxing.Result {
+func testDecodeImage(t testing.TB, file, expect string) *gozxing.Result {
+	t.Helper()
 	bmp := testutil.NewBinaryBitmapFromFile(file)
 	r, e := NewQRCodeReader().Decode(bmp, nil)
 	if e != nil {
@@ -221,7 +222,8 @@ func testDecodeImage(t *testing.T, file, expect string) *gozxing.Result {
 	return r
 }
 
-func testStructuredAppend(t *testing.T, file string, metadata map[gozxing.ResultMetadataType]interface{}, seq, parity int) {
+func testStructuredAppend(t testing.TB, file string, metadata map[gozxing.ResultMetadataType]interface{}, seq, parity int) {
+	t.Helper()
 	s, ok := metadata[gozxing.ResultMetadataType_STRUCTURED_APPEND_SEQUENCE]
 	if !ok {
 		t.Fatalf("Decode(%s) ResultMetadata must have STRUCTURED_APPEND_SEQUENCE", file)

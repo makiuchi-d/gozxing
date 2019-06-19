@@ -8,7 +8,8 @@ import (
 	errors "golang.org/x/xerrors"
 )
 
-func testNotFoundExceptionType(t *testing.T, e error) {
+func testNotFoundExceptionType(t testing.TB, e error) {
+	t.Helper()
 	var ne NotFoundException
 	if !errors.As(e, &ne) {
 		t.Fatalf("Type must be NotFoundException")

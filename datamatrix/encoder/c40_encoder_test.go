@@ -23,7 +23,8 @@ func TestC40EncodeToCodewords(t *testing.T) {
 	}
 }
 
-func testC40EncodeChar(t *testing.T, c byte, expn int, expb []byte) {
+func testC40EncodeChar(t testing.TB, c byte, expn int, expb []byte) {
+	t.Helper()
 	n, b := c40EncodeChar(c, make([]byte, 0))
 	if n != expn {
 		t.Fatalf("c40EncodeChar(%v) num=%v, expect %v", c, n, expn)

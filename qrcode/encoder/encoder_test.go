@@ -471,7 +471,8 @@ func TestEncoder_chooseMaskPattern(t *testing.T) {
 	}
 }
 
-func testDecode(t *testing.T, qr *QRCode, content string) {
+func testDecode(t testing.TB, qr *QRCode, content string) {
+	t.Helper()
 	matrix, _ := gozxing.ParseStringToBitMatrix(qr.matrix.String(), " 1", " 0")
 	result, e := decoder.NewDecoder().Decode(matrix, nil)
 	if e != nil {

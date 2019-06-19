@@ -162,7 +162,8 @@ func TestMaskUtil_applyMaskPenaltyRule4(t *testing.T) {
 	}
 }
 
-func testMaskPattern(t *testing.T, maskPattern int, isMasked func(int, int) bool) {
+func testMaskPattern(t testing.TB, maskPattern int, isMasked func(int, int) bool) {
+	t.Helper()
 	for x := 0; x < 30; x++ {
 		for y := 0; y < 30; y++ {
 			bit, e := MaskUtil_getDataMaskBit(maskPattern, x, y)

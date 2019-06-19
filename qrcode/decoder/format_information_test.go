@@ -9,7 +9,8 @@ var (
 	UNMASKED_TEST_FORMAT_INFO = uint(MASKED_TEST_FORMAT_INFO ^ 0x5412)
 )
 
-func testFormatInformation_NumBitsDiffering(t *testing.T, a, b uint, expect int) {
+func testFormatInformation_NumBitsDiffering(t testing.TB, a, b uint, expect int) {
+	t.Helper()
 	if r := FormatInformation_NumBitsDiffering(a, b); r != expect {
 		t.Fatalf("numBitsDiffering(%v,%v) = %v, expect %v", a, b, r, expect)
 	}

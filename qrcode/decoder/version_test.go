@@ -5,7 +5,8 @@ import (
 	"testing"
 )
 
-func checkVersion(t *testing.T, v *Version, number, dimension int) {
+func checkVersion(t testing.TB, v *Version, number, dimension int) {
+	t.Helper()
 	if v == nil {
 		t.Fatalf("Version is nil, number=%d, dimension=%d", number, dimension)
 	}
@@ -56,7 +57,8 @@ func TestGetProvisionalVersionForDimension(t *testing.T) {
 	}
 }
 
-func doTestVersion(t *testing.T, exceptedVersion, mask int) {
+func doTestVersion(t testing.TB, exceptedVersion, mask int) {
+	t.Helper()
 	v, e := Version_decodeVersionInformation(mask)
 	if e != nil {
 		t.Fatalf("decodeVersionInformation(%v) failed: %v", mask, e)

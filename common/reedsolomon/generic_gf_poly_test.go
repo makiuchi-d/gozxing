@@ -56,7 +56,8 @@ func TestNewGenericGFPoly(t *testing.T) {
 	}
 }
 
-func testGenericGFPoly_EvaluateAt(t *testing.T, p *GenericGFPoly, a, expect int) {
+func testGenericGFPoly_EvaluateAt(t testing.TB, p *GenericGFPoly, a, expect int) {
+	t.Helper()
 	if r := p.EvaluateAt(a); r != expect {
 		t.Fatalf("EvaluateAt(%v) = %v, expect %v", a, r, expect)
 	}
@@ -75,7 +76,8 @@ func TestGenericGFPoly_EvaluateAt(t *testing.T) {
 	testGenericGFPoly_EvaluateAt(t, p, 255, 192)
 }
 
-func testGenericGFPoly_AddOrSubtract(t *testing.T, p, other *GenericGFPoly, expect []int) {
+func testGenericGFPoly_AddOrSubtract(t testing.TB, p, other *GenericGFPoly, expect []int) {
+	t.Helper()
 	r, e := p.AddOrSubtract(other)
 	if e != nil {
 		t.Fatalf("AddOrSubtract returns error, %v", e)
@@ -111,7 +113,8 @@ func TestGenericGFPoly_AddOrSubtract(t *testing.T) {
 	testGenericGFPoly_AddOrSubtract(t, p, other, []int{1, 1, 6})
 }
 
-func testGenericGFPoly_Multiply(t *testing.T, p, o *GenericGFPoly, expect []int) {
+func testGenericGFPoly_Multiply(t testing.TB, p, o *GenericGFPoly, expect []int) {
+	t.Helper()
 	r, e := p.Multiply(o)
 	if e != nil {
 		t.Fatalf("Multiply(%v) returns error, %v", o, e)
@@ -145,7 +148,8 @@ func TestGenericGFPoly_Multiply(t *testing.T) {
 	testGenericGFPoly_Multiply(t, p, o, []int{7, 5, 31, 29})
 }
 
-func testGenericGFPoly_MultiplyBy(t *testing.T, p *GenericGFPoly, s int, expect []int) {
+func testGenericGFPoly_MultiplyBy(t testing.TB, p *GenericGFPoly, s int, expect []int) {
+	t.Helper()
 	r := p.MultiplyBy(s)
 	if r.field != p.field {
 		t.Fatalf("MultiplyBy returns different GF, %v, expect %v", r.field, p.field)
@@ -164,7 +168,8 @@ func TestGenericGFPoly_MultiplyBy(t *testing.T) {
 	testGenericGFPoly_MultiplyBy(t, p, 3, []int{6, 5, 15, 9})
 }
 
-func testGenericGFPoly_MultiplyMonomial(t *testing.T, p *GenericGFPoly, d, c int, expect []int) {
+func testGenericGFPoly_MultiplyMonomial(t testing.TB, p *GenericGFPoly, d, c int, expect []int) {
+	t.Helper()
 	r, e := p.MultiplyByMonomial(d, c)
 	if e != nil {
 		t.Fatalf("MultiplyByMonomial(%v,%v) returns error, %v", d, c, e)
@@ -192,7 +197,8 @@ func TestGenericGFPoly_MultiplyByMonomial(t *testing.T) {
 	testGenericGFPoly_MultiplyMonomial(t, p, 3, 5, []int{15, 17, 27, 0, 0, 0})
 }
 
-func testGenericGFPoly_Divide(t *testing.T, p, o *GenericGFPoly, expquot, exprem []int) {
+func testGenericGFPoly_Divide(t testing.TB, p, o *GenericGFPoly, expquot, exprem []int) {
+	t.Helper()
 	quot, rem, e := p.Divide(o)
 	if e != nil {
 		t.Fatalf("Divide(%v) returns error, %v", o, e)

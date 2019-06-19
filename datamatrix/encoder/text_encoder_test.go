@@ -12,7 +12,8 @@ func TestTextEncoder_getEncodingMode(t *testing.T) {
 	}
 }
 
-func testTextEncodeChar(t *testing.T, c byte, expn int, expb []byte) {
+func testTextEncodeChar(t testing.TB, c byte, expn int, expb []byte) {
+	t.Helper()
 	n, b := textEncodeChar(c, []byte{})
 	if n != expn {
 		t.Fatalf("textEncodeChar(%v) n = %v, expect %v", c, n, expn)

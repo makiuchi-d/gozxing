@@ -6,7 +6,8 @@ import (
 	errors "golang.org/x/xerrors"
 )
 
-func testFormatExceptionType(t *testing.T, e error) {
+func testFormatExceptionType(t testing.TB, e error) {
+	t.Helper()
 	var fe FormatException
 	if !errors.As(e, &fe) {
 		t.Fatalf("Type must be FormatException")

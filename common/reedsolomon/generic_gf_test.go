@@ -61,7 +61,8 @@ func TestGenericGF_addOrSubtract(t *testing.T) {
 	}
 }
 
-func testGenericGF_Exp(t *testing.T, g *GenericGF, a, expect int) {
+func testGenericGF_Exp(t testing.TB, g *GenericGF, a, expect int) {
+	t.Helper()
 	if r := g.Exp(a); r != expect {
 		t.Fatalf("Exp(%v) = %v, expect %v", a, r, expect)
 	}
@@ -77,7 +78,8 @@ func TestGenericGF_Exp(t *testing.T) {
 	testGenericGF_Exp(t, g, 255, 1)
 }
 
-func testGenericGF_Log(t *testing.T, g *GenericGF, a, expect int) {
+func testGenericGF_Log(t testing.TB, g *GenericGF, a, expect int) {
+	t.Helper()
 	r, e := g.Log(a)
 	if e != nil {
 		t.Fatalf("Log(%v) returns error, %v", a, e)
@@ -100,7 +102,8 @@ func TestGenericGF_Log(t *testing.T) {
 	testGenericGF_Log(t, g, 255, 175)
 }
 
-func testGenericGF_Inverse(t *testing.T, g *GenericGF, a, expect int) {
+func testGenericGF_Inverse(t testing.TB, g *GenericGF, a, expect int) {
+	t.Helper()
 	r, e := g.Inverse(a)
 	if e != nil {
 		t.Fatalf("Inverse(%v) returns error, %v", a, e)
@@ -122,7 +125,8 @@ func TestGenericGF_Inverse(t *testing.T) {
 	testGenericGF_Inverse(t, g, 255, 253)
 }
 
-func testGenericGF_Multiply(t *testing.T, g *GenericGF, a, b, expect int) {
+func testGenericGF_Multiply(t testing.TB, g *GenericGF, a, b, expect int) {
+	t.Helper()
 	r := g.Multiply(a, b)
 	if r != expect {
 		t.Fatalf("Multiply(%v, %v) = %v, expect %v", a, b, r, expect)

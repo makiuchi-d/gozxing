@@ -7,7 +7,8 @@ import (
 	"github.com/makiuchi-d/gozxing/testutil"
 )
 
-func testEan13Reader_determineFirstDigit(t *testing.T, p int, expect byte) {
+func testEan13Reader_determineFirstDigit(t testing.TB, p int, expect byte) {
+	t.Helper()
 	d, e := ean13Reader_determineFirstDigit(p)
 	if e != nil {
 		t.Fatalf("determineFirstDigit(%v) returns errror, %v", p, e)

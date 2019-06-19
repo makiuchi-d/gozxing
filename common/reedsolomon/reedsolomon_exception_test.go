@@ -10,7 +10,8 @@ import (
 	"github.com/makiuchi-d/gozxing"
 )
 
-func testReedSolomonExceptionType(t *testing.T, e error) {
+func testReedSolomonExceptionType(t testing.TB, e error) {
+	t.Helper()
 	var rse ReedSolomonException
 	if !errors.As(e, &rse) {
 		t.Fatalf("Type must be ReedSolomonException")
@@ -69,9 +70,9 @@ func TestWrapReedSolomonException(t *testing.T) {
 	cases := []string{
 		"test error",
 		"reedsolomon.TestWrapReedSolomonException",
-		"common/reedsolomon/reedsolomon_exception_test.go:62",
+		"common/reedsolomon/reedsolomon_exception_test.go:63",
 		"reedsolomon.testError",
-		"common/reedsolomon/reedsolomon_exception_test.go:57",
+		"common/reedsolomon/reedsolomon_exception_test.go:58",
 	}
 	for _, c := range cases {
 		if strings.Index(s, c) < 0 {

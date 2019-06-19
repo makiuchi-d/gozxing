@@ -20,7 +20,8 @@ func TestNewFinderPattern1(t *testing.T) {
 	}
 }
 
-func testFinderPattern_AboutEquals(t *testing.T, f *FinderPattern, moduleSize, i, j float64, expect bool) {
+func testFinderPattern_AboutEquals(t testing.TB, f *FinderPattern, moduleSize, i, j float64, expect bool) {
+	t.Helper()
 	if r := f.AboutEquals(moduleSize, i, j); r != expect {
 		t.Fatalf("AboutEquals(%v,%v,%v) = %v, expect %v", moduleSize, i, j, r, expect)
 	}

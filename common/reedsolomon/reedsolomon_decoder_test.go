@@ -29,7 +29,8 @@ func getPseudoRandom() *rand.Rand {
 	return rand.New(rand.NewSource(0xdeadbeef))
 }
 
-func testDecoder(t *testing.T, field *GenericGF, dataWords, ecWords []int) {
+func testDecoder(t testing.TB, field *GenericGF, dataWords, ecWords []int) {
+	t.Helper()
 	decoder := NewReedSolomonDecoder(field)
 	message := make([]int, len(dataWords)+len(ecWords))
 	maxErrors := len(ecWords) / 2

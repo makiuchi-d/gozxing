@@ -185,7 +185,8 @@ func TestBitArray_Clear(t *testing.T) {
 	}
 }
 
-func testIsRange(t *testing.T, b *BitArray, start, end int, value, expect bool) {
+func testIsRange(t testing.TB, b *BitArray, start, end int, value, expect bool) {
+	t.Helper()
 	if v, e := b.IsRange(start, end, value); v != expect || e != nil {
 		t.Fatalf("IsRange(%v, %v, %v) must %v (%v, %v)", start, end, value, expect, v, e)
 	}
@@ -223,7 +224,8 @@ func TestBitArray_IsRange(t *testing.T) {
 	testIsRange(t, b, 100, 128, false, true)
 }
 
-func testBit(t *testing.T, b *BitArray, pos int, expect bool) {
+func testBit(t testing.TB, b *BitArray, pos int, expect bool) {
+	t.Helper()
 	if v := b.Get(pos); v != expect {
 		t.Fatalf("[%v] = %v, expect %v", pos, v, expect)
 	}

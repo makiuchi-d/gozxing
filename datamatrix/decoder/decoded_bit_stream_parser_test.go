@@ -8,7 +8,8 @@ import (
 	"github.com/makiuchi-d/gozxing/common"
 )
 
-func testUnrandomize255State(t *testing.T, randomized, codewordPosition, expect int) {
+func testUnrandomize255State(t testing.TB, randomized, codewordPosition, expect int) {
+	t.Helper()
 	c := unrandomize255State(randomized, codewordPosition)
 	if c != expect {
 		t.Fatalf("unrandomize255State(%v,%v) = %v, expect %v", randomized, codewordPosition, c, expect)
@@ -397,7 +398,8 @@ func TestDecodeC40Segment(t *testing.T) {
 	}
 }
 
-func testDecodeAsciiSegment(t *testing.T, bits *common.BitSource, mode Mode, result, trailer []byte) {
+func testDecodeAsciiSegment(t testing.TB, bits *common.BitSource, mode Mode, result, trailer []byte) {
+	t.Helper()
 	r := make([]byte, 0)
 	rt := make([]byte, 0)
 	m, r, rt, e := decodeAsciiSegment(bits, r, rt)
@@ -547,7 +549,8 @@ func TestDecodeAsciiSegment(t *testing.T) {
 	}
 }
 
-func testDecodedBitStreamParser_decode(t *testing.T, bytes []byte, str string, segments [][]byte) {
+func testDecodedBitStreamParser_decode(t testing.TB, bytes []byte, str string, segments [][]byte) {
+	t.Helper()
 	r, e := DecodedBitStreamParser_decode(bytes)
 	if e != nil {
 		t.Fatalf("DecodedBitStreamParser_decode(%v) returns error, %v", bytes, e)

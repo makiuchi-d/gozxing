@@ -226,7 +226,8 @@ func TestDataMatrixReader_DecodeWithoutHints(t *testing.T) {
 	}
 }
 
-func testDataMatrixReader_Decode(t *testing.T, file, expect string, pure bool) {
+func testDataMatrixReader_Decode(t testing.TB, file, expect string, pure bool) {
+	t.Helper()
 	reader := NewDataMatrixReader()
 	bmp := testutil.NewBinaryBitmapFromFile(file)
 	var help map[gozxing.DecodeHintType]interface{}

@@ -75,7 +75,8 @@ func TestUPCEReader_decodeMiddle(t *testing.T) {
 	}
 }
 
-func testConvertUPCEtoUPCA(t *testing.T, upce, expect string) {
+func testConvertUPCEtoUPCA(t testing.TB, upce, expect string) {
+	t.Helper()
 	upca := convertUPCEtoUPCA(upce)
 	if upca != expect {
 		t.Fatalf("UPCEtoUPCE: %s => %s, expect %s", upce, upca, expect)

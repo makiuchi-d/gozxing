@@ -156,7 +156,8 @@ func TestBitMatrixParser_ReadFormatInformation(t *testing.T) {
 
 }
 
-func testBitMatrixParser_ReadVersion(t *testing.T, img *gozxing.BitMatrix, expect_version int) {
+func testBitMatrixParser_ReadVersion(t testing.TB, img *gozxing.BitMatrix, expect_version int) {
+	t.Helper()
 	p, _ := NewBitMatrixParser(img)
 	ver, e := p.ReadVersion()
 	if e != nil {
@@ -268,7 +269,8 @@ func TestBitMatrixParser_ReadCodewords(t *testing.T) {
 	}
 }
 
-func compareBitMatrix(t *testing.T, img, expect *gozxing.BitMatrix) {
+func compareBitMatrix(t testing.TB, img, expect *gozxing.BitMatrix) {
+	t.Helper()
 	if img.GetWidth() != expect.GetWidth() || img.GetHeight() != expect.GetHeight() {
 		t.Fatalf("BitMatrix size different, (%v, %v), expect (%v, %v)",
 			img.GetWidth(), img.GetHeight(), expect.GetWidth(), expect.GetHeight())

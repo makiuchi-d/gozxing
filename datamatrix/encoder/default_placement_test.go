@@ -33,7 +33,8 @@ func TestDefaultPlacement_module(t *testing.T) {
 	}
 }
 
-func testBits(t *testing.T, p *DefaultPlacement, x, y int, expect int8) {
+func testBits(t testing.TB, p *DefaultPlacement, x, y int, expect int8) {
+	t.Helper()
 	pos := p.numcols*y + x
 	bits := p.getBits()
 	if r := bits[pos]; r != expect {
@@ -160,7 +161,8 @@ func TestDefaultPlacement_corner4(t *testing.T) {
 	testBits(t, p, 15, 1, 1)
 }
 
-func testPlace(t *testing.T, p *DefaultPlacement, m *gozxing.BitMatrix) {
+func testPlace(t testing.TB, p *DefaultPlacement, m *gozxing.BitMatrix) {
+	t.Helper()
 	col := p.getNumcols()
 	row := p.getNumrows()
 

@@ -122,8 +122,9 @@ func (s DummyGridSampler) SampleGridWithTransform(image *gozxing.BitMatrix,
 	return nil, errors.New("dummy sampler")
 }
 
-func TestFile(t *testing.T, reader gozxing.Reader, file, expectText string,
+func TestFile(t testing.TB, reader gozxing.Reader, file, expectText string,
 	expectFormat gozxing.BarcodeFormat, hints map[gozxing.DecodeHintType]interface{}) {
+	t.Helper()
 	bmp := NewBinaryBitmapFromFile(file)
 	result, e := reader.Decode(bmp, hints)
 	if e != nil {
