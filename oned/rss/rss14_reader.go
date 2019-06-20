@@ -155,8 +155,8 @@ func (this *rss14Reader) decodePair(row *gozxing.BitArray, right bool, rowNumber
 	}
 
 	if resultPointCallback, ok := hints[gozxing.DecodeHintType_NEED_RESULT_POINT_CALLBACK].(gozxing.ResultPointCallback); ok {
-		se := pattern.GetStartEnd()
-		center := float64(se[0]+se[1]-1) / 2.0
+		startEnd = pattern.GetStartEnd()
+		center := float64(startEnd[0]+startEnd[1]-1) / 2.0
 		if right {
 			// row is actually reversed
 			center = float64(row.GetSize()) - 1 - center
