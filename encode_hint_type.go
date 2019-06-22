@@ -81,6 +81,14 @@ const (
 	EncodeHintType_QR_VERSION
 
 	/**
+	 * Specifies the QR code mask pattern to be used. Allowed values are
+	 * 0..QRCode.NUM_MASK_PATTERNS-1. By default the code will automatically select
+	 * the optimal mask pattern.
+	 * (Type {@link Integer}, or {@link String} representation of the integer value).
+	 */
+	EncodeHintType_QR_MASK_PATTERN
+
+	/**
 	 * Specifies whether the data should be encoded to the GS1 standard (type {@link Boolean}, or "true" or "false"
 	 * {@link String } value).
 	 */
@@ -111,6 +119,8 @@ func (this EncodeHintType) String() string {
 		return "AZTEC_LAYERS"
 	case EncodeHintType_QR_VERSION:
 		return "QR_VERSION"
+	case EncodeHintType_QR_MASK_PATTERN:
+		return "QR_MASK_PATTERN"
 	case EncodeHintType_GS1_FORMAT:
 		return "GS1_FORMAT"
 	}

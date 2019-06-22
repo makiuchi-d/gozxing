@@ -23,6 +23,7 @@ func TestEncodeHintType_String(t *testing.T) {
 	testEncodeHintType_String(t, EncodeHintType_PDF417_DIMENSIONS, "PDF417_DIMENSIONS")
 	testEncodeHintType_String(t, EncodeHintType_AZTEC_LAYERS, "AZTEC_LAYERS")
 	testEncodeHintType_String(t, EncodeHintType_QR_VERSION, "QR_VERSION")
+	testEncodeHintType_String(t, EncodeHintType_QR_MASK_PATTERN, "QR_MASK_PATTERN")
 	testEncodeHintType_String(t, EncodeHintType_GS1_FORMAT, "GS1_FORMAT")
 	testEncodeHintType_String(t, EncodeHintType(-1), "")
 }

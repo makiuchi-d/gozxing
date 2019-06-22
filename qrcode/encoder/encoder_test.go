@@ -544,6 +544,34 @@ func TestEncoder_encode(t *testing.T) {
 		t.Fatalf("encoded ecLevel = %v, expect %v", r, decoder.ErrorCorrectionLevel_H)
 	}
 	testDecode(t, qr, "http://example.com")
+
+	hints = make(map[gozxing.EncodeHintType]interface{})
+	hints[gozxing.EncodeHintType_QR_MASK_PATTERN] = 1
+	qr, e = Encoder_encode("http://example.com", decoder.ErrorCorrectionLevel_H, hints)
+	if e != nil {
+		t.Fatalf("Encoder_encoder returns error: %v", e)
+	}
+	if mask, wants := qr.GetMaskPattern(), 1; mask != wants {
+		t.Fatalf("Encoder_encode maskPattern = %v, wants %v", mask, wants)
+	}
+
+	hints[gozxing.EncodeHintType_QR_MASK_PATTERN] = "2"
+	qr, e = Encoder_encode("http://example.com", decoder.ErrorCorrectionLevel_H, hints)
+	if e != nil {
+		t.Fatalf("Encoder_encoder returns error: %v", e)
+	}
+	if mask, wants := qr.GetMaskPattern(), 2; mask != wants {
+		t.Fatalf("Encoder_encode maskPattern = %v, wants %v", mask, wants)
+	}
+
+	hints[gozxing.EncodeHintType_QR_MASK_PATTERN] = 10
+	qr, e = Encoder_encode("http://example.com", decoder.ErrorCorrectionLevel_H, hints)
+	if e != nil {
+		t.Fatalf("Encoder_encoder returns error: %v", e)
+	}
+	if mask, wants := qr.GetMaskPattern(), 7; mask != wants {
+		t.Fatalf("Encoder_encode maskPattern = %v, wants %v", mask, wants)
+	}
 }
 
 func TestEncoder_encodeFail(t *testing.T) {

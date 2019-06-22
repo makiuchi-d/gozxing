@@ -165,9 +165,28 @@ func Encoder_encode(content string, ecLevel decoder.ErrorCorrectionLevel, hints 
 	//  Choose the mask pattern and set to "qrCode".
 	dimension := version.GetDimensionForVersion()
 	matrix := NewByteMatrix(dimension, dimension)
-	maskPattern, e := chooseMaskPattern(finalBits, ecLevel, version, matrix)
-	if e != nil {
-		return nil, e
+
+	// Enable manual selection of the pattern to be used via hint
+	maskPattern := -1
+	if hintMaskPattern, ok := hints[gozxing.EncodeHintType_QR_MASK_PATTERN]; ok {
+		switch mask := hintMaskPattern.(type) {
+		case int:
+			maskPattern = mask
+		case string:
+			if m, e := strconv.Atoi(mask); e == nil {
+				maskPattern = m
+			}
+		}
+		if !QRCode_IsValidMaskPattern(maskPattern) {
+			maskPattern = -1
+		}
+	}
+
+	if maskPattern == -1 {
+		maskPattern, e = chooseMaskPattern(finalBits, ecLevel, version, matrix)
+		if e != nil {
+			return nil, e
+		}
 	}
 	qrCode.SetMaskPattern(maskPattern)
 
