@@ -59,9 +59,8 @@ func (upcEEncoder) encode(contents string) ([]bool, error) {
 	checkDigit := contents[7] - '0'
 	parities := upce_NUMSYS_AND_CHECK_DIGIT_PATTERNS[firstDigit][checkDigit]
 	result := make([]bool, upcEWriter_CODE_WIDTH)
-	pos := 0
 
-	pos += onedWriter_appendPattern(result, pos, UPCEANReader_START_END_PATTERN, true)
+	pos := onedWriter_appendPattern(result, 0, UPCEANReader_START_END_PATTERN, true)
 
 	for i := 1; i <= 6; i++ {
 		digit := contents[i] - '0'
