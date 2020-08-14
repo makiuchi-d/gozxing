@@ -48,7 +48,8 @@ func (code128Encoder) getSupportedWriteFormats() gozxing.BarcodeFormats {
 	return gozxing.BarcodeFormats{gozxing.BarcodeFormat_CODE_128}
 }
 
-func (code128Encoder) encode(contents string) ([]bool, error) {
+func (code128Encoder) encode(contentsStr string) ([]bool, error) {
+	contents := []rune(contentsStr)
 	length := len(contents)
 	// Check length
 	if length < 1 || length > 80 {
@@ -181,7 +182,7 @@ func (code128Encoder) encode(contents string) ([]bool, error) {
 	return result, nil
 }
 
-func code128FindCType(value string, start int) code128CType {
+func code128FindCType(value []rune, start int) code128CType {
 	last := len(value)
 	if start >= last {
 		return code128CType_UNCODABLE
@@ -203,7 +204,7 @@ func code128FindCType(value string, start int) code128CType {
 	return code128CType_TWO_DIGITS
 }
 
-func code128ChooseCode(value string, start, oldCode int) int {
+func code128ChooseCode(value []rune, start, oldCode int) int {
 	lookahead := code128FindCType(value, start)
 	if lookahead == code128CType_ONE_DIGIT {
 		if oldCode == code128CODE_CODE_A {
