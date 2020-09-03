@@ -26,129 +26,129 @@ func TestCode128CType_String(t *testing.T) {
 }
 
 func TestCode128FindCType(t *testing.T) {
-	ctype := code128FindCType("abcd", 4)
+	ctype := code128FindCType([]rune("abcd"), 4)
 	if ctype != code128CType_UNCODABLE {
 		t.Fatalf("code128FindCType = %v, expect %v", ctype, code128CType_UNCODABLE)
 	}
 
-	ctype = code128FindCType("\xf1", 0)
+	ctype = code128FindCType([]rune("\u00f1"), 0)
 	if ctype != code128CType_FNC_1 {
 		t.Fatalf("code128FindCType = %v, expect %v", ctype, code128CType_FNC_1)
 	}
 
-	ctype = code128FindCType("abc", 0)
+	ctype = code128FindCType([]rune("abc"), 0)
 	if ctype != code128CType_UNCODABLE {
 		t.Fatalf("code128FindCType = %v, expect %v", ctype, code128CType_UNCODABLE)
 	}
 
-	ctype = code128FindCType("abc0", 3)
+	ctype = code128FindCType([]rune("abc0"), 3)
 	if ctype != code128CType_ONE_DIGIT {
 		t.Fatalf("code128FindCType = %v, expect %v", ctype, code128CType_ONE_DIGIT)
 	}
 
-	ctype = code128FindCType("abc0a", 3)
+	ctype = code128FindCType([]rune("abc0a"), 3)
 	if ctype != code128CType_ONE_DIGIT {
 		t.Fatalf("code128FindCType = %v, expect %v", ctype, code128CType_ONE_DIGIT)
 	}
 
-	ctype = code128FindCType("abc00", 3)
+	ctype = code128FindCType([]rune("abc00"), 3)
 	if ctype != code128CType_TWO_DIGITS {
 		t.Fatalf("code128FindCType = %v, expect %v", ctype, code128CType_TWO_DIGITS)
 	}
 }
 
 func TestCode128ChooseCode(t *testing.T) {
-	r := code128ChooseCode("0a", 0, code128CODE_CODE_A)
+	r := code128ChooseCode([]rune("0a"), 0, code128CODE_CODE_A)
 	expect := code128CODE_CODE_A
 	if r != expect {
 		t.Fatalf("chooseCode = %v, expect %v", r, expect)
 	}
 
-	r = code128ChooseCode("0a", 0, code128CODE_CODE_C)
+	r = code128ChooseCode([]rune("0a)"), 0, code128CODE_CODE_C)
 	expect = code128CODE_CODE_B
 	if r != expect {
 		t.Fatalf("chooseCode = %v, expect %v", r, expect)
 	}
 
-	r = code128ChooseCode("\x00", 0, code128CODE_CODE_B)
+	r = code128ChooseCode([]rune("\x00"), 0, code128CODE_CODE_B)
 	expect = code128CODE_CODE_A
 	if r != expect {
 		t.Fatalf("chooseCode = %v, expect %v", r, expect)
 	}
 
-	r = code128ChooseCode("A", 0, code128CODE_CODE_A)
+	r = code128ChooseCode([]rune("A"), 0, code128CODE_CODE_A)
 	expect = code128CODE_CODE_A
 	if r != expect {
 		t.Fatalf("chooseCode = %v, expect %v", r, expect)
 	}
 
-	r = code128ChooseCode("A", 0, code128CODE_CODE_C)
+	r = code128ChooseCode([]rune("A"), 0, code128CODE_CODE_C)
 	expect = code128CODE_CODE_B
 	if r != expect {
 		t.Fatalf("chooseCode = %v, expect %v", r, expect)
 	}
 
-	r = code128ChooseCode("00", 0, code128CODE_CODE_C)
+	r = code128ChooseCode([]rune("00"), 0, code128CODE_CODE_C)
 	expect = code128CODE_CODE_C
 	if r != expect {
 		t.Fatalf("chooseCode = %v, expect %v", r, expect)
 	}
 
-	r = code128ChooseCode("\xf1", 0, code128CODE_CODE_A)
+	r = code128ChooseCode([]rune("\u00f1"), 0, code128CODE_CODE_A)
 	expect = code128CODE_CODE_A
 	if r != expect {
 		t.Fatalf("chooseCode = %v, expect %v", r, expect)
 	}
 
-	r = code128ChooseCode("\xf1", 0, code128CODE_CODE_B)
+	r = code128ChooseCode([]rune("\u00f1"), 0, code128CODE_CODE_B)
 	expect = code128CODE_CODE_B
 	if r != expect {
 		t.Fatalf("chooseCode = %v, expect %v", r, expect)
 	}
 
-	r = code128ChooseCode("012a", 0, code128CODE_CODE_B)
+	r = code128ChooseCode([]rune("012a"), 0, code128CODE_CODE_B)
 	expect = code128CODE_CODE_B
 	if r != expect {
 		t.Fatalf("chooseCode = %v, expect %v", r, expect)
 	}
 
-	r = code128ChooseCode("01\xf123", 0, code128CODE_CODE_B)
+	r = code128ChooseCode([]rune("01\u00f123"), 0, code128CODE_CODE_B)
 	expect = code128CODE_CODE_C
 	if r != expect {
 		t.Fatalf("chooseCode = %v, expect %v", r, expect)
 	}
 
-	r = code128ChooseCode("01\xf10a", 0, code128CODE_CODE_B)
+	r = code128ChooseCode([]rune("01\u00f10a"), 0, code128CODE_CODE_B)
 	expect = code128CODE_CODE_B
 	if r != expect {
 		t.Fatalf("chooseCode = %v, expect %v", r, expect)
 	}
 
-	r = code128ChooseCode("0123456a", 0, code128CODE_CODE_B)
+	r = code128ChooseCode([]rune("0123456a"), 0, code128CODE_CODE_B)
 	expect = code128CODE_CODE_B
 	if r != expect {
 		t.Fatalf("chooseCode = %v, expect %v", r, expect)
 	}
 
-	r = code128ChooseCode("01234567a", 0, code128CODE_CODE_B)
+	r = code128ChooseCode([]rune("01234567a"), 0, code128CODE_CODE_B)
 	expect = code128CODE_CODE_C
 	if r != expect {
 		t.Fatalf("chooseCode = %v, expect %v", r, expect)
 	}
 
-	r = code128ChooseCode("00", 0, 0)
+	r = code128ChooseCode([]rune("00"), 0, 0)
 	expect = code128CODE_CODE_C
 	if r != expect {
 		t.Fatalf("chooseCode = %v, expect %v", r, expect)
 	}
 
-	r = code128ChooseCode("\xf100", 0, 0)
+	r = code128ChooseCode([]rune("\u00f100"), 0, 0)
 	expect = code128CODE_CODE_C
 	if r != expect {
 		t.Fatalf("chooseCode = %v, expect %v", r, expect)
 	}
 
-	r = code128ChooseCode("\xf10a", 0, 0)
+	r = code128ChooseCode([]rune("\u00f10a"), 0, 0)
 	expect = code128CODE_CODE_B
 	if r != expect {
 		t.Fatalf("chooseCode = %v, expect %v", r, expect)
@@ -174,7 +174,7 @@ func TestCode128Encoder_encode(t *testing.T) {
 	}
 
 	// FNCs and single number in codesetA with FNCs
-	r, e := enc.encode("\n\xf1\xf2\xf3\xf41\n")
+	r, e := enc.encode("\n\u00f1\u00f2\u00f3\u00f41\n")
 	expect := []bool{
 		true, true, false, true, false, false, false, false, true, false, false, // StartA
 		true, false, false, false, false, true, true, false, false, true, false, // LF
@@ -195,7 +195,7 @@ func TestCode128Encoder_encode(t *testing.T) {
 	}
 
 	// CodesetB with FNCs
-	r, e = enc.encode("a\xf1\xf2\xf3\xf4a")
+	r, e = enc.encode("a\u00f1\u00f2\u00f3\u00f4a")
 	expect = []bool{
 		true, true, false, true, false, false, true, false, false, false, false, // StartB
 		true, false, false, true, false, true, true, false, false, false, false, // a
@@ -246,4 +246,26 @@ func TestCode128Writer(t *testing.T) {
 			"10111011110"+"11001101100"+"11101101110"+"10111011000"+ // CodeC 01 23 45
 			"11011100010"+ // Checksum 52
 			"1100011101011"+"00000") // Stop
+}
+
+func TestCode128WriterFnc3(t *testing.T) {
+	enc := code128Encoder{}
+	data := "\u00f3FOO"
+	expect := []bool{
+		true, true, false, true, false, false, true, false, false, false, false, // StartB
+		true, false, true, true, true, true, false, false, false, true, false, // FNC3
+		true, false, false, false, true, true, false, false, false, true, false, // F
+		true, false, false, false, true, true, true, false, true, true, false, // O
+		true, false, false, false, true, true, true, false, true, true, false, // O
+		true, true, false, true, true, true, true, false, true, true, false, // Checksum
+		true, true, false, false, false, true, true, true, false, true, false, true, true, // Stop
+	}
+
+	r, e := enc.encode(data)
+	if e != nil {
+		t.Fatalf("encode = %v", e)
+	}
+	if !reflect.DeepEqual(r, expect) {
+		t.Fatalf("encode = %v, expect %v", r, expect)
+	}
 }
