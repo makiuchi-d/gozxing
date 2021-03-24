@@ -111,7 +111,10 @@ func EncodeHighLevel(msg string, shape SymbolShapeHint, minSize, maxSize *gozxin
 		NewX12Encoder(), NewEdifactEncoder(), NewBase256Encoder(),
 	}
 
-	context, _ := NewEncoderContext(msg)
+	context, e := NewEncoderContext(msg)
+	if e != nil {
+		return nil, e
+	}
 	context.SetSymbolShape(shape)
 	context.SetSizeConstraints(minSize, maxSize)
 
@@ -136,7 +139,7 @@ func EncodeHighLevel(msg string, shape SymbolShapeHint, minSize, maxSize *gozxin
 		}
 	}
 	length := context.GetCodewordCount()
-	e := context.UpdateSymbolInfo()
+	e = context.UpdateSymbolInfo()
 	if e != nil {
 		return nil, gozxing.WrapWriterException(e)
 	}

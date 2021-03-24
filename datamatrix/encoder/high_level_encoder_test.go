@@ -296,10 +296,15 @@ func TestHighLevelEncoder_lookAheadTest(t *testing.T) {
 func TestEncodeHighLevel(t *testing.T) {
 	shape := SymbolShapeHint_FORCE_NONE
 
-	str := string(make([]byte, 1559))
-	_, e := EncodeHighLevel(str, shape, nil, nil)
+	_, e := EncodeHighLevel("Mосква", shape, nil, nil)
 	if e == nil {
-		t.Fatalf("EncodeHighLevel must be error")
+		t.Fatalf("EncodeHighLevel(Mосква) must be error");
+	}
+
+	str := string(make([]byte, 1559))
+	_, e = EncodeHighLevel(str, shape, nil, nil)
+	if e == nil {
+		t.Fatalf("EncodeHighLevel([1559]) must be error")
 	}
 
 	str = " 0A 0A 0A 0A000000"
