@@ -20,7 +20,7 @@ const (
 	HighLevelEncoder_LATCH_TO_BASE256 = 231
 
 	// FNC1 Codeword
-	// HighLevelEncoder_FUNC1 = 232
+	HighLevelEncoder_FUNC1 = 232
 
 	// Structured Append Codeword
 	// HighLevelEncoder_STRUCTURED_APPEND = 233
@@ -117,6 +117,11 @@ func EncodeHighLevel(msg string, shape SymbolShapeHint, minSize, maxSize *gozxin
 	}
 	context.SetSymbolShape(shape)
 	context.SetSizeConstraints(minSize, maxSize)
+
+	if strings.HasPrefix(msg, "\u00e8") {
+		context.WriteCodeword(HighLevelEncoder_FUNC1)
+		context.pos += 1
+	}
 
 	if strings.HasPrefix(msg, HighLevelEncoder_MACRO_05_HEADER) &&
 		strings.HasSuffix(msg, HighLevelEncoder_MACRO_TRAILER) {
