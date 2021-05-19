@@ -128,8 +128,7 @@ func (b *BitMatrix) Flip(x, y int) {
 }
 
 func (b *BitMatrix) Xor(mask *BitMatrix) error {
-	if b.width != mask.GetWidth() || b.height != mask.GetHeight() ||
-		b.rowSize != mask.GetRowSize() {
+	if b.width != mask.width || b.height != mask.height || b.rowSize != mask.rowSize {
 		return errors.New("IllegalArgumentException: input matrix dimensions do not match")
 	}
 	for y := 0; y < b.height; y++ {

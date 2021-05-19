@@ -116,9 +116,6 @@ func ErrorCorrection_EncodeECC200(codewords []byte, symbolInfo *SymbolInfo) ([]b
 }
 
 func createECCBlock(codewords []byte, numECWords int) ([]byte, error) {
-	start := 0
-	length := len(codewords)
-
 	table := -1
 	for i := 0; i < len(factorSets); i++ {
 		if factorSets[i] == numECWords {
@@ -133,7 +130,7 @@ func createECCBlock(codewords []byte, numECWords int) ([]byte, error) {
 	}
 	poly := factors[table]
 	ecc := make([]int, numECWords)
-	for i := start; i < start+length; i++ {
+	for i := 0; i < len(codewords); i++ {
 		m := ecc[numECWords-1] ^ int(codewords[i])
 		for k := numECWords - 1; k > 0; k-- {
 			if m != 0 && poly[k] != 0 {

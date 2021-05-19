@@ -51,7 +51,7 @@ func (f *FinderPatternFinder) Find(hints map[gozxing.DecodeHintType]interface{})
 	done := false
 	stateCount := make([]int, 5)
 	for i := iSkip - 1; i < maxI && !done; i += iSkip {
-		FinderPatternFinder_ClearCounts(stateCount)
+		FinderPatternFinder_doClearCounts(stateCount)
 		currentState := 0
 		for j := 0; j < maxJ; j++ {
 			if f.image.Get(j, i) {
@@ -76,14 +76,14 @@ func (f *FinderPatternFinder) Find(hints map[gozxing.DecodeHintType]interface{})
 									}
 								}
 							} else {
-								FinderPatternFinder_ShiftCounts2(stateCount)
+								FinderPatternFinder_doShiftCounts2(stateCount)
 								currentState = 3
 								continue
 							}
 							currentState = 0
-							FinderPatternFinder_ClearCounts(stateCount)
+							FinderPatternFinder_doClearCounts(stateCount)
 						} else {
-							FinderPatternFinder_ShiftCounts2(stateCount)
+							FinderPatternFinder_doShiftCounts2(stateCount)
 							currentState = 3
 						}
 					} else {
@@ -163,17 +163,25 @@ func FinderPatternFinder_foundPatternDiagonal(stateCount []int) bool {
 }
 
 func (f *FinderPatternFinder) GetCrossCheckStateCount() []int {
-	FinderPatternFinder_ClearCounts(f.crossCheckStateCount)
+	FinderPatternFinder_doClearCounts(f.crossCheckStateCount)
 	return f.crossCheckStateCount
 }
 
 func FinderPatternFinder_ClearCounts(counts []int) {
+	FinderPatternFinder_doClearCounts(counts)
+}
+
+func FinderPatternFinder_ShiftCounts2(stateCount []int) {
+	FinderPatternFinder_doShiftCounts2(stateCount)
+}
+
+func FinderPatternFinder_doClearCounts(counts []int) {
 	for x := 0; x < len(counts); x++ {
 		counts[x] = 0
 	}
 }
 
-func FinderPatternFinder_ShiftCounts2(stateCount []int) {
+func FinderPatternFinder_doShiftCounts2(stateCount []int) {
 	stateCount[0] = stateCount[2]
 	stateCount[1] = stateCount[3]
 	stateCount[2] = stateCount[4]

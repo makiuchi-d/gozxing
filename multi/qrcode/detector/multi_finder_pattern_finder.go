@@ -213,7 +213,7 @@ func (this *MultiFinderPatternFinder) FindMulti(hints map[gozxing.DecodeHintType
 	stateCount := make([]int, 5)
 	for i := iSkip - 1; i < maxI; i += iSkip {
 		// Get a row of black/white values
-		detector.FinderPatternFinder_ClearCounts(stateCount)
+		detector.FinderPatternFinder_doClearCounts(stateCount)
 		currentState := 0
 		for j := 0; j < maxJ; j++ {
 			if image.Get(j, i) {
@@ -229,9 +229,9 @@ func (this *MultiFinderPatternFinder) FindMulti(hints map[gozxing.DecodeHintType
 							this.HandlePossibleCenter(stateCount, i, j) { // Yes
 							// Clear state to start looking again
 							currentState = 0
-							detector.FinderPatternFinder_ClearCounts(stateCount)
+							detector.FinderPatternFinder_doClearCounts(stateCount)
 						} else { // No, shift counts back by two
-							detector.FinderPatternFinder_ShiftCounts2(stateCount)
+							detector.FinderPatternFinder_doShiftCounts2(stateCount)
 							currentState = 3
 						}
 					} else {
