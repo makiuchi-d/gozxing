@@ -470,7 +470,6 @@ func (f *FinderPatternFinder) SelectBestPatterns() ([]*FinderPattern, gozxing.No
 	sort.Slice(f.possibleCenters, estimatedModuleComparator(f.possibleCenters))
 
 	distortion := math.MaxFloat64
-	squares := sort.Float64Slice{0, 0, 0}
 	bestPatterns := []*FinderPattern{nil, nil, nil}
 
 	for i := 0; i < len(f.possibleCenters)-2; i++ {
@@ -489,17 +488,37 @@ func (f *FinderPatternFinder) SelectBestPatterns() ([]*FinderPattern, gozxing.No
 					continue
 				}
 
-				squares[0] = square0
-				squares[1] = squaredDistance(fpj, fpk)
-				squares[2] = squaredDistance(fpi, fpk)
-				sort.Sort(squares)
+				a := square0
+				b := squaredDistance(fpj, fpk)
+				c := squaredDistance(fpi, fpk)
+
+				// sorts ascending - inlined
+				if a < b {
+					if b > c {
+						if a < c {
+							b, c = c, b
+						} else {
+							a, b, c = c, a, b
+						}
+					}
+				} else {
+					if b < c {
+						if a < c {
+							a, b = b, a
+						} else {
+							a, b, c = b, c, a
+						}
+					} else {
+						a, c = c, a
+					}
+				}
 
 				// a^2 + b^2 = c^2 (Pythagorean theorem), and a = b (isosceles triangle).
 				// Since any right triangle satisfies the formula c^2 - b^2 - a^2 = 0,
 				// we need to check both two equal sides separately.
 				// The value of |c^2 - 2 * b^2| + |c^2 - 2 * a^2| increases as dissimilarity
 				// from isosceles right triangle.
-				d := math.Abs(squares[2]-2*squares[1]) + math.Abs(squares[2]-2*squares[0])
+				d := math.Abs(c-2*b) + math.Abs(c-2*a)
 				if d < distortion {
 					distortion = d
 					bestPatterns[0] = fpi
