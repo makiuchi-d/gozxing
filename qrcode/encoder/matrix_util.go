@@ -179,17 +179,18 @@ func embedTypeInfo(ecLevel decoder.ErrorCorrectionLevel, maskPattern int, matrix
 		y1 := coordinates[1]
 		matrix.SetBool(x1, y1, bit)
 
+		var x2, y2 int
 		if i < 8 {
 			// Right top corner.
-			x2 := matrix.GetWidth() - i - 1
-			y2 := 8
-			matrix.SetBool(x2, y2, bit)
+			x2 = matrix.GetWidth() - i - 1
+			y2 = 8
 		} else {
 			// Left bottom corner.
-			x2 := 8
-			y2 := matrix.GetHeight() - 7 + (i - 8)
+			x2 = 8
+			y2 = matrix.GetHeight() - 7 + (i - 8)
 			matrix.SetBool(x2, y2, bit)
 		}
+		matrix.SetBool(x2, y2, bit)
 	}
 
 	return nil
