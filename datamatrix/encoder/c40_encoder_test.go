@@ -15,8 +15,8 @@ func TestC40Encoder_getEncodingMode(t *testing.T) {
 }
 
 func TestC40EncodeToCodewords(t *testing.T) {
-	sb := []byte{1, 2, 3, 4, 5}
-	r := c40EncodeToCodewords(sb, 2)
+	sb := []byte{3, 4, 5}
+	r := c40EncodeToCodewords(sb)
 	expect := []byte{19, 102}
 	if !reflect.DeepEqual(r, expect) {
 		t.Fatalf("c40EncodeToCodewords = %v, expect %v", r, expect)

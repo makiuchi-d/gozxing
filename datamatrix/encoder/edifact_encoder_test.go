@@ -13,12 +13,12 @@ func TestEdifactEncoder_getEncodingMode(t *testing.T) {
 }
 
 func TestEdifactEncodeToCodewords(t *testing.T) {
-	_, e := edifactEncodeToCodewords([]byte{}, 0)
+	_, e := edifactEncodeToCodewords([]byte{})
 	if e == nil {
 		t.Fatalf("edifactEncodeToCodewords must be error")
 	}
 
-	sb, e := edifactEncodeToCodewords([]byte{10}, 0)
+	sb, e := edifactEncodeToCodewords([]byte{10})
 	expect := []byte{40}
 	if e != nil {
 		t.Fatalf("edifactEncodeToCodewords returns error: %v", e)
@@ -27,7 +27,7 @@ func TestEdifactEncodeToCodewords(t *testing.T) {
 		t.Fatalf("edifactEncodeToCodewords = %v, expect %v", sb, expect)
 	}
 
-	sb, e = edifactEncodeToCodewords([]byte{10, 20, 30, 40}, 0)
+	sb, e = edifactEncodeToCodewords([]byte{10, 20, 30, 40})
 	expect = []byte{41, 71, 168}
 	if e != nil {
 		t.Fatalf("edifactEncodeToCodewords returns error: %v", e)

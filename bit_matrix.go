@@ -2,6 +2,7 @@ package gozxing
 
 import (
 	"math/bits"
+	"strings"
 
 	errors "golang.org/x/xerrors"
 )
@@ -70,11 +71,11 @@ func ParseStringToBitMatrix(stringRepresentation, setString, unsetString string)
 				nRows++
 			}
 			pos++
-		} else if stringRepresentation[pos:pos+len(setString)] == setString {
+		} else if strings.HasPrefix(stringRepresentation[pos:], setString) {
 			pos += len(setString)
 			bits[bitsPos] = true
 			bitsPos++
-		} else if stringRepresentation[pos:pos+len(unsetString)] == unsetString {
+		} else if strings.HasPrefix(stringRepresentation[pos:], unsetString) {
 			pos += len(unsetString)
 			bits[bitsPos] = false
 			bitsPos++

@@ -28,7 +28,7 @@ func (this EdifactEncoder) encode(context *EncoderContext) error {
 
 		count := len(buffer)
 		if count >= 4 {
-			codewords, _ := edifactEncodeToCodewords(buffer, 0)
+			codewords, _ := edifactEncodeToCodewords(buffer)
 			context.WriteCodewords(codewords)
 			buffer = buffer[4:]
 
@@ -82,7 +82,7 @@ func edifactHandleEOD(context *EncoderContext, buffer []byte) error {
 		return gozxing.NewWriterException("IllegalStateException: Count must not exceed 4, %v", count)
 	}
 	restChars := count - 1
-	encoded, _ := edifactEncodeToCodewords(buffer, 0)
+	encoded, _ := edifactEncodeToCodewords(buffer)
 	endOfSymbolReached := !context.HasMoreCharacters()
 	restInAscii := endOfSymbolReached && restChars <= 2
 
@@ -123,23 +123,23 @@ func edifactEncodeChar(c byte, sb []byte) ([]byte, error) {
 	return sb, nil
 }
 
-func edifactEncodeToCodewords(sb []byte, startPos int) ([]byte, error) {
-	len := len(sb) - startPos
+func edifactEncodeToCodewords(sb []byte) ([]byte, error) {
+	len := len(sb)
 	if len == 0 {
 		return sb, gozxing.NewWriterException("IllegalStateException: StringBuilder must not be empty")
 	}
-	c1 := int(sb[startPos])
+	c1 := int(sb[0])
 	c2 := 0
 	if len >= 2 {
-		c2 = int(sb[startPos+1])
+		c2 = int(sb[1])
 	}
 	c3 := 0
 	if len >= 3 {
-		c3 = int(sb[startPos+2])
+		c3 = int(sb[2])
 	}
 	c4 := 0
 	if len >= 4 {
-		c4 = int(sb[startPos+3])
+		c4 = int(sb[3])
 	}
 
 	v := (c1 << 18) + (c2 << 12) + (c3 << 6) + c4

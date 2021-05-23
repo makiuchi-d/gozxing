@@ -78,7 +78,7 @@ func (this *C40Encoder) backtrackOneCharacter(context *EncoderContext,
 }
 
 func c40WriteNextTriplet(context *EncoderContext, buffer []byte) []byte {
-	context.WriteCodewords(c40EncodeToCodewords(buffer, 0))
+	context.WriteCodewords(c40EncodeToCodewords(buffer))
 	return buffer[3:]
 }
 
@@ -172,11 +172,8 @@ func c40EncodeChar(c byte, sb []byte) (int, []byte) {
 	return len + 2, sb
 }
 
-func c40EncodeToCodewords(sb []byte, startPos int) []byte {
-	c1 := int(sb[startPos])
-	c2 := int(sb[startPos+1])
-	c3 := int(sb[startPos+2])
-	v := (1600 * c1) + (40 * c2) + c3 + 1
+func c40EncodeToCodewords(sb []byte) []byte {
+	v := (1600 * int(sb[0])) + (40 * int(sb[1])) + int(sb[2]) + 1
 	cw1 := byte(v / 256)
 	cw2 := byte(v % 256)
 	return []byte{cw1, cw2}
