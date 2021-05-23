@@ -85,9 +85,9 @@ func HighLevelEncoder_getBytesForMessage(msg string) ([]byte, error) {
 }
 */
 
-func randomize253State(ch byte, codewordPosition int) byte {
+func randomize253State(codewordPosition int) byte {
 	pseudoRandom := ((149 * codewordPosition) % 253) + 1
-	tempVariable := int(ch) + pseudoRandom
+	tempVariable := HighLevelEncoder_PAD + pseudoRandom
 	if tempVariable <= 254 {
 		return byte(tempVariable)
 	}
@@ -157,7 +157,7 @@ func EncodeHighLevel(msg string, shape SymbolShapeHint, minSize, maxSize *gozxin
 		codewords = append(codewords, HighLevelEncoder_PAD)
 	}
 	for len(codewords) < capacity {
-		codewords = append(codewords, randomize253State(HighLevelEncoder_PAD, len(codewords)+1))
+		codewords = append(codewords, randomize253State(len(codewords)+1))
 	}
 	context.codewords = codewords
 

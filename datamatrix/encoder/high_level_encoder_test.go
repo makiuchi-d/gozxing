@@ -8,14 +8,14 @@ import (
 )
 
 func TestRandomize253State(t *testing.T) {
-	if r := randomize253State(104, 1); r != 254 {
-		t.Fatalf("randomize253State(104, 1) = %v, expect 254", r)
+	if r := randomize253State(1); r != 25 {
+		t.Fatalf("randomize253State(1) = %v, expect 25", r)
 	}
-	if r := randomize253State(210, 2); r != 2 {
-		t.Fatalf("randomize253State(210, 2) = %v, expect 2", r)
+	if r := randomize253State(2); r != 175 {
+		t.Fatalf("randomize253State(2) = %v, expect 175", r)
 	}
-	if r := randomize253State(210, 10); r != 182 {
-		t.Fatalf("randomize253State(210, 10) = %v, expect 182", r)
+	if r := randomize253State(10); r != 101 {
+		t.Fatalf("randomize253State(10) = %v, expect 101", r)
 	}
 }
 
@@ -298,7 +298,7 @@ func TestEncodeHighLevel(t *testing.T) {
 
 	_, e := EncodeHighLevel("Mосква", shape, nil, nil)
 	if e == nil {
-		t.Fatalf("EncodeHighLevel(Mосква) must be error");
+		t.Fatalf("EncodeHighLevel(Mосква) must be error")
 	}
 
 	str := string(make([]byte, 1559))
