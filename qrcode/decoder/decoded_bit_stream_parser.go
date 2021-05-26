@@ -1,9 +1,7 @@
 package decoder
 
 import (
-	"golang.org/x/text/encoding/ianaindex"
-	"golang.org/x/text/encoding/japanese"
-	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/encoding"
 	"golang.org/x/text/transform"
 
 	"github.com/makiuchi-d/gozxing"
@@ -161,7 +159,7 @@ func DecodedBitStreamParser_decodeHanziSegment(bits *common.BitSource, result []
 		count--
 	}
 
-	dec := simplifiedchinese.GBK.NewDecoder() // GBK is a extension of GB2312
+	dec := common.StringUtils_GB2312_CHARSET.NewDecoder()
 	result, _, e := transform.Append(dec, result, buffer[:offset])
 	if e != nil {
 		return result, gozxing.WrapFormatException(e)
@@ -197,7 +195,7 @@ func DecodedBitStreamParser_decodeKanjiSegment(bits *common.BitSource, result []
 	}
 
 	// Shift_JIS may not be supported in some environments:
-	dec := japanese.ShiftJIS.NewDecoder()
+	dec := common.StringUtils_SHIFT_JIS_CHARSET.NewDecoder()
 	result, _, e := transform.Append(dec, result, buffer[:offset])
 	if e != nil {
 		return result, gozxing.WrapFormatException(e)
@@ -220,31 +218,26 @@ func DecodedBitStreamParser_decodeByteSegment(bits *common.BitSource,
 		readBytes[i] = byte(b)
 	}
 
-	var encoding string
+	var encoding encoding.Encoding
 	if currentCharacterSetECI == nil {
 		// The spec isn't clear on this mode; see
 		// section 6.4.5: t does not say which encoding to assuming
 		// upon decoding. I have seen ISO-8859-1 used as well as
 		// Shift_JIS -- without anything like an ECI designator to
 		// give a hint.
-		encoding = common.StringUtils_guessEncoding(readBytes, hints)
+		var err error
+		encoding, err = common.StringUtils_guessCharset(readBytes, hints)
+		if err != nil {
+			return nil, nil, gozxing.WrapFormatException(err)
+		}
 	} else {
-		encoding = currentCharacterSetECI.Name()
+		encoding = currentCharacterSetECI.GetCharset()
 	}
 
-	if encoding == "ASCII" || encoding == "UTF-8" {
-		// not necessary to convert.
-		result = append(result, readBytes...)
-	} else {
-		ianaEncoding, e := ianaindex.IANA.Encoding(encoding)
-		if e != nil {
-			return result, byteSegments, gozxing.WrapFormatException(e)
-		}
-		dec := ianaEncoding.NewDecoder()
-		result, _, e = transform.Append(dec, result, readBytes)
-		if e != nil {
-			return result, byteSegments, gozxing.WrapFormatException(e)
-		}
+	dec := encoding.NewDecoder()
+	result, _, e := transform.Append(dec, result, readBytes)
+	if e != nil {
+		return result, byteSegments, gozxing.WrapFormatException(e)
 	}
 
 	byteSegments = append(byteSegments, readBytes)

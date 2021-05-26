@@ -1,21 +1,58 @@
 package common
 
 import (
+	"fmt"
+
+	"golang.org/x/text/encoding"
+	"golang.org/x/text/encoding/charmap"
+	"golang.org/x/text/encoding/ianaindex"
+	"golang.org/x/text/encoding/japanese"
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/encoding/unicode"
+
 	"github.com/makiuchi-d/gozxing"
 )
 
 const (
-	StringUtils_SHIFT_JIS                 = "Shift_JIS" //"SJIS"
-	StringUtils_GB2312                    = "GB2312"
-	StringUtils_EUC_JP                    = "EUC-JP"     // "EUC_JP"
-	StringUtils_UTF8                      = "UTF-8"      // UTF8
-	StringUtils_ISO88591                  = "ISO-8859-1" // ISO8859_1
-	StringUtils_PLATFORM_DEFAULT_ENCODING = StringUtils_UTF8
+	StringUtils_ASSUME_SHIFT_JIS = false
+	// Retained for ABI compatibility with earlier versions
+	StringUtils_SHIFT_JIS = "SJIS"
+	StringUtils_GB2312    = "GB2312"
 )
 
-func StringUtils_guessEncoding(bytes []byte, hints map[gozxing.DecodeHintType]interface{}) string {
-	if charset, ok := hints[gozxing.DecodeHintType_CHARACTER_SET]; ok {
-		return charset.(string)
+var (
+	StringUtils_PLATFORM_DEFAULT_ENCODING = unicode.UTF8
+	StringUtils_SHIFT_JIS_CHARSET         = japanese.ShiftJIS         // "SJIS"
+	StringUtils_GB2312_CHARSET            = simplifiedchinese.GB18030 // "GB2312"
+	StringUtils_EUC_JP                    = japanese.EUCJP            // "EUC_JP"
+)
+
+func StringUtils_guessEncoding(bytes []byte, hints map[gozxing.DecodeHintType]interface{}) (string, error) {
+	c, err := StringUtils_guessCharset(bytes, hints)
+	if err != nil {
+		return "", err
+	}
+	if c == StringUtils_SHIFT_JIS_CHARSET {
+		return "SJIS", nil
+	} else if c == unicode.UTF8 {
+		return "UTF8", nil
+	} else if c == charmap.ISO8859_1 {
+		return "ISO8859_1", nil
+	}
+	return ianaindex.IANA.Name(c)
+}
+
+func StringUtils_guessCharset(bytes []byte, hints map[gozxing.DecodeHintType]interface{}) (encoding.Encoding, error) {
+	if hint, ok := hints[gozxing.DecodeHintType_CHARACTER_SET]; ok {
+		if charset, ok := hint.(encoding.Encoding); ok {
+			return charset, nil
+		}
+		name := fmt.Sprintf("%v", hint)
+		if eci, ok := GetCharacterSetECIByName(name); ok {
+			return eci.GetCharset(), nil
+		}
+
+		return ianaindex.IANA.Encoding(name)
 	}
 	// For now, merely tries to distinguish ISO-8859-1, UTF-8 and Shift_JIS,
 	// which should be by far the most common encodings.
@@ -127,11 +164,11 @@ func StringUtils_guessEncoding(bytes []byte, hints map[gozxing.DecodeHintType]in
 
 	// Easy -- if there is BOM or at least 1 valid not-single byte character (and no evidence it can't be UTF-8), done
 	if canBeUTF8 && (utf8bom || utf2BytesChars+utf3BytesChars+utf4BytesChars > 0) {
-		return StringUtils_UTF8
+		return unicode.UTF8, nil
 	}
 	// Easy -- if assuming Shift_JIS or at least 3 valid consecutive not-ascii characters (and no evidence it can't be), done
 	if canBeShiftJIS && (sjisMaxKatakanaWordLength >= 3 || sjisMaxDoubleBytesWordLength >= 3) {
-		return StringUtils_SHIFT_JIS
+		return StringUtils_SHIFT_JIS_CHARSET, nil
 	}
 	// Distinguishing Shift_JIS and ISO-8859-1 can be a little tough for short words. The crude heuristic is:
 	// - If we saw
@@ -140,21 +177,21 @@ func StringUtils_guessEncoding(bytes []byte, hints map[gozxing.DecodeHintType]in
 	// - then we conclude Shift_JIS, else ISO-8859-1
 	if canBeISO88591 && canBeShiftJIS {
 		if (sjisMaxKatakanaWordLength == 2 && sjisKatakanaChars == 2) || isoHighOther*10 >= length {
-			return StringUtils_SHIFT_JIS
+			return StringUtils_SHIFT_JIS_CHARSET, nil
 		}
-		return StringUtils_ISO88591
+		return charmap.ISO8859_1, nil
 	}
 
 	// Otherwise, try in order ISO-8859-1, Shift JIS, UTF-8 and fall back to default platform encoding
 	if canBeISO88591 {
-		return StringUtils_ISO88591
+		return charmap.ISO8859_1, nil
 	}
 	if canBeShiftJIS {
-		return StringUtils_SHIFT_JIS
+		return StringUtils_SHIFT_JIS_CHARSET, nil
 	}
 	if canBeUTF8 {
-		return StringUtils_UTF8
+		return unicode.UTF8, nil
 	}
 	// Otherwise, we take a wild guess with platform encoding
-	return StringUtils_PLATFORM_DEFAULT_ENCODING
+	return StringUtils_PLATFORM_DEFAULT_ENCODING, nil
 }

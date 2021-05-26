@@ -5,7 +5,10 @@ import (
 	"testing"
 
 	"github.com/makiuchi-d/gozxing"
+	"github.com/makiuchi-d/gozxing/common"
 	"github.com/makiuchi-d/gozxing/qrcode/decoder"
+	"golang.org/x/text/encoding/charmap"
+	"golang.org/x/text/encoding/japanese"
 )
 
 func TestEncoder_calculateMaskPenalty(t *testing.T) {
@@ -91,31 +94,31 @@ func TestEncoder_isOnlyDoubleByteKanji(t *testing.T) {
 func TestEncoder_chooseMode(t *testing.T) {
 	content := "漢字モード"
 	expect := decoder.Mode_KANJI
-	if m := chooseMode(content, "Shift_JIS"); m != expect {
+	if m := chooseMode(content, japanese.ShiftJIS); m != expect {
 		t.Fatalf("chooseMode(%v, Shift_JIS) = %v mode, expect %v mode", content, m, expect)
 	}
 
 	content = "12345"
 	expect = decoder.Mode_NUMERIC
-	if m := chooseMode(content, ""); m != expect {
+	if m := chooseMode(content, nil); m != expect {
 		t.Fatalf("chooseMode(%v) = %v mode, expect %v mode", content, m, expect)
 	}
 
 	content = "12345ABCDE"
 	expect = decoder.Mode_ALPHANUMERIC
-	if m := chooseMode(content, ""); m != expect {
+	if m := chooseMode(content, nil); m != expect {
 		t.Fatalf("chooseMode(%v) = %v mode, expect %v mode", content, m, expect)
 	}
 
 	content = "12345ABCDEabcde"
 	expect = decoder.Mode_BYTE
-	if m := chooseMode(content, ""); m != expect {
+	if m := chooseMode(content, nil); m != expect {
 		t.Fatalf("chooseMode(%v) = %v mode, expect %v mode", content, m, expect)
 	}
 
 	content = ""
 	expect = decoder.Mode_BYTE
-	if m := chooseMode(content, ""); m != expect {
+	if m := chooseMode(content, nil); m != expect {
 		t.Fatalf("chooseMode(%v) = %v mode, expect %v mode", content, m, expect)
 	}
 }
@@ -326,16 +329,12 @@ func TestEncoder_append8BitBytes(t *testing.T) {
 	var e error
 	bits := gozxing.NewEmptyBitArray()
 
-	e = append8BitBytes("金魚", bits, "unknownencoding")
-	if e == nil {
-		t.Fatalf("append8BitBytes must be error")
-	}
-	e = append8BitBytes("金魚", bits, "ISO-8859-1")
+	e = append8BitBytes("金魚", bits, charmap.ISO8859_1)
 	if e == nil {
 		t.Fatalf("append8BitBytes must be error")
 	}
 
-	e = append8BitBytes("金魚", bits, "Shift_JIS")
+	e = append8BitBytes("金魚", bits, common.StringUtils_SHIFT_JIS_CHARSET)
 	if e != nil {
 		t.Fatalf("append8BitBytes returns error, %v", e)
 	}
@@ -603,6 +602,12 @@ func TestEncoder_encodeFail(t *testing.T) {
 		content = content + content
 	}
 	_, e = Encoder_encode(content, decoder.ErrorCorrectionLevel_H, hints)
+	if e == nil {
+		t.Fatalf("encode must be error")
+	}
+
+	hints = map[gozxing.EncodeHintType]interface{}{gozxing.EncodeHintType_CHARACTER_SET: "Dummy"}
+	_, e = Encoder_encode("Dummy", decoder.ErrorCorrectionLevel_H, hints)
 	if e == nil {
 		t.Fatalf("encode must be error")
 	}

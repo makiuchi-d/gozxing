@@ -484,8 +484,7 @@ func decodeBase256Segment(bits *common.BitSource, result []byte, byteSegments []
 
 	str, e := charmap.ISO8859_1.NewDecoder().Bytes(bytes)
 	if e != nil {
-		return result, byteSegments, gozxing.NewFormatException(
-			"Platform does not support required encoding: %v", e)
+		return result, byteSegments, e
 	}
 	result = append(result, str...)
 

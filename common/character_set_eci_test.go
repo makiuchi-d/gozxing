@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"golang.org/x/text/encoding/ianaindex"
+	"golang.org/x/text/encoding/unicode"
 
 	"github.com/makiuchi-d/gozxing"
 )
@@ -55,41 +56,54 @@ func TestCharacterSetECI(t *testing.T) {
 		t.Fatalf("GetCharacterSetECIByValue(899) must return nil without error")
 	}
 
-	c = GetCharacterSetECIByName("ISO-8859-1")
-	if c == nil {
+	c, ok := GetCharacterSetECIByName("ISO-8859-1")
+	if !ok || c == nil {
 		t.Fatalf("GetCharacterSetECIByName(ISO-8859-1) returns nil")
 	}
 	if r := c.GetValue(); r != 1 {
 		t.Fatalf("GetCharacterSetECIByValue(ISO-8859-1) value = %v, expect 1", r)
 	}
 
-	c = GetCharacterSetECIByName("UTF-16BE")
-	if c == nil {
+	c, ok = GetCharacterSetECIByName("UTF-16BE")
+	if !ok || c == nil {
 		t.Fatalf("GetCharacterSetECIByName(UTF-16BE) returns nil")
 	}
 	if r := c.GetValue(); r != 25 {
 		t.Fatalf("GetCharacterSetECIByValue(UTF-16E) value = %v, expect 25", r)
 	}
 
-	c = GetCharacterSetECIByName("UnicodeBig")
-	if c == nil {
+	c, ok = GetCharacterSetECIByName("UnicodeBig")
+	if !ok || c == nil {
 		t.Fatalf("GetCharacterSetECIByName(UnicodeBig) returns nil")
 	}
 	if r := c.GetValue(); r != 25 {
 		t.Fatalf("GetCharacterSetECIByValue(UnicodeBig) value = %v, expect 25", r)
 	}
 
-	c = GetCharacterSetECIByName("UTF-8")
-	if c == nil {
+	c, ok = GetCharacterSetECIByName("UTF-8")
+	if !ok || c == nil {
 		t.Fatalf("GetCharacterSetECIByName(UTF-8) returns nil")
 	}
 	if r := c.GetValue(); r != 26 {
 		t.Fatalf("GetCharacterSetECIByValue(UTF-8) value = %v, expect 26", r)
 	}
 
-	c = GetCharacterSetECIByName("")
-	if c != nil {
+	c, ok = GetCharacterSetECIByName("")
+	if ok || c != nil {
 		t.Fatalf("GetCharacterSetECIByName(\"\") must be nil")
+	}
+
+	_, ok = GetCharacterSetECI(nil)
+	if ok {
+		t.Fatalf("GetCharacterSetECI(nil) must be not ok")
+	}
+
+	c, ok = GetCharacterSetECI(unicode.UTF8)
+	if !ok || c == nil {
+		t.Fatalf("GetCharacterSetECI(UTF8) failed")
+	}
+	if r := c.GetValue(); r != 26 {
+		t.Fatalf("GetCharacterSetECI(UTF-8) value = %v, expect 26", r)
 	}
 }
 

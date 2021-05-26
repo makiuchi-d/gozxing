@@ -1,12 +1,13 @@
 package encoder
 
 import (
+	"fmt"
 	"math"
 	"strconv"
 	"unicode/utf8"
 
-	"golang.org/x/text/encoding/ianaindex"
-	"golang.org/x/text/encoding/japanese"
+	textencoding "golang.org/x/text/encoding"
+	"golang.org/x/text/encoding/unicode"
 
 	"github.com/makiuchi-d/gozxing"
 	"github.com/makiuchi-d/gozxing/common"
@@ -14,8 +15,8 @@ import (
 	"github.com/makiuchi-d/gozxing/qrcode/decoder"
 )
 
-const (
-	Encoder_DEFAULT_BYTE_MODE_ENCODING = "UTF-8" // original default is "ISO-8859-1"
+var (
+	Encoder_DEFAULT_BYTE_MODE_ENCODING textencoding.Encoding = unicode.UTF8 // original default is "ISO-8859-1"
 )
 
 var alphanumericTable = []int{
@@ -46,13 +47,10 @@ func Encoder_encode(content string, ecLevel decoder.ErrorCorrectionLevel, hints 
 	encoding := Encoder_DEFAULT_BYTE_MODE_ENCODING
 	encodingHint, hasEncodingHint := hints[gozxing.EncodeHintType_CHARACTER_SET]
 	if hasEncodingHint {
-		// normalize encoding name using CharcterSetECI
-		if enc, ok := encodingHint.(string); ok {
-			encoding = enc
-			eci := common.GetCharacterSetECIByName(encoding)
-			if eci != nil {
-				encoding = eci.Name()
-			}
+		if eci, ok := common.GetCharacterSetECIByName(fmt.Sprintf("%v", encodingHint)); ok {
+			encoding = eci.GetCharset()
+		} else {
+			return nil, gozxing.NewWriterException(encodingHint)
 		}
 	}
 
@@ -66,8 +64,8 @@ func Encoder_encode(content string, ecLevel decoder.ErrorCorrectionLevel, hints 
 
 	// Append ECI segment if applicable
 	if mode == decoder.Mode_BYTE && hasEncodingHint {
-		eci := common.GetCharacterSetECIByName(encoding)
-		if eci != nil {
+		eci, ok := common.GetCharacterSetECI(encoding)
+		if ok && eci != nil {
 			appendECI(eci, headerBits)
 		}
 	}
@@ -235,8 +233,8 @@ func getAlphanumericCode(code uint8) int {
 
 // chooseMode Choose the best mode by examining the content. Note that 'encoding' is used as a hint;
 // if it is Shift_JIS, and the input is only double-byte Kanji, then we return {@link Mode#KANJI}.
-func chooseMode(content, encoding string) *decoder.Mode {
-	if "Shift_JIS" == encoding && isOnlyDoubleByteKanji(content) {
+func chooseMode(content string, encoding textencoding.Encoding) *decoder.Mode {
+	if common.StringUtils_SHIFT_JIS_CHARSET == encoding && isOnlyDoubleByteKanji(content) {
 		// Choose Kanji mode if all input are double-byte characters
 		return decoder.Mode_KANJI
 	}
@@ -262,7 +260,7 @@ func chooseMode(content, encoding string) *decoder.Mode {
 }
 
 func isOnlyDoubleByteKanji(content string) bool {
-	enc := japanese.ShiftJIS.NewEncoder()
+	enc := common.StringUtils_SHIFT_JIS_CHARSET.NewEncoder()
 	bytes, e := enc.Bytes([]byte(content))
 	if e != nil {
 		return false
@@ -516,7 +514,7 @@ func appendLengthInfo(numLetters int, version *decoder.Version, mode *decoder.Mo
 
 // appendBytes Append "bytes" in "mode" mode (encoding) into "bits".
 //  On success, store the result in "bits".
-func appendBytes(content string, mode *decoder.Mode, bits *gozxing.BitArray, encoding string) gozxing.WriterException {
+func appendBytes(content string, mode *decoder.Mode, bits *gozxing.BitArray, encoding textencoding.Encoding) gozxing.WriterException {
 	switch mode {
 	case decoder.Mode_NUMERIC:
 		appendNumericBytes(content, bits)
@@ -581,18 +579,13 @@ func appendAlphanumericBytes(content string, bits *gozxing.BitArray) gozxing.Wri
 	return nil
 }
 
-func append8BitBytes(content string, bits *gozxing.BitArray, encoding string) gozxing.WriterException {
+func append8BitBytes(content string, bits *gozxing.BitArray, encoding textencoding.Encoding) gozxing.WriterException {
 	bytes := []byte(content)
 
-	if encoding != "ASCII" {
-		enc, e := ianaindex.IANA.Encoding(encoding)
-		if e != nil {
-			return gozxing.WrapWriterException(e)
-		}
-		bytes, e = enc.NewEncoder().Bytes([]byte(content))
-		if e != nil {
-			return gozxing.WrapWriterException(e)
-		}
+	var e error
+	bytes, e = encoding.NewEncoder().Bytes([]byte(content))
+	if e != nil {
+		return gozxing.WrapWriterException(e)
 	}
 
 	for _, b := range bytes {
@@ -602,7 +595,7 @@ func append8BitBytes(content string, bits *gozxing.BitArray, encoding string) go
 }
 
 func appendKanjiBytes(content string, bits *gozxing.BitArray) gozxing.WriterException {
-	enc := japanese.ShiftJIS.NewEncoder()
+	enc := common.StringUtils_SHIFT_JIS_CHARSET.NewEncoder()
 	bytes, e := enc.Bytes([]byte(content))
 	if e != nil {
 		return gozxing.WrapWriterException(e)
