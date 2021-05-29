@@ -223,6 +223,29 @@ func (b *BitMatrix) Rotate180() {
 	}
 }
 
+func (b *BitMatrix) Rotate90() {
+	newWidth := b.height
+	newHeight := b.width
+	newRowSize := (newWidth + 31) / 32
+	newBits := make([]uint32, newRowSize*newHeight)
+
+	for y := 0; y < b.height; y++ {
+		for x := 0; x < b.width; x++ {
+			offset := y*b.rowSize + (x / 32)
+			if ((b.bits[offset] >> (x & 0x1f)) & 1) != 0 {
+				newY := newHeight - 1 - x
+				newX := y
+				newOffset := newY*newRowSize + (newX / 32)
+				newBits[newOffset] |= 1 << (newX & 0x1f)
+			}
+		}
+	}
+	b.width = newWidth
+	b.height = newHeight
+	b.rowSize = newRowSize
+	b.bits = newBits
+}
+
 func (b *BitMatrix) GetEnclosingRectangle() []int {
 	left := b.width
 	top := b.height

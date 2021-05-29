@@ -321,6 +321,21 @@ func TestBitMatrix_Rotate180WideWidth(t *testing.T) {
 	}
 }
 
+func TestBitMatrix_Rotate90(t *testing.T) {
+	b, _ := NewBitMatrix(3, 3)
+	b.Set(0, 0)
+	b.Set(0, 1)
+	b.Set(1, 2)
+	b.Set(2, 1)
+
+	b.Rotate90()
+
+	testBitMatrixGet(t, b, 0, 2, true)
+	testBitMatrixGet(t, b, 1, 2, true)
+	testBitMatrixGet(t, b, 2, 1, true)
+	testBitMatrixGet(t, b, 1, 0, true)
+}
+
 func TestGetEnclosingRectangle(t *testing.T) {
 
 }
