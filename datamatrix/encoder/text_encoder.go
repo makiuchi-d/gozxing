@@ -42,7 +42,7 @@ func textEncodeChar(c byte, sb []byte) (int, []byte) {
 	}
 	if c == '`' {
 		sb = append(sb, 2) //Shift 3 Set
-		sb = append(sb, c-96)
+		sb = append(sb, 0) // '`' - 96 == 0
 		return 2, sb
 	}
 	if c <= 'Z' {

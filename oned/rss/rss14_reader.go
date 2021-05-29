@@ -125,11 +125,6 @@ func constructResult(leftPair, rightPair *Pair) *gozxing.Result {
 }
 
 func checkChecksum(leftPair, rightPair *Pair) bool {
-	//int leftFPValue = leftPair.getFinderPattern().getValue();
-	//int rightFPValue = rightPair.getFinderPattern().getValue();
-	//if ((leftFPValue == 0 && rightFPValue == 8) ||
-	//    (leftFPValue == 8 && rightFPValue == 0)) {
-	//}
 	checkValue := (leftPair.GetChecksumPortion() + 16*rightPair.GetChecksumPortion()) % 79
 	targetCheckValue :=
 		9*leftPair.GetFinderPattern().GetValue() + rightPair.GetFinderPattern().GetValue()

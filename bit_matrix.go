@@ -233,10 +233,8 @@ func (b *BitMatrix) Rotate90() {
 		for x := 0; x < b.width; x++ {
 			offset := y*b.rowSize + (x / 32)
 			if ((b.bits[offset] >> (x & 0x1f)) & 1) != 0 {
-				newY := newHeight - 1 - x
-				newX := y
-				newOffset := newY*newRowSize + (newX / 32)
-				newBits[newOffset] |= 1 << (newX & 0x1f)
+				newOffset := (newHeight-1-x)*newRowSize + (y / 32)
+				newBits[newOffset] |= 1 << (y & 0x1f)
 			}
 		}
 	}

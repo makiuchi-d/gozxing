@@ -72,19 +72,6 @@ const (
 	HighLevelEncoder_BASE256_ENCODATION = 5
 )
 
-// Converts the message to a byte array using the default encoding (cp437) as defined by the
-// specification
-//
-// @param msg the message
-// @return the byte array of the message
-//
-/*
-func HighLevelEncoder_getBytesForMessage(msg string) ([]byte, error) {
-	//See 4.4.3 and annex B of ISO/IEC 15438:2001(E)
-	return charmap.CodePage437.NewEncoder().Bytes([]byte(msg))
-}
-*/
-
 func randomize253State(codewordPosition int) byte {
 	pseudoRandom := ((149 * codewordPosition) % 253) + 1
 	tempVariable := HighLevelEncoder_PAD + pseudoRandom
