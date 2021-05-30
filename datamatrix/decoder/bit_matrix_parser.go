@@ -137,7 +137,7 @@ func (p *BitMatrixParser) readCodewords() ([]byte, error) {
 		}
 	}
 
-	if t := p.version.getTotalCodewords(); resultOffset != t {
+	if t := p.version.getTotalCodewords(); resultOffset != t && resultOffset != t-1 {
 		return nil, gozxing.NewFormatException(
 			"resultOffset=%v, totalCodewords=%v", resultOffset, t)
 	}
