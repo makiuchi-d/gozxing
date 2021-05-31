@@ -53,7 +53,7 @@ func (this *Detector) Detect() (*common.DetectorResult, error) {
 		dimensionRight += 1
 	}
 
-	if 4*dimensionTop < 7*dimensionRight && 4*dimensionRight < 7*dimensionTop {
+	if 4*dimensionTop < 6*dimensionRight && 4*dimensionRight < 6*dimensionTop {
 		// The matrix is square
 		dimensionTop = max(dimensionTop, dimensionRight)
 		dimensionRight = dimensionTop
