@@ -131,6 +131,25 @@ func TestBitMatrix_GetSetFlip(t *testing.T) {
 	testBitMatrixGet(t, b, 0, 7, false)
 }
 
+func TestBitMatrix_FlipAll(t *testing.T) {
+	b, _ := ParseStringToBitMatrix("XX.X\n..XX\nX.X.", "X", ".")
+	w, _ := ParseStringToBitMatrix("XX.X\n..XX\nX.X.", ".", "X")
+	b.FlipAll()
+
+	if b.width != w.width || b.height != w.height {
+		t.Fatalf("size mismatch: %vx%v, %vx%v", b.width, b.height, w.width, w.height)
+	}
+	for y := 0; y < b.height; y++ {
+		for x := 0; x < b.width; x++ {
+			bb := b.Get(x, y)
+			wb := w.Get(x, y)
+			if bb != wb {
+				t.Fatalf("[%v,%v] = %v, expect %v", x, y, bb, wb)
+			}
+		}
+	}
+}
+
 func TestBitMatrix_Xor(t *testing.T) {
 	var b, m *BitMatrix
 

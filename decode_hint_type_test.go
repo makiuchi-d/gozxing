@@ -23,5 +23,6 @@ func TestDecodeHintType_String(t *testing.T) {
 	testDecodeHintType_String(t, DecodeHintType_RETURN_CODABAR_START_END, "RETURN_CODABAR_START_END")
 	testDecodeHintType_String(t, DecodeHintType_NEED_RESULT_POINT_CALLBACK, "NEED_RESULT_POINT_CALLBACK")
 	testDecodeHintType_String(t, DecodeHintType_ALLOWED_EAN_EXTENSIONS, "ALLOWED_EAN_EXTENSIONS")
+	testDecodeHintType_String(t, DecodeHintType_ALSO_INVERTED, "ALSO_INVERTED")
 	testDecodeHintType_String(t, DecodeHintType(-1), "Unknown DecodeHintType")
 }

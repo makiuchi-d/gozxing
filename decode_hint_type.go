@@ -70,6 +70,12 @@ const (
 	 * at all.
 	 */
 	DecodeHintType_ALLOWED_EAN_EXTENSIONS
+
+	/**
+	 * If true, also tries to decode as inverted image. All configured decoders are simply called a
+	 * second time with an inverted image. Doesn't matter what it maps to; use {@link Boolean#TRUE}.
+	 */
+	DecodeHintType_ALSO_INVERTED
 )
 
 func (t DecodeHintType) String() string {
@@ -96,6 +102,8 @@ func (t DecodeHintType) String() string {
 		return "NEED_RESULT_POINT_CALLBACK"
 	case DecodeHintType_ALLOWED_EAN_EXTENSIONS:
 		return "ALLOWED_EAN_EXTENSIONS"
+	case DecodeHintType_ALSO_INVERTED:
+		return "ALSO_INVERTED"
 	}
 	return "Unknown DecodeHintType"
 }
