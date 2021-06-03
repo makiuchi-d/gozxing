@@ -137,7 +137,7 @@ func (p *BitMatrixParser) readCodewords() ([]byte, error) {
 		}
 	}
 
-	if t := p.version.getTotalCodewords(); resultOffset != t && resultOffset != t-1 {
+	if t := p.version.getTotalCodewords(); resultOffset != t {
 		return nil, gozxing.NewFormatException(
 			"resultOffset=%v, totalCodewords=%v", resultOffset, t)
 	}
@@ -160,6 +160,9 @@ func (p *BitMatrixParser) readModule(row, column, numRows, numColumns int) bool 
 	if column < 0 {
 		column += numColumns
 		row += 4 - ((numColumns + 4) & 0x07)
+	}
+	if row >= numRows {
+		row -= numRows
 	}
 	p.readMappingMatrix.Set(column, row)
 	return p.mappingBitMatrix.Get(column, row)

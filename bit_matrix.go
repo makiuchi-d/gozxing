@@ -110,28 +110,22 @@ func (b *BitMatrix) Get(x, y int) bool {
 		return false
 	}
 	offset := (y * b.rowSize) + (x / 32)
-	return offset < len(b.bits) && ((b.bits[offset]>>uint(x%32))&1) != 0
+	return ((b.bits[offset] >> uint(x%32)) & 1) != 0
 }
 
 func (b *BitMatrix) Set(x, y int) {
 	offset := (y * b.rowSize) + (x / 32)
-	if offset < len(b.bits) {
-		b.bits[offset] |= 1 << uint(x%32)
-	}
+	b.bits[offset] |= 1 << uint(x%32)
 }
 
 func (b *BitMatrix) Unset(x, y int) {
 	offset := (y * b.rowSize) + (x / 32)
-	if offset < len(b.bits) {
-		b.bits[offset] &= ^(1 << uint(x%32))
-	}
+	b.bits[offset] &= ^(1 << uint(x%32))
 }
 
 func (b *BitMatrix) Flip(x, y int) {
 	offset := (y * b.rowSize) + (x / 32)
-	if offset < len(b.bits) {
-		b.bits[offset] ^= 1 << uint(x%32)
-	}
+	b.bits[offset] ^= 1 << uint(x%32)
 }
 
 func (b *BitMatrix) Xor(mask *BitMatrix) error {

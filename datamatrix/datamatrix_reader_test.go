@@ -245,7 +245,6 @@ func testDataMatrixReader_Decode(t testing.TB, file, expect string, pure bool) {
 }
 
 func TestDataMatrixReader_Decode(t *testing.T) {
-
 	// testdata from zxing core/src/test/resources/blackbox/datamatrix-1/
 	testDataMatrixReader_Decode(t, "testdata/0123456789.png", "0123456789", false)
 	testDataMatrixReader_Decode(t, "testdata/C40.png", "Testing C40", true)
@@ -274,7 +273,7 @@ func TestDataMatrixReader_Decode(t *testing.T) {
 	testDataMatrixReader_Decode(t, "testdata/abcdefg.png", "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*(),./\\", true)
 	testDataMatrixReader_Decode(t, "testdata/zxing_URL_L_Kayway.png", "http://code.google.com/p/zxing/", true)
 
-	// testdata from zxing core/src/test/resources/blackbox/datamatrix-1/
+	// testdata from zxing core/src/test/resources/blackbox/datamatrix-2/
 	testDataMatrixReader_Decode(t, "testdata/01.png", "http://google.com/m", false)
 	testDataMatrixReader_Decode(t, "testdata/02.png", "http://google.com/m", false)
 	testDataMatrixReader_Decode(t, "testdata/04.png", "http://google.com/m", false)
@@ -295,4 +294,24 @@ func TestDataMatrixReader_Decode(t *testing.T) {
 	//testDataMatrixReader_Decode(t, "testdata/16.png","This is a test of our DataMatrix support using a longer piece of text, and therefore a more dense barcode.", false)
 	//testDataMatrixReader_Decode(t, "testdata/17.png","This is a test of our DataMatrix support using a longer piece of text, and therefore a more dense barcode.", false)
 	//testDataMatrixReader_Decode(t, "testdata/18.png","This is a test of our DataMatrix support using a longer piece of text, and therefore a more dense barcode.", false)
+
+	// testdata from zxing core/src/test/resources/blackbox/datamatrix-3/
+	testDataMatrixReader_Decode(t, "testdata/3/abcd-36x20.png", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijkl", false)
+	testDataMatrixReader_Decode(t, "testdata/3/abcd-40x26.png", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxy", true)
+	testDataMatrixReader_Decode(t, "testdata/3/abcd-44x20.png", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcd", true)
+	testDataMatrixReader_Decode(t, "testdata/3/abcd-48x8.png", "abcdefghijklmnopqrstuvwxy", false)
+	testDataMatrixReader_Decode(t, "testdata/3/abcd-48x22.png", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzab", false)
+	testDataMatrixReader_Decode(t, "testdata/3/abcd-48x24.png", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmn", false)
+	testDataMatrixReader_Decode(t, "testdata/3/abcd-48x26.png", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabc", false)
+	testDataMatrixReader_Decode(t, "testdata/3/abcd-64x8.png", "abcdefghijklmnopqrstuvwxyzabcdefgh", true)
+	testDataMatrixReader_Decode(t, "testdata/3/abcd-64x12.png", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijk", true)
+	testDataMatrixReader_Decode(t, "testdata/3/abcd-64x16.png", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklm", true)
+	testDataMatrixReader_Decode(t, "testdata/3/abcd-64x20.png", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrst", false)
+	testDataMatrixReader_Decode(t, "testdata/3/abcd-64x24.png", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcd", true)
+	testDataMatrixReader_Decode(t, "testdata/3/abcd-64x26.png", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrs", true)
+	testDataMatrixReader_Decode(t, "testdata/3/abcd-80x8.png", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrst", true)
+	testDataMatrixReader_Decode(t, "testdata/3/abcd-88x12.png", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnop", true)
+	testDataMatrixReader_Decode(t, "testdata/3/abcd-96x8.png", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabc", true)
+	testDataMatrixReader_Decode(t, "testdata/3/abcd-120x8.png", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrst", true)
+	testDataMatrixReader_Decode(t, "testdata/3/abcd-144x8.png", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmno", true)
 }
