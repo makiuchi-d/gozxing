@@ -140,13 +140,15 @@ func (this *codabarReader) DecodeRow(rowNumber int, row *gozxing.BitArray, hints
 		runningCount += this.counters[i]
 	}
 	right := float64(runningCount)
-	return gozxing.NewResult(
+	result := gozxing.NewResult(
 		string(this.decodeRowResult),
 		nil,
 		[]gozxing.ResultPoint{
 			gozxing.NewResultPoint(left, float64(rowNumber)),
 			gozxing.NewResultPoint(right, float64(rowNumber))},
-		gozxing.BarcodeFormat_CODABAR), nil
+		gozxing.BarcodeFormat_CODABAR)
+	result.PutMetadata(gozxing.ResultMetadataType_SYMBOLOGY_IDENTIFIER, "]F0")
+	return result, nil
 }
 
 func (this *codabarReader) validatePattern(start int) error {

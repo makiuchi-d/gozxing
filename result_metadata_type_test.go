@@ -23,6 +23,7 @@ func TestResultMetadataTypeString(t *testing.T) {
 	testResultMetadataTypeString(t, ResultMetadataType_PDF417_EXTRA_METADATA, "PDF417_EXTRA_METADATA")
 	testResultMetadataTypeString(t, ResultMetadataType_STRUCTURED_APPEND_SEQUENCE, "STRUCTURED_APPEND_SEQUENCE")
 	testResultMetadataTypeString(t, ResultMetadataType_STRUCTURED_APPEND_PARITY, "STRUCTURED_APPEND_PARITY")
+	testResultMetadataTypeString(t, ResultMetadataType_SYMBOLOGY_IDENTIFIER, "SYMBOLOGY_IDENTIFIER")
 
 	testResultMetadataTypeString(t, -1, "unknown metadata type")
 }

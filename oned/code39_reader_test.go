@@ -200,37 +200,43 @@ func TestCode39Reader(t *testing.T) {
 
 	reader := NewCode39Reader()
 	tests := []struct {
-		file  string
-		wants string
+		file     string
+		wants    string
+		metadata map[gozxing.ResultMetadataType]interface{}
 	}{
-		{"testdata/code39/1-1.png", "TEST-SHEET"},
-		{"testdata/code39/1-2.png", " WWW.CITRONSOFT.COM "},
-		{"testdata/code39/1-3.png", "MOROVIA"},
-		{"testdata/code39/1-4.png", "ABC123"},
-		{"testdata/code39/01.png", "165627"},
-		{"testdata/code39/02.png", "165627"},
-		{"testdata/code39/03.png", "001EC947D49B"},
-		{"testdata/code39/04.png", "001EC947D49B"},
-		{"testdata/code39/05.png", "001EC947D49B"},
-		{"testdata/code39/06.png", "165340"},
-		{"testdata/code39/07.png", "165340"},
-		{"testdata/code39/08.png", "165340"},
-		{"testdata/code39/09.png", "165340"},
-		{"testdata/code39/10.png", "001EC94767E0"},
-		{"testdata/code39/11.png", "001EC94767E0"},
-		{"testdata/code39/12.png", "001EC94767E0"},
-		{"testdata/code39/13.png", "001EC94767E0"},
-		{"testdata/code39/14.png", "404785"},
-		{"testdata/code39/15.png", "404785"},
-		{"testdata/code39/16.png", "404785"},
-		{"testdata/code39/17.png", "404785"},
+		{
+			"testdata/code39/1-1.png", "TEST-SHEET",
+			map[gozxing.ResultMetadataType]interface{}{
+				gozxing.ResultMetadataType_SYMBOLOGY_IDENTIFIER: "]A0",
+			},
+		},
+		{"testdata/code39/1-2.png", " WWW.CITRONSOFT.COM ", nil},
+		{"testdata/code39/1-3.png", "MOROVIA", nil},
+		{"testdata/code39/1-4.png", "ABC123", nil},
+		{"testdata/code39/01.png", "165627", nil},
+		{"testdata/code39/02.png", "165627", nil},
+		{"testdata/code39/03.png", "001EC947D49B", nil},
+		{"testdata/code39/04.png", "001EC947D49B", nil},
+		{"testdata/code39/05.png", "001EC947D49B", nil},
+		{"testdata/code39/06.png", "165340", nil},
+		{"testdata/code39/07.png", "165340", nil},
+		{"testdata/code39/08.png", "165340", nil},
+		{"testdata/code39/09.png", "165340", nil},
+		{"testdata/code39/10.png", "001EC94767E0", nil},
+		{"testdata/code39/11.png", "001EC94767E0", nil},
+		{"testdata/code39/12.png", "001EC94767E0", nil},
+		{"testdata/code39/13.png", "001EC94767E0", nil},
+		{"testdata/code39/14.png", "404785", nil},
+		{"testdata/code39/15.png", "404785", nil},
+		{"testdata/code39/16.png", "404785", nil},
+		{"testdata/code39/17.png", "404785", nil},
 	}
 	for _, test := range tests {
-		testutil.TestFile(t, reader, test.file, test.wants, format, nil)
+		testutil.TestFile(t, reader, test.file, test.wants, format, nil, test.metadata)
 	}
 
 	// extended mode
 	reader = NewCode39ReaderWithFlags(false, true)
-	testutil.TestFile(t, reader, "testdata/code39/2-1.png", "Extended !?*#", format, nil)
-	testutil.TestFile(t, reader, "testdata/code39/2-2.png", "12ab", format, nil)
+	testutil.TestFile(t, reader, "testdata/code39/2-1.png", "Extended !?*#", format, nil, nil)
+	testutil.TestFile(t, reader, "testdata/code39/2-2.png", "12ab", format, nil, nil)
 }

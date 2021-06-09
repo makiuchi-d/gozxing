@@ -298,3 +298,67 @@ func TestQRCodeReader_DecodeImage(t *testing.T) {
 	result = testDecodeImage(t, file, "KLMNOPQRSTUVWXYZ")
 	testStructuredAppend(t, file, result.GetResultMetadata(), 0x33, 1) // 4 of 4
 }
+
+func TestQRCodeReaderBlackbox(t *testing.T) {
+	reader := NewQRCodeReader()
+	format := gozxing.BarcodeFormat_QR_CODE
+
+	tests := []struct {
+		file     string
+		wants    string
+		hints    map[gozxing.DecodeHintType]interface{}
+		metadata map[gozxing.ResultMetadataType]interface{}
+	}{
+		// testdata from zxing core/src/test/resources/blackbox/qrcode-1
+		{
+			"testdata/qrcode-1/1.png", "MEBKM:URL:http\\://en.wikipedia.org/wiki/Main_Page;;", nil,
+			map[gozxing.ResultMetadataType]interface{}{
+				gozxing.ResultMetadataType_SYMBOLOGY_IDENTIFIER: "]Q1",
+			},
+		},
+		{"testdata/qrcode-1/2.png", "MEBKM:URL:http\\://en.wikipedia.org/wiki/Main_Page;;", nil, nil},
+		{"testdata/qrcode-1/3.png", "MEBKM:URL:http\\://en.wikipedia.org/wiki/Main_Page;;", nil, nil},
+		{"testdata/qrcode-1/4.png", "MEBKM:URL:http\\://en.wikipedia.org/wiki/Main_Page;;", nil, nil},
+		{"testdata/qrcode-1/5.png", "MEBKM:URL:http\\://en.wikipedia.org/wiki/Main_Page;;", nil, nil},
+		{"testdata/qrcode-1/6.png", "MEBKM:URL:http\\://en.wikipedia.org/wiki/Main_Page;;", nil, nil},
+		{"testdata/qrcode-1/7.png", "MEBKM:URL:http\\://en.wikipedia.org/wiki/Main_Page;;", nil, nil},
+		{"testdata/qrcode-1/8.png", "MEBKM:URL:http\\://en.wikipedia.org/wiki/Main_Page;;", nil, nil},
+		{"testdata/qrcode-1/9.png", "MEBKM:URL:http\\://en.wikipedia.org/wiki/Main_Page;;", nil, nil},
+		{"testdata/qrcode-1/10.png", "MEBKM:URL:http\\://en.wikipedia.org/wiki/Main_Page;;", nil, nil},
+		{"testdata/qrcode-1/11.png", "MEBKM:URL:http\\://en.wikipedia.org/wiki/Main_Page;;", nil, nil},
+		{"testdata/qrcode-1/12.png", "MEBKM:URL:http\\://en.wikipedia.org/wiki/Main_Page;;", nil, nil},
+		{"testdata/qrcode-1/13.png", "http://google.com/gwt/n?u=bluenile.com", nil, nil},
+		//{"testdata/qrcode-1/14.png", "http://google.com/gwt/n?u=bluenile.com", nil, nil},
+		{"testdata/qrcode-1/15.png", "http://google.com/gwt/n?u=bluenile.com", nil, nil},
+		{"testdata/qrcode-1/16.png", "Sean Owen\r\nsrowen@google.com\r\n917-364-2918\r\nhttp://awesome-thoughts.com", nil, nil},
+		{"testdata/qrcode-1/17.png", "Sean Owen\r\nsrowen@google.com\r\n917-364-2918\r\nhttp://awesome-thoughts.com", nil, nil},
+		{"testdata/qrcode-1/18.png", "Sean Owen\r\nsrowen@google.com\r\n917-364-2918\r\nhttp://awesome-thoughts.com", nil, nil},
+		{"testdata/qrcode-1/19.png", "Sean Owen\r\nsrowen@google.com\r\n917-364-2918\r\nhttp://awesome-thoughts.com", nil, nil},
+		{"testdata/qrcode-1/20.png", "Sean Owen\r\nsrowen@google.com\r\n917-364-2918\r\nhttp://awesome-thoughts.com", nil, nil},
+
+		// testdata from zxing core/src/test/resources/blackbox/qrcode-6
+		{
+			"testdata/qrcode-6/1.png", "1234567890", nil,
+			map[gozxing.ResultMetadataType]interface{}{
+				gozxing.ResultMetadataType_SYMBOLOGY_IDENTIFIER: "]Q1",
+			},
+		},
+		{"testdata/qrcode-6/2.png", "1234567890", nil, nil},
+		{"testdata/qrcode-6/3.png", "1234567890", nil, nil},
+		{"testdata/qrcode-6/4.png", "1234567890", nil, nil},
+		{"testdata/qrcode-6/5.png", "1234567890", nil, nil},
+		{"testdata/qrcode-6/6.png", "1234567890", nil, nil},
+		{"testdata/qrcode-6/7.png", "1234567890", nil, nil},
+		{"testdata/qrcode-6/8.png", "1234567890", nil, nil},
+		{"testdata/qrcode-6/9.png", "1234567890", nil, nil},
+		{"testdata/qrcode-6/10.png", "1234567890", nil, nil},
+		{"testdata/qrcode-6/11.png", "1234567890", nil, nil},
+		{"testdata/qrcode-6/12.png", "1234567890", nil, nil},
+		{"testdata/qrcode-6/13.png", "1234567890", nil, nil},
+		{"testdata/qrcode-6/14.png", "1234567890", nil, nil},
+		{"testdata/qrcode-6/15.png", "TEST", nil, nil},
+	}
+	for _, test := range tests {
+		testutil.TestFile(t, reader, test.file, test.wants, format, test.hints, test.metadata)
+	}
+}

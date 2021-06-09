@@ -107,6 +107,6 @@ func TestUPCEReader(t *testing.T) {
 		{"testdata/upce/4.png", "01234531"},
 	}
 	for _, test := range tests {
-		testutil.TestFile(t, reader, test.file, test.wants, format, nil)
+		testutil.TestFile(t, reader, test.file, test.wants, format, nil, nil)
 	}
 }

@@ -206,14 +206,20 @@ func TestCode93Reader(t *testing.T) {
 	format := gozxing.BarcodeFormat_CODE_93
 
 	tests := []struct {
-		file  string
-		wants string
+		file     string
+		wants    string
+		metadata map[gozxing.ResultMetadataType]interface{}
 	}{
-		{"testdata/code93/1.png", "1234567890"},
-		{"testdata/code93/2.png", "CODE 93"},
-		{"testdata/code93/3.png", "DATA"},
+		{
+			"testdata/code93/1.png", "1234567890",
+			map[gozxing.ResultMetadataType]interface{}{
+				gozxing.ResultMetadataType_SYMBOLOGY_IDENTIFIER: "]G0",
+			},
+		},
+		{"testdata/code93/2.png", "CODE 93", nil},
+		{"testdata/code93/3.png", "DATA", nil},
 	}
 	for _, test := range tests {
-		testutil.TestFile(t, reader, test.file, test.wants, format, nil)
+		testutil.TestFile(t, reader, test.file, test.wants, format, nil, test.metadata)
 	}
 }

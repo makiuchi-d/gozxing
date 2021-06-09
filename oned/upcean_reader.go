@@ -1,6 +1,8 @@
 package oned
 
 import (
+	"strconv"
+
 	"github.com/makiuchi-d/gozxing"
 )
 
@@ -152,6 +154,8 @@ func (this *upceanReader) decodeRowWithStartRange(
 	if hint, ok := hints[gozxing.DecodeHintType_NEED_RESULT_POINT_CALLBACK]; ok {
 		resultPointCallback = hint.(gozxing.ResultPointCallback)
 	}
+	symbologyIdentifier := 0
+
 	if resultPointCallback != nil {
 		resultPointCallback(gozxing.NewResultPoint(
 			float64(startGuardRange[0]+startGuardRange[1])/2.0, float64(rowNumber)))
@@ -254,6 +258,12 @@ func (this *upceanReader) decodeRowWithStartRange(
 			decodeResult.PutMetadata(gozxing.ResultMetadataType_POSSIBLE_COUNTRY, countryID)
 		}
 	}
+	if format == gozxing.BarcodeFormat_EAN_8 {
+		symbologyIdentifier = 4
+	}
+
+	decodeResult.PutMetadata(
+		gozxing.ResultMetadataType_SYMBOLOGY_IDENTIFIER, "]E"+strconv.Itoa(symbologyIdentifier))
 
 	return decodeResult, nil
 }

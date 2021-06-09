@@ -72,6 +72,11 @@ const (
 	 * parity is given with it.
 	 */
 	ResultMetadataType_STRUCTURED_APPEND_PARITY
+
+	/**
+	 * Barcode Symbology Identifier.
+	 */
+	ResultMetadataType_SYMBOLOGY_IDENTIFIER
 )
 
 func (t ResultMetadataType) String() string {
@@ -98,6 +103,8 @@ func (t ResultMetadataType) String() string {
 		return "STRUCTURED_APPEND_SEQUENCE"
 	case ResultMetadataType_STRUCTURED_APPEND_PARITY:
 		return "STRUCTURED_APPEND_PARITY"
+	case ResultMetadataType_SYMBOLOGY_IDENTIFIER:
+		return "SYMBOLOGY_IDENTIFIER"
 	default:
 		return "unknown metadata type"
 	}

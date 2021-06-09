@@ -1,6 +1,7 @@
 package oned
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -182,6 +183,85 @@ func TestCode128Reader_DecodeRowCodeA(t *testing.T) {
 	}
 }
 
+func TestCode128Reader_DecodeRowSymbologyIdentifier(t *testing.T) {
+	fmt.Println("====DecodeRowSymbologyIdentifier====")
+
+	dec := NewCode128Reader().(*code128Reader)
+	hint := map[gozxing.DecodeHintType]interface{}{
+		gozxing.DecodeHintType_ASSUME_GS1: true,
+	}
+
+	tests := []struct {
+		symbology string
+		bits      string
+	}{
+		{
+			"]C1", "0000000" + "11010000100" + // StartA
+				"11110101110" + //FNC1
+				"11110101110" + // Checksum=102
+				"1100011101011" + "00000001",
+		},
+		{
+			"]C2", "0000000" + "11010000100" + // StartA
+				"10100011000" + "11110101110" + // A, FNC1
+				"11011000110" + // Checksum=31
+				"1100011101011" + "00000001",
+		},
+		{
+			"]C4", "0000000" + "11010000100" + // StartA
+				"10100011000" + "11110101000" + // A, FNC2
+				"11011100100" + // Checksum=21
+				"1100011101011" + "00000001",
+		},
+		{
+			"]C1", "0000000" + "11010010000" + // StartB
+				"11110101110" + //FNC1
+				"11011001100" + // Checksum=0
+				"1100011101011" + "00000001",
+		},
+		{
+			"]C2", "0000000" + "11010010000" + // StartB
+				"10100011000" + "11110101110" + // A FNC1
+				"11000110110" + // Checksum=32
+				"1100011101011" + "00000001",
+		},
+		{
+			"]C4", "0000000" + "11010010000" + // StartB
+				"10100011000" + "11110101000" + // A, FNC2
+				"11001110100" + // Checksum=22
+				"1100011101011" + "00000001",
+		},
+		{
+			"]C1", "0000000" + "11010011100" + // StartC
+				"11110101110" + //FNC1
+				"11001101100" + // Checksum=1
+				"1100011101011" + "00000001",
+		},
+		{
+			"]C2", "0000000" + "11010000100" + // StartA
+				"10100011000" + "10111011110" + "11110101110" + // A CodeC FNC1
+				"11001110100" + // Checksum=22
+				"1100011101011" + "00000001",
+		},
+	}
+	for _, test := range tests {
+		row := testutil.NewBitArrayFromString(test.bits)
+		r, e := dec.DecodeRow(10, row, hint)
+		if e != nil {
+			t.Fatalf("DecodeRow (symbology=%v) error: %v", test.symbology, e)
+		}
+		symbology, ok := r.GetResultMetadata()[gozxing.ResultMetadataType_SYMBOLOGY_IDENTIFIER].(string)
+		if !ok {
+			t.Fatalf("DecodeRow (symbology=%v) metadata not contains SIMBOLOGY_IDENTIFIER", test.symbology)
+		}
+		if symbology != test.symbology {
+			t.Fatalf(
+				"DecodeRow (symbology=%v) metadata[SIMBOLOGY_IDENTIFIER] = %v, wants %v",
+				test.symbology, symbology, test.symbology)
+		}
+	}
+}
+
 func TestCode128Reader_DecodeRowCodeB(t *testing.T) {
 	dec := NewCode128Reader().(*code128Reader)
 	hint := map[gozxing.DecodeHintType]interface{}{
@@ -266,7 +346,6 @@ func TestCode128Reader_DecodeRowCodeC(t *testing.T) {
 }
 
 func TestCode128Reader(t *testing.T) {
-	// testdata from zxing core/src/test/resources/blackbox/code128-2/
 	reader := NewCode128Reader()
 	format := gozxing.BarcodeFormat_CODE_128
 	harder := map[gozxing.DecodeHintType]interface{}{
@@ -274,53 +353,68 @@ func TestCode128Reader(t *testing.T) {
 	}
 
 	tests := []struct {
-		file   string
-		wants  string
-		harder map[gozxing.DecodeHintType]interface{}
+		file     string
+		wants    string
+		hints    map[gozxing.DecodeHintType]interface{}
+		metadata map[gozxing.ResultMetadataType]interface{}
 	}{
-		{"testdata/code128/01.png", "005-3379497200006", nil},
-		{"testdata/code128/02.png", "005-3379497200006", nil},
-		{"testdata/code128/03.png", "005-3379497200006", nil},
-		{"testdata/code128/04.png", "005-3379497200006", nil},
-		{"testdata/code128/05.png", "15182881", nil},
-		{"testdata/code128/06.png", "15182881", nil},
-		{"testdata/code128/07.png", "15182881", nil},
-		{"testdata/code128/08.png", "15182881", nil},
-		{"testdata/code128/09.png", "CNK8181G2C", harder},
-		{"testdata/code128/10.png", "CNK8181G2C", nil},
-		{"testdata/code128/11.png", "CNK8181G2C", nil},
-		{"testdata/code128/12.png", "CNK8181G2C", harder},
-		{"testdata/code128/13.png", "1PEF224A4", nil},
-		{"testdata/code128/14.png", "1PEF224A4", nil},
-		{"testdata/code128/15.png", "1PEF224A4", nil},
-		{"testdata/code128/16.png", "1PEF224A4", nil},
-		{"testdata/code128/17.png", "FW727", nil},
-		{"testdata/code128/18.png", "FW727", nil},
-		{"testdata/code128/19.png", "FW727", nil},
-		{"testdata/code128/20.png", "FW727", nil},
-		{"testdata/code128/21.png", "005-3354174500018", nil},
-		{"testdata/code128/22.png", "005-3354174500018", nil},
-		{"testdata/code128/23.png", "005-3354174500018", nil},
-		{"testdata/code128/24.png", "005-3354174500018", nil},
-		{"testdata/code128/25.png", "31001171800000017989625355702636", nil},
-		{"testdata/code128/26.png", "31001171800000017989625355702636", nil},
-		{"testdata/code128/27.png", "31001171800000017989625355702636", nil},
-		{"testdata/code128/28.png", "31001171800000017989625355702636", nil},
-		{"testdata/code128/29.png", "42094043", nil},
+		// testdata from zxing core/src/test/resources/blackbox/code128-1/
+		{
+			"testdata/code128/1.png", "168901", nil,
+			map[gozxing.ResultMetadataType]interface{}{
+				gozxing.ResultMetadataType_SYMBOLOGY_IDENTIFIER: "]C1",
+			},
+		},
+		{
+			"testdata/code128/2.png", "Code 128", nil,
+			map[gozxing.ResultMetadataType]interface{}{
+				gozxing.ResultMetadataType_SYMBOLOGY_IDENTIFIER: "]C0",
+			},
+		},
+		// testdata from zxing core/src/test/resources/blackbox/code128-2/
+		{"testdata/code128/01.png", "005-3379497200006", nil, nil},
+		{"testdata/code128/02.png", "005-3379497200006", nil, nil},
+		{"testdata/code128/03.png", "005-3379497200006", nil, nil},
+		{"testdata/code128/04.png", "005-3379497200006", nil, nil},
+		{"testdata/code128/05.png", "15182881", nil, nil},
+		{"testdata/code128/06.png", "15182881", nil, nil},
+		{"testdata/code128/07.png", "15182881", nil, nil},
+		{"testdata/code128/08.png", "15182881", nil, nil},
+		{"testdata/code128/09.png", "CNK8181G2C", harder, nil},
+		{"testdata/code128/10.png", "CNK8181G2C", nil, nil},
+		{"testdata/code128/11.png", "CNK8181G2C", nil, nil},
+		{"testdata/code128/12.png", "CNK8181G2C", harder, nil},
+		{"testdata/code128/13.png", "1PEF224A4", nil, nil},
+		{"testdata/code128/14.png", "1PEF224A4", nil, nil},
+		{"testdata/code128/15.png", "1PEF224A4", nil, nil},
+		{"testdata/code128/16.png", "1PEF224A4", nil, nil},
+		{"testdata/code128/17.png", "FW727", nil, nil},
+		{"testdata/code128/18.png", "FW727", nil, nil},
+		{"testdata/code128/19.png", "FW727", nil, nil},
+		{"testdata/code128/20.png", "FW727", nil, nil},
+		{"testdata/code128/21.png", "005-3354174500018", nil, nil},
+		{"testdata/code128/22.png", "005-3354174500018", nil, nil},
+		{"testdata/code128/23.png", "005-3354174500018", nil, nil},
+		{"testdata/code128/24.png", "005-3354174500018", nil, nil},
+		{"testdata/code128/25.png", "31001171800000017989625355702636", nil, nil},
+		{"testdata/code128/26.png", "31001171800000017989625355702636", nil, nil},
+		{"testdata/code128/27.png", "31001171800000017989625355702636", nil, nil},
+		{"testdata/code128/28.png", "31001171800000017989625355702636", nil, nil},
+		{"testdata/code128/29.png", "42094043", nil, nil},
 		// original zxing could not read too.
 		// {"testdata/code128/30.png", "42094043", harder},
-		{"testdata/code128/31.png", "42094043", nil},
-		{"testdata/code128/32.png", "42094043", nil},
-		{"testdata/code128/33.png", "30885909173823", nil},
-		{"testdata/code128/34.png", "30885909173823", nil},
-		{"testdata/code128/35.png", "30885909173823", nil},
-		{"testdata/code128/36.png", "30885909173823", nil},
-		{"testdata/code128/37.png", "FGGQ6D1", harder},
-		{"testdata/code128/38.png", "FGGQ6D1", nil},
-		{"testdata/code128/39.png", "FGGQ6D1", nil},
-		{"testdata/code128/40.png", "FGGQ6D1", nil},
+		{"testdata/code128/31.png", "42094043", nil, nil},
+		{"testdata/code128/32.png", "42094043", nil, nil},
+		{"testdata/code128/33.png", "30885909173823", nil, nil},
+		{"testdata/code128/34.png", "30885909173823", nil, nil},
+		{"testdata/code128/35.png", "30885909173823", nil, nil},
+		{"testdata/code128/36.png", "30885909173823", nil, nil},
+		{"testdata/code128/37.png", "FGGQ6D1", harder, nil},
+		{"testdata/code128/38.png", "FGGQ6D1", nil, nil},
+		{"testdata/code128/39.png", "FGGQ6D1", nil, nil},
+		{"testdata/code128/40.png", "FGGQ6D1", nil, nil},
 	}
 	for _, test := range tests {
-		testutil.TestFile(t, reader, test.file, test.wants, format, test.harder)
+		testutil.TestFile(t, reader, test.file, test.wants, format, test.hints, test.metadata)
 	}
 }

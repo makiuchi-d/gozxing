@@ -3,6 +3,8 @@ package oned
 // Decodes Code 128 barcodes.
 
 import (
+	"strconv"
+
 	"github.com/makiuchi-d/gozxing"
 )
 
@@ -221,6 +223,8 @@ func (*code128Reader) DecodeRow(rowNumber int, row *gozxing.BitArray, hints map[
 
 	_, convertFNC1 := hints[gozxing.DecodeHintType_ASSUME_GS1]
 
+	symbologyModifier := 0
+
 	startPatternInfo, e := code128FindStartPattern(row)
 	if e != nil {
 		return nil, e
@@ -326,6 +330,11 @@ func (*code128Reader) DecodeRow(rowNumber int, row *gozxing.BitArray, hints map[
 				}
 				switch code {
 				case code128CODE_FNC_1:
+					if len(result) == 0 { // FNC1 at first or second character determines the symbology
+						symbologyModifier = 1
+					} else if len(result) == 1 {
+						symbologyModifier = 2
+					}
 					if convertFNC1 {
 						if len(result) == 0 {
 							// GS1 specification 5.4.3.7. and 5.4.6.4. If the first char after the start code
@@ -337,7 +346,10 @@ func (*code128Reader) DecodeRow(rowNumber int, row *gozxing.BitArray, hints map[
 						}
 					}
 					break
-				case code128CODE_FNC_2, code128CODE_FNC_3:
+				case code128CODE_FNC_2:
+					symbologyModifier = 4
+					break
+				case code128CODE_FNC_3:
 					// do nothing?
 					break
 				case code128CODE_FNC_4_A:
@@ -381,6 +393,11 @@ func (*code128Reader) DecodeRow(rowNumber int, row *gozxing.BitArray, hints map[
 				}
 				switch code {
 				case code128CODE_FNC_1:
+					if len(result) == 0 { // FNC1 at first or second character determines the symbology
+						symbologyModifier = 1
+					} else if len(result) == 1 {
+						symbologyModifier = 2
+					}
 					if convertFNC1 {
 						if len(result) == 0 {
 							// GS1 specification 5.4.3.7. and 5.4.6.4. If the first char after the start code
@@ -392,7 +409,10 @@ func (*code128Reader) DecodeRow(rowNumber int, row *gozxing.BitArray, hints map[
 						}
 					}
 					break
-				case code128CODE_FNC_2, code128CODE_FNC_3:
+				case code128CODE_FNC_2:
+					symbologyModifier = 4
+					break
+				case code128CODE_FNC_3:
 					// do nothing?
 					break
 				case code128CODE_FNC_4_B:
@@ -432,6 +452,11 @@ func (*code128Reader) DecodeRow(rowNumber int, row *gozxing.BitArray, hints map[
 				}
 				switch code {
 				case code128CODE_FNC_1:
+					if len(result) == 0 { // FNC1 at first or second character determines the symbology
+						symbologyModifier = 1
+					} else if len(result) == 1 {
+						symbologyModifier = 2
+					}
 					if convertFNC1 {
 						if len(result) == 0 {
 							// GS1 specification 5.4.3.7. and 5.4.6.4. If the first char after the start code
@@ -442,6 +467,9 @@ func (*code128Reader) DecodeRow(rowNumber int, row *gozxing.BitArray, hints map[
 							result = append(result, 29)
 						}
 					}
+					break
+				case code128CODE_FNC_2:
+					symbologyModifier = 4
 					break
 				case code128CODE_CODE_A:
 					codeSet = code128CODE_CODE_A
@@ -514,11 +542,13 @@ func (*code128Reader) DecodeRow(rowNumber int, row *gozxing.BitArray, hints map[
 	}
 
 	rowNumberf := float64(rowNumber)
-	return gozxing.NewResult(
+	resultObject := gozxing.NewResult(
 		string(result),
 		rawBytes,
 		[]gozxing.ResultPoint{
 			gozxing.NewResultPoint(left, rowNumberf),
 			gozxing.NewResultPoint(right, rowNumberf)},
-		gozxing.BarcodeFormat_CODE_128), nil
+		gozxing.BarcodeFormat_CODE_128)
+	resultObject.PutMetadata(gozxing.ResultMetadataType_SYMBOLOGY_IDENTIFIER, "]C"+strconv.Itoa(symbologyModifier))
+	return resultObject, nil
 }

@@ -117,11 +117,13 @@ func constructResult(leftPair, rightPair *Pair) *gozxing.Result {
 
 	leftPoints := leftPair.GetFinderPattern().GetResultPoints()
 	rightPoints := rightPair.GetFinderPattern().GetResultPoints()
-	return gozxing.NewResult(
+	result := gozxing.NewResult(
 		string(buffer),
 		nil,
 		[]gozxing.ResultPoint{leftPoints[0], leftPoints[1], rightPoints[0], rightPoints[1]},
 		gozxing.BarcodeFormat_RSS_14)
+	result.PutMetadata(gozxing.ResultMetadataType_SYMBOLOGY_IDENTIFIER, "]e0")
+	return result
 }
 
 func checkChecksum(leftPair, rightPair *Pair) bool {

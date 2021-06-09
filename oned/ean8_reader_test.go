@@ -91,19 +91,25 @@ func TestEAN8Reader(t *testing.T) {
 	format := gozxing.BarcodeFormat_EAN_8
 
 	tests := []struct {
-		file  string
-		wants string
+		file     string
+		wants    string
+		metadata map[gozxing.ResultMetadataType]interface{}
 	}{
-		{"testdata/ean8/1.png", "48512343"},
-		{"testdata/ean8/2.png", "12345670"},
-		{"testdata/ean8/3.png", "12345670"},
-		{"testdata/ean8/4.png", "67678983"},
-		{"testdata/ean8/5.png", "80674313"},
-		{"testdata/ean8/6.png", "59001270"},
-		{"testdata/ean8/7.png", "50487066"},
-		{"testdata/ean8/8.png", "55123457"},
+		{
+			"testdata/ean8/1.png", "48512343",
+			map[gozxing.ResultMetadataType]interface{}{
+				gozxing.ResultMetadataType_SYMBOLOGY_IDENTIFIER: "]E4",
+			},
+		},
+		{"testdata/ean8/2.png", "12345670", nil},
+		{"testdata/ean8/3.png", "12345670", nil},
+		{"testdata/ean8/4.png", "67678983", nil},
+		{"testdata/ean8/5.png", "80674313", nil},
+		{"testdata/ean8/6.png", "59001270", nil},
+		{"testdata/ean8/7.png", "50487066", nil},
+		{"testdata/ean8/8.png", "55123457", nil},
 	}
 	for _, test := range tests {
-		testutil.TestFile(t, reader, test.file, test.wants, format, nil)
+		testutil.TestFile(t, reader, test.file, test.wants, format, nil, test.metadata)
 	}
 }

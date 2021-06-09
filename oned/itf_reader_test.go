@@ -293,25 +293,31 @@ func TestITFReader(t *testing.T) {
 	reader := NewITFReader()
 
 	tests := []struct {
-		file  string
-		wants string
+		file     string
+		wants    string
+		metadata map[gozxing.ResultMetadataType]interface{}
 	}{
-		{"testdata/itf/1.png", "30712345000010"},
-		{"testdata/itf/2.png", "00012345678905"},
-		{"testdata/itf/3.png", "0053611912"},
-		{"testdata/itf/5.png", "0829220875"},
-		{"testdata/itf/6.png", "0829220874"},
-		{"testdata/itf/7.png", "0817605453"},
-		{"testdata/itf/8.png", "0829220874"},
-		{"testdata/itf/9.png", "0053611912"},
-		{"testdata/itf/10.png", "0053611912"},
-		{"testdata/itf/13.png", "0829220875"},
-		{"testdata/itf/14.png", "0829220875"},
-		{"testdata/itf/15.png", "0829220875"},
-		{"testdata/itf/16.png", "0829220874"},
-		{"testdata/itf/17.png", "3018108390"},
+		{
+			"testdata/itf/1.png", "30712345000010",
+			map[gozxing.ResultMetadataType]interface{}{
+				// gozxing.ResultMetadataType_SYMBOLOGY_IDENTIFIER: "]I0", // implement in PR 1396
+			},
+		},
+		{"testdata/itf/2.png", "00012345678905", nil},
+		{"testdata/itf/3.png", "0053611912", nil},
+		{"testdata/itf/5.png", "0829220875", nil},
+		{"testdata/itf/6.png", "0829220874", nil},
+		{"testdata/itf/7.png", "0817605453", nil},
+		{"testdata/itf/8.png", "0829220874", nil},
+		{"testdata/itf/9.png", "0053611912", nil},
+		{"testdata/itf/10.png", "0053611912", nil},
+		{"testdata/itf/13.png", "0829220875", nil},
+		{"testdata/itf/14.png", "0829220875", nil},
+		{"testdata/itf/15.png", "0829220875", nil},
+		{"testdata/itf/16.png", "0829220874", nil},
+		{"testdata/itf/17.png", "3018108390", nil},
 	}
 	for _, test := range tests {
-		testutil.TestFile(t, reader, test.file, test.wants, gozxing.BarcodeFormat_ITF, nil)
+		testutil.TestFile(t, reader, test.file, test.wants, gozxing.BarcodeFormat_ITF, nil, test.metadata)
 	}
 }

@@ -11,13 +11,22 @@ type DecoderResult struct {
 	other                          interface{}
 	structuredAppendParity         int
 	structuredAppendSequenceNumber int
+	symbologyModifier              int
 }
 
 func NewDecoderResult(rawBytes []byte, text string, byteSegments [][]byte, ecLevel string) *DecoderResult {
-	return NewDecoderResultWithSA(rawBytes, text, byteSegments, ecLevel, -1, -1)
+	return NewDecoderResultWithParams(rawBytes, text, byteSegments, ecLevel, -1, -1, 0)
+}
+
+func NewDecoderResultWithSymbologyModifier(rawBytes []byte, text string, byteSegments [][]byte, ecLevel string, symbologyModifier int) *DecoderResult {
+	return NewDecoderResultWithParams(rawBytes, text, byteSegments, ecLevel, -1, -1, symbologyModifier)
 }
 
 func NewDecoderResultWithSA(rawBytes []byte, text string, byteSegments [][]byte, ecLevel string, saSequence, saParity int) *DecoderResult {
+	return NewDecoderResultWithParams(rawBytes, text, byteSegments, ecLevel, saSequence, saParity, 0)
+}
+
+func NewDecoderResultWithParams(rawBytes []byte, text string, byteSegments [][]byte, ecLevel string, saSequence, saParity, symbologyModifier int) *DecoderResult {
 	return &DecoderResult{
 		rawBytes:                       rawBytes,
 		numBits:                        8 * len(rawBytes),
@@ -26,6 +35,7 @@ func NewDecoderResultWithSA(rawBytes []byte, text string, byteSegments [][]byte,
 		ecLevel:                        ecLevel,
 		structuredAppendParity:         saParity,
 		structuredAppendSequenceNumber: saSequence,
+		symbologyModifier:              symbologyModifier,
 	}
 }
 
@@ -87,4 +97,8 @@ func (this *DecoderResult) GetStructuredAppendParity() int {
 
 func (this *DecoderResult) GetStructuredAppendSequenceNumber() int {
 	return this.structuredAppendSequenceNumber
+}
+
+func (this *DecoderResult) GetSymbologyModifier() int {
+	return this.symbologyModifier
 }

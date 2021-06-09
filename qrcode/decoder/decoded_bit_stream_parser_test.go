@@ -532,3 +532,26 @@ func TestDecodedBitStreamPars_decodeGS1(t *testing.T) {
 		t.Fatalf("Decode result: \"%v\", expect \"%v\" ", text, expect)
 	}
 }
+
+func TestDecodedBitStreamParser_Decode_SymbologyModifier(t *testing.T) {
+	tests := []struct {
+		symbologyModifier int
+		bytes             []byte
+	}{
+		{4, []byte{0x57, 0x1a, 0x00}}, // FNC1-1stPos, ECI(26), TERM
+		{6, []byte{0x71, 0xa9, 0x00}}, // ECI(26), FNC1-2ndPos, TERM
+		{2, []byte{0x71, 0xa0}},       // ECI(26), TERM
+		{3, []byte{0x50}},             // FNC1-1stPos, TERM
+		{5, []byte{0x90}},             // FNC1-2ndPos, TERM
+		{1, []byte{0x00}},
+	}
+	for _, test := range tests {
+		r, e := DecodedBitStreamParser_Decode(test.bytes, VERSIONS[0], ErrorCorrectionLevel_L, nil)
+		if e != nil {
+			t.Fatalf("decode error (%v): %v", test.symbologyModifier, e)
+		}
+		if sm := r.GetSymbologyModifier(); sm != test.symbologyModifier {
+			t.Fatalf("symbologyModifier = %v, wants %v", sm, test.symbologyModifier)
+		}
+	}
+}

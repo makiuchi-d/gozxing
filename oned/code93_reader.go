@@ -114,13 +114,15 @@ func (this *code93Reader) DecodeRow(rowNumber int, row *gozxing.BitArray, hints 
 	left := float64(startLeft+startRight) / 2.0
 	right := float64(lastStart) + float64(lastPatternSize)/2.0
 	rowNumberf := float64(rowNumber)
-	return gozxing.NewResult(
+	resultObject := gozxing.NewResult(
 		resultString,
 		nil,
 		[]gozxing.ResultPoint{
 			gozxing.NewResultPoint(left, rowNumberf),
 			gozxing.NewResultPoint(right, rowNumberf)},
-		gozxing.BarcodeFormat_CODE_93), nil
+		gozxing.BarcodeFormat_CODE_93)
+	resultObject.PutMetadata(gozxing.ResultMetadataType_SYMBOLOGY_IDENTIFIER, "]G0")
+	return resultObject, nil
 }
 
 func (this *code93Reader) findAsteriskPattern(row *gozxing.BitArray) (int, int, error) {

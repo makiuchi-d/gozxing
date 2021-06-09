@@ -480,9 +480,9 @@ func TestRSS14Reader(t *testing.T) {
 	}
 
 	tests := []struct {
-		file   string
-		wants  string
-		harder map[gozxing.DecodeHintType]interface{}
+		file  string
+		wants string
+		hints map[gozxing.DecodeHintType]interface{}
 	}{
 		// blackbox/rss14-1
 		{"testdata/1_1.png", "04412345678909", nil},
@@ -520,7 +520,7 @@ func TestRSS14Reader(t *testing.T) {
 		// {"testdata/2_22.png", "00012345678905", harder},
 	}
 	for _, test := range tests {
-		testutil.TestFile(t, reader, test.file, test.wants, format, test.harder)
+		testutil.TestFile(t, reader, test.file, test.wants, format, test.hints, nil)
 		reader.Reset()
 	}
 }

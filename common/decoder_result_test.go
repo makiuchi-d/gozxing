@@ -73,4 +73,29 @@ func TestNewDecoderResult(t *testing.T) {
 	if r := dr.GetStructuredAppendSequenceNumber(); r != 2 {
 		t.Fatalf("GetStructuredAppendSequenceNumber() = %v, expect %v", r, 2)
 	}
+
+	dr.symbologyModifier = 1
+	if r := dr.GetSymbologyModifier(); r != 1 {
+		t.Fatalf("GetSymbologyModifier() = %v, expect %v", r, 1)
+	}
+}
+
+func TestNewDecoderResultWithSymbologyModifier(t *testing.T) {
+	symbologyModifier := 3
+	dr := NewDecoderResultWithSymbologyModifier([]byte{}, "", [][]byte{}, "L", symbologyModifier)
+	if r := dr.GetSymbologyModifier(); r != symbologyModifier {
+		t.Fatalf("New WithSymbologyModifier GetSymbologyModifier() = %v, expect %v", r, symbologyModifier)
+	}
+}
+
+func TestNewDecoderResultWithSA(t *testing.T) {
+	saSeqNum := 4
+	saParity := 2
+	dr := NewDecoderResultWithSA([]byte{}, "", [][]byte{}, "L", saSeqNum, saParity)
+	if r := dr.GetStructuredAppendSequenceNumber(); r != saSeqNum {
+		t.Fatalf("New WithSA GetStructuredAppendSequenceNumber() = %v, expect %v", r, saSeqNum)
+	}
+	if r := dr.GetStructuredAppendParity(); r != saParity {
+		t.Fatalf("New WithSA GetStructuredAppendParity() = %v, expect %v", r, saParity)
+	}
 }

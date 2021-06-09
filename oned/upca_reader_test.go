@@ -109,6 +109,6 @@ func TestUPCAReader(t *testing.T) {
 		{"testdata/upca/35.png", "045496442736", nil},
 	}
 	for _, test := range tests {
-		testutil.TestFile(t, reader, test.file, test.wants, format, test.harder)
+		testutil.TestFile(t, reader, test.file, test.wants, format, test.harder, nil)
 	}
 }

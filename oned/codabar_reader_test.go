@@ -229,22 +229,28 @@ func TestCodaBarReader(t *testing.T) {
 	// testdata from zxing core/src/test/resources/blackbox/codabar-1/
 	reader := NewCodaBarReader()
 	tests := []struct {
-		file  string
-		wants string
+		file     string
+		wants    string
+		metadata map[gozxing.ResultMetadataType]interface{}
 	}{
-		{"testdata/codabar/01.png", "1234567890"},
-		{"testdata/codabar/02.png", "1234567890"},
-		{"testdata/codabar/03.png", "294/586"},
-		{"testdata/codabar/04.png", "123455"},
-		{"testdata/codabar/09.png", "12345"},
-		{"testdata/codabar/10.png", "123456"},
-		{"testdata/codabar/11.png", "3419500"},
-		{"testdata/codabar/12.png", "31117013206375"},
-		{"testdata/codabar/13.png", "12345"},
-		{"testdata/codabar/14.png", "31117013206375"},
-		{"testdata/codabar/15.png", "123456789012"},
+		{
+			"testdata/codabar/01.png", "1234567890",
+			map[gozxing.ResultMetadataType]interface{}{
+				gozxing.ResultMetadataType_SYMBOLOGY_IDENTIFIER: "]F0",
+			},
+		},
+		{"testdata/codabar/02.png", "1234567890", nil},
+		{"testdata/codabar/03.png", "294/586", nil},
+		{"testdata/codabar/04.png", "123455", nil},
+		{"testdata/codabar/09.png", "12345", nil},
+		{"testdata/codabar/10.png", "123456", nil},
+		{"testdata/codabar/11.png", "3419500", nil},
+		{"testdata/codabar/12.png", "31117013206375", nil},
+		{"testdata/codabar/13.png", "12345", nil},
+		{"testdata/codabar/14.png", "31117013206375", nil},
+		{"testdata/codabar/15.png", "123456789012", nil},
 	}
 	for _, test := range tests {
-		testutil.TestFile(t, reader, test.file, test.wants, gozxing.BarcodeFormat_CODABAR, nil)
+		testutil.TestFile(t, reader, test.file, test.wants, gozxing.BarcodeFormat_CODABAR, nil, test.metadata)
 	}
 }

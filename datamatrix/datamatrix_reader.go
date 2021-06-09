@@ -1,6 +1,8 @@
 package datamatrix
 
 import (
+	"strconv"
+
 	"github.com/makiuchi-d/gozxing"
 	"github.com/makiuchi-d/gozxing/common"
 	"github.com/makiuchi-d/gozxing/datamatrix/decoder"
@@ -78,6 +80,7 @@ func (r *DataMatrixReader) Decode(image *gozxing.BinaryBitmap, hints map[gozxing
 	if ecLevel != "" {
 		result.PutMetadata(gozxing.ResultMetadataType_ERROR_CORRECTION_LEVEL, ecLevel)
 	}
+	result.PutMetadata(gozxing.ResultMetadataType_SYMBOLOGY_IDENTIFIER, "]d"+strconv.Itoa(decoderResult.GetSymbologyModifier()))
 	return result, nil
 }
 

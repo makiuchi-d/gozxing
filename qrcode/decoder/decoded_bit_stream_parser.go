@@ -21,9 +21,12 @@ func DecodedBitStreamParser_Decode(
 	byteSegments := make([][]byte, 0, 1)
 	symbolSequence := -1
 	parityData := -1
+	symbologyModifier := 1
 
 	var currentCharacterSetECI *common.CharacterSetECI
 	fc1InEffect := false
+	hasFNC1first := false
+	hasFNC1second := false
 	var mode *Mode
 	var e error
 
@@ -41,7 +44,12 @@ func DecodedBitStreamParser_Decode(
 		}
 		switch mode {
 		case Mode_TERMINATOR:
-		case Mode_FNC1_FIRST_POSITION, Mode_FNC1_SECOND_POSITION:
+		case Mode_FNC1_FIRST_POSITION:
+			hasFNC1first = true // symbology detection
+			// We do little with FNC1 except alter the parsed result a bit according to the spec
+			fc1InEffect = true
+		case Mode_FNC1_SECOND_POSITION:
+			hasFNC1second = true // symbology detection
 			// We do little with FNC1 except alter the parsed result a bit according to the spec
 			fc1InEffect = true
 		case Mode_STRUCTURED_APPEND:
@@ -121,15 +129,34 @@ func DecodedBitStreamParser_Decode(
 		}
 	}
 
+	if currentCharacterSetECI != nil {
+		if hasFNC1first {
+			symbologyModifier = 4
+		} else if hasFNC1second {
+			symbologyModifier = 6
+		} else {
+			symbologyModifier = 2
+		}
+	} else {
+		if hasFNC1first {
+			symbologyModifier = 3
+		} else if hasFNC1second {
+			symbologyModifier = 5
+		} else {
+			symbologyModifier = 1
+		}
+	}
+
 	if len(byteSegments) == 0 {
 		byteSegments = nil
 	}
-	return common.NewDecoderResultWithSA(bytes,
+	return common.NewDecoderResultWithParams(bytes,
 		string(result),
 		byteSegments,
 		ecLevel.String(),
 		symbolSequence,
-		parityData), nil
+		parityData,
+		symbologyModifier), nil
 }
 
 func DecodedBitStreamParser_decodeHanziSegment(bits *common.BitSource, result []byte, count int) ([]byte, error) {

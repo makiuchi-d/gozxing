@@ -5,6 +5,7 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 	"os"
+	"reflect"
 	"testing"
 
 	errors "golang.org/x/xerrors"
@@ -123,7 +124,8 @@ func (s DummyGridSampler) SampleGridWithTransform(image *gozxing.BitMatrix,
 }
 
 func TestFile(t testing.TB, reader gozxing.Reader, file, expectText string,
-	expectFormat gozxing.BarcodeFormat, hints map[gozxing.DecodeHintType]interface{}) {
+	expectFormat gozxing.BarcodeFormat, hints map[gozxing.DecodeHintType]interface{},
+	metadata map[gozxing.ResultMetadataType]interface{}) {
 	t.Helper()
 	bmp := NewBinaryBitmapFromFile(file)
 	result, e := reader.Decode(bmp, hints)
@@ -135,5 +137,16 @@ func TestFile(t testing.TB, reader gozxing.Reader, file, expectText string,
 	}
 	if format := result.GetBarcodeFormat(); format != expectFormat {
 		t.Fatalf("TestFile(%v) format = %v, wants %v", file, format, expectFormat)
+	}
+
+	meta := result.GetResultMetadata()
+	for k, v := range metadata {
+		m, ok := meta[k]
+		if !ok {
+			t.Fatalf("TestFile(%v) metadata[%v] not found", file, k)
+		}
+		if !reflect.DeepEqual(m, v) {
+			t.Fatalf("TestFile(%v) metadata[%v] = %#v, wants %#v", file, k, m, v)
+		}
 	}
 }

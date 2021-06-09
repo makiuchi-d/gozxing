@@ -24,6 +24,7 @@ const (
 	Mode_ANSIX12_ENCODE
 	Mode_EDIFACT_ENCODE
 	Mode_BASE256_ENCODE
+	Mode_ECI_ENCODE
 )
 
 var (
@@ -60,29 +61,45 @@ var (
 	}
 )
 
+type intSet map[int]struct{}
+
+func (s intSet) add(n int) {
+	s[n] = struct{}{}
+}
+
+func (s intSet) contains(n int) bool {
+	_, ok := s[n]
+	return ok
+}
+
 func DecodedBitStreamParser_decode(bytes []byte) (*common.DecoderResult, error) {
 	bits := common.NewBitSource(bytes)
 	result := make([]byte, 0, 100)
 	resultTrailer := make([]byte, 0)
 	byteSegments := make([][]byte, 0, 1)
+	symbologyModifier := 0
 	mode := Mode_ASCII_ENCODE
+	fnc1Positions := intSet{} // Would be replaceable by looking directly at 'bytes', if we're sure to not having to account for multi byte values.
+	isECIencoded := false
 
 	for mode != Mode_PDA_ENCODE && bits.Available() > 0 {
 		var e error
 		if mode == Mode_ASCII_ENCODE {
-			mode, result, resultTrailer, e = decodeAsciiSegment(bits, result, resultTrailer)
+			mode, result, resultTrailer, e = decodeAsciiSegment(bits, result, resultTrailer, fnc1Positions)
 		} else {
 			switch mode {
 			case Mode_C40_ENCODE:
-				result, e = decodeC40Segment(bits, result)
+				result, e = decodeC40Segment(bits, result, fnc1Positions)
 			case Mode_TEXT_ENCODE:
-				result, e = decodeTextSegment(bits, result)
+				result, e = decodeTextSegment(bits, result, fnc1Positions)
 			case Mode_ANSIX12_ENCODE:
 				result, e = decodeAnsiX12Segment(bits, result)
 			case Mode_EDIFACT_ENCODE:
 				result = decodeEdifactSegment(bits, result)
 			case Mode_BASE256_ENCODE:
 				result, byteSegments, e = decodeBase256Segment(bits, result, byteSegments)
+			case Mode_ECI_ENCODE:
+				isECIencoded = true // ECI detection only, atm continue decoding as ASCII
 			default:
 				return nil, gozxing.NewFormatException("mode = %v", mode)
 			}
@@ -99,11 +116,31 @@ func DecodedBitStreamParser_decode(bytes []byte) (*common.DecoderResult, error) 
 	if len(byteSegments) == 0 {
 		byteSegments = nil
 	}
-	return common.NewDecoderResult(bytes, string(result), byteSegments, ""), nil
+	if isECIencoded {
+		// Examples for this numbers can be found in this documentation of a hardware barcode scanner:
+		// https://honeywellaidc.force.com/supportppr/s/article/List-of-barcode-symbology-AIM-Identifiers
+		if fnc1Positions.contains(0) || fnc1Positions.contains(4) {
+			symbologyModifier = 5
+		} else if fnc1Positions.contains(1) || fnc1Positions.contains(5) {
+			symbologyModifier = 6
+		} else {
+			symbologyModifier = 4
+		}
+	} else {
+		if fnc1Positions.contains(0) || fnc1Positions.contains(4) {
+			symbologyModifier = 2
+		} else if fnc1Positions.contains(1) || fnc1Positions.contains(5) {
+			symbologyModifier = 3
+		} else {
+			symbologyModifier = 1
+		}
+	}
+
+	return common.NewDecoderResultWithSymbologyModifier(bytes, string(result), byteSegments, "", symbologyModifier), nil
 }
 
 // decodeAsciiSegment See ISO 16022:2006, 5.2.3 and Annex C, Table C.2
-func decodeAsciiSegment(bits *common.BitSource, result, resultTrailer []byte) (Mode, []byte, []byte, error) {
+func decodeAsciiSegment(bits *common.BitSource, result, resultTrailer []byte, fnc1positions intSet) (Mode, []byte, []byte, error) {
 	upperShift := false
 	for bits.Available() > 0 {
 		oneByte, _ := bits.ReadBits(8)
@@ -131,6 +168,7 @@ func decodeAsciiSegment(bits *common.BitSource, result, resultTrailer []byte) (M
 			case 231: // Latch to Base 256 encodation
 				return Mode_BASE256_ENCODE, result, resultTrailer, nil
 			case 232: // FNC1
+				fnc1positions.add(len(result))
 				result = append(result, 29) // translate as ASCII 29
 				break
 			case 233, 234: // Structured Append, Reader Programming
@@ -155,10 +193,7 @@ func decodeAsciiSegment(bits *common.BitSource, result, resultTrailer []byte) (M
 			case 240: // Latch to EDIFACT encodation
 				return Mode_EDIFACT_ENCODE, result, resultTrailer, nil
 			case 241: // ECI Character
-				// TODO(bbrown): I think we need to support ECI
-				//throw ReaderException.getInstance();
-				// Ignore this symbol for now
-				break
+				return Mode_ECI_ENCODE, result, resultTrailer, nil
 			default:
 				// Not to be used in ASCII encodation
 				// but work around encoders that end with 254, latch back to ASCII
@@ -174,7 +209,7 @@ func decodeAsciiSegment(bits *common.BitSource, result, resultTrailer []byte) (M
 }
 
 // decodeC40Segment See ISO 16022:2006, 5.2.5 and Annex C, Table C.1
-func decodeC40Segment(bits *common.BitSource, result []byte) ([]byte, error) {
+func decodeC40Segment(bits *common.BitSource, result []byte, fnc1positions intSet) ([]byte, error) {
 	// Three C40 values are encoded in a 16-bit value as
 	// (1600 * C1) + (40 * C2) + C3 + 1
 	// TODO(bbrown): The Upper Shift with C40 doesn't work in the 4 value scenario all the time
@@ -235,6 +270,7 @@ func decodeC40Segment(bits *common.BitSource, result []byte) ([]byte, error) {
 				} else {
 					switch cValue {
 					case 27: // FNC1
+						fnc1positions.add(len(result))
 						result = append(result, 29) // translate as ASCII 29
 						break
 					case 30: // Upper Shift
@@ -264,7 +300,7 @@ func decodeC40Segment(bits *common.BitSource, result []byte) ([]byte, error) {
 }
 
 // decodeTextSegment See ISO 16022:2006, 5.2.6 and Annex C, Table C.2
-func decodeTextSegment(bits *common.BitSource, result []byte) ([]byte, error) {
+func decodeTextSegment(bits *common.BitSource, result []byte, fnc1positions intSet) ([]byte, error) {
 	// Three Text values are encoded in a 16-bit value as
 	// (1600 * C1) + (40 * C2) + C3 + 1
 	// TODO(bbrown): The Upper Shift with Text doesn't work in the 4 value scenario all the time
@@ -325,6 +361,7 @@ func decodeTextSegment(bits *common.BitSource, result []byte) ([]byte, error) {
 				} else {
 					switch cValue {
 					case 27: // FNC1
+						fnc1positions.add(len(result))
 						result = append(result, 29) // translate as ASCII 29
 						break
 					case 30: // Upper Shift
@@ -517,6 +554,8 @@ func (m Mode) String() string {
 		return "EDIFACT_ENCODE"
 	case Mode_BASE256_ENCODE:
 		return "BASE256_ENCODE"
+	case Mode_ECI_ENCODE:
+		return "ECI_ENCODE"
 	}
 	return ""
 }

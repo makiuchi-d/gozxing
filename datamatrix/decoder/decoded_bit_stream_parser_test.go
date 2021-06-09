@@ -212,14 +212,15 @@ func TestDecodeTextSegment(t *testing.T) {
 	// basic set
 	// 40,0,0 (out of range)
 	bits := common.NewBitSource([]byte{250, 1})
-	_, e := decodeTextSegment(bits, result)
+	fnc1poss := intSet{}
+	_, e := decodeTextSegment(bits, result, fnc1poss)
 	if _, ok := e.(gozxing.FormatException); !ok {
 		t.Fatalf("decodeTextSegment must be FormatException, %T", e)
 	}
 	// 14,1,30, 3,15,16 ('a',uppser-shift,128+32,'b','c')
 	bits = common.NewBitSource([]byte{87, 199, 21, 41})
 	expect := []byte{'a', 128 + 32, 'b', 'c'}
-	r, e := decodeTextSegment(bits, result)
+	r, e := decodeTextSegment(bits, result, fnc1poss)
 	if e != nil {
 		t.Fatalf("decodeTextSegment returns error, %v", e)
 	}
@@ -231,7 +232,7 @@ func TestDecodeTextSegment(t *testing.T) {
 	// 0,13,1, 30,0,0 ('\r',upper-shift,128+0)
 	bits = common.NewBitSource([]byte{2, 10, 187, 129})
 	expect = []byte{'\r', 128}
-	r, e = decodeTextSegment(bits, result)
+	r, e = decodeTextSegment(bits, result, fnc1poss)
 	if e != nil {
 		t.Fatalf("decodeTextSegment returns error, %v", e)
 	}
@@ -242,14 +243,14 @@ func TestDecodeTextSegment(t *testing.T) {
 	// shift-2
 	// 1,28,0 (out of range)
 	bits = common.NewBitSource([]byte{10, 161})
-	_, e = decodeTextSegment(bits, result)
+	_, e = decodeTextSegment(bits, result, fnc1poss)
 	if _, ok := e.(gozxing.FormatException); !ok {
 		t.Fatalf("decodeTextSegment must be FormatException, %T", e)
 	}
 	// 1,0,1, 27,1,30, 1,26,3 ('!',FNC1,upper-shift,128+95)
 	bits = common.NewBitSource([]byte{6, 66, 169, 7, 10, 84})
 	expect = []byte{'!', 29, 128 + 95, ' '}
-	r, e = decodeTextSegment(bits, result)
+	r, e = decodeTextSegment(bits, result, fnc1poss)
 	if e != nil {
 		t.Fatalf("decodeTextSegment returns error, %v", e)
 	}
@@ -260,14 +261,14 @@ func TestDecodeTextSegment(t *testing.T) {
 	// shift-3
 	// 2,32,0 (out of range)
 	bits = common.NewBitSource([]byte{17, 129})
-	_, e = decodeTextSegment(bits, result)
+	_, e = decodeTextSegment(bits, result, fnc1poss)
 	if _, ok := e.(gozxing.FormatException); !ok {
 		t.Fatalf("decodeTextSegment must be FormatException, %T", e)
 	}
 	// 2,0,1,30,2,31 ('`', upper-shift, 128+127)
 	bits = common.NewBitSource([]byte{12, 130, 187, 240})
 	expect = []byte{'`', 255}
-	r, e = decodeTextSegment(bits, result)
+	r, e = decodeTextSegment(bits, result, fnc1poss)
 	if e != nil {
 		t.Fatalf("decodeTextSegment returns error, %v", e)
 	}
@@ -279,7 +280,7 @@ func TestDecodeTextSegment(t *testing.T) {
 	// 4,5,6, <8bit>
 	bits = common.NewBitSource([]byte{25, 207, 0})
 	expect = []byte("012")
-	r, e = decodeTextSegment(bits, result)
+	r, e = decodeTextSegment(bits, result, fnc1poss)
 	if e != nil {
 		t.Fatalf("decodeTextSegment returns error, %v", e)
 	}
@@ -293,7 +294,7 @@ func TestDecodeTextSegment(t *testing.T) {
 	// 4,5,6, <254><8bit>
 	bits = common.NewBitSource([]byte{25, 207, 254, 0})
 	expect = []byte("012")
-	r, e = decodeTextSegment(bits, result)
+	r, e = decodeTextSegment(bits, result, fnc1poss)
 	if e != nil {
 		t.Fatalf("decodeTextSegment returns error, %v", e)
 	}
@@ -311,14 +312,15 @@ func TestDecodeC40Segment(t *testing.T) {
 	// basic set
 	// 40,0,0 (out of range)
 	bits := common.NewBitSource([]byte{250, 1})
-	_, e := decodeC40Segment(bits, result)
+	fnc1poss := intSet{}
+	_, e := decodeC40Segment(bits, result, fnc1poss)
 	if _, ok := e.(gozxing.FormatException); !ok {
 		t.Fatalf("decodeC40Segment must be FormatException, %T", e)
 	}
 	// 14,1,30, 3,15,16 ('A',uppser-shift,128+32,'B','C')
 	bits = common.NewBitSource([]byte{87, 199, 21, 41})
 	expect := []byte{'A', 128 + 32, 'B', 'C'}
-	r, e := decodeC40Segment(bits, result)
+	r, e := decodeC40Segment(bits, result, fnc1poss)
 	if e != nil {
 		t.Fatalf("decodeC40Segment returns error, %v", e)
 	}
@@ -330,7 +332,7 @@ func TestDecodeC40Segment(t *testing.T) {
 	// 0,13,1, 30,0,0 ('\r',upper-shift,128+0)
 	bits = common.NewBitSource([]byte{2, 10, 187, 129})
 	expect = []byte{'\r', 128}
-	r, e = decodeC40Segment(bits, result)
+	r, e = decodeC40Segment(bits, result, fnc1poss)
 	if e != nil {
 		t.Fatalf("decodeC40Segment returns error, %v", e)
 	}
@@ -341,14 +343,14 @@ func TestDecodeC40Segment(t *testing.T) {
 	// shift-2
 	// 1,28,0 (out of range)
 	bits = common.NewBitSource([]byte{10, 161})
-	_, e = decodeC40Segment(bits, result)
+	_, e = decodeC40Segment(bits, result, fnc1poss)
 	if _, ok := e.(gozxing.FormatException); !ok {
 		t.Fatalf("decodeC40Segment must be FormatException, %T", e)
 	}
 	// 1,0,1, 27,1,30, 1,26,3 ('!',FNC1,upper-shift,128+95)
 	bits = common.NewBitSource([]byte{6, 66, 169, 7, 10, 84})
 	expect = []byte{'!', 29, 128 + 95, ' '}
-	r, e = decodeC40Segment(bits, result)
+	r, e = decodeC40Segment(bits, result, fnc1poss)
 	if e != nil {
 		t.Fatalf("decodeC40Segment returns error, %v", e)
 	}
@@ -360,7 +362,7 @@ func TestDecodeC40Segment(t *testing.T) {
 	// 2,0,1,30,2,31 ('`', upper-shift, 128+127)
 	bits = common.NewBitSource([]byte{12, 130, 187, 240})
 	expect = []byte{'`', 255}
-	r, e = decodeC40Segment(bits, result)
+	r, e = decodeC40Segment(bits, result, fnc1poss)
 	if e != nil {
 		t.Fatalf("decodeC40Segment returns error, %v", e)
 	}
@@ -372,7 +374,7 @@ func TestDecodeC40Segment(t *testing.T) {
 	// 4,5,6, <8bit>
 	bits = common.NewBitSource([]byte{25, 207, 0})
 	expect = []byte("012")
-	r, e = decodeC40Segment(bits, result)
+	r, e = decodeC40Segment(bits, result, fnc1poss)
 	if e != nil {
 		t.Fatalf("decodeTextSegment returns error, %v", e)
 	}
@@ -386,7 +388,7 @@ func TestDecodeC40Segment(t *testing.T) {
 	// 4,5,6, <254><8bit>
 	bits = common.NewBitSource([]byte{25, 207, 254, 0})
 	expect = []byte("012")
-	r, e = decodeC40Segment(bits, result)
+	r, e = decodeC40Segment(bits, result, fnc1poss)
 	if e != nil {
 		t.Fatalf("decodeTextSegment returns error, %v", e)
 	}
@@ -402,7 +404,8 @@ func testDecodeAsciiSegment(t testing.TB, bits *common.BitSource, mode Mode, res
 	t.Helper()
 	r := make([]byte, 0)
 	rt := make([]byte, 0)
-	m, r, rt, e := decodeAsciiSegment(bits, r, rt)
+	fnc1poss := intSet{}
+	m, r, rt, e := decodeAsciiSegment(bits, r, rt, fnc1poss)
 	if e != nil {
 		t.Fatalf("decodeAsciiSegment(%v) return error, %v", bits, e)
 	}
@@ -419,7 +422,8 @@ func testDecodeAsciiSegment(t testing.TB, bits *common.BitSource, mode Mode, res
 
 func TestDecodeAsciiSegment(t *testing.T) {
 	bits := common.NewBitSource([]byte{0})
-	_, _, _, e := decodeAsciiSegment(bits, []byte{}, []byte{})
+	fnc1poss := intSet{}
+	_, _, _, e := decodeAsciiSegment(bits, []byte{}, []byte{}, fnc1poss)
 	if _, ok := e.(gozxing.FormatException); !ok {
 		t.Fatalf("decodeAsciiSegment must be FormatException, %T", e)
 	}
@@ -525,9 +529,9 @@ func TestDecodeAsciiSegment(t *testing.T) {
 	trailer = []byte{}
 	testDecodeAsciiSegment(t, bits, mode, expect, trailer)
 
-	// ECI encodation (not implemented)
+	// ECI encodation
 	bits = common.NewBitSource([]byte{241})
-	mode = Mode_ASCII_ENCODE
+	mode = Mode_ECI_ENCODE
 	expect = []byte{}
 	trailer = []byte{}
 	testDecodeAsciiSegment(t, bits, mode, expect, trailer)
@@ -542,7 +546,7 @@ func TestDecodeAsciiSegment(t *testing.T) {
 	// invalid code
 	for i := 250; i < 256; i++ {
 		bits = common.NewBitSource([]byte{byte(i), 'A' + 1})
-		_, _, _, e := decodeAsciiSegment(bits, []byte{}, []byte{})
+		_, _, _, e := decodeAsciiSegment(bits, []byte{}, []byte{}, fnc1poss)
 		if _, ok := e.(gozxing.FormatException); !ok {
 			t.Fatalf("decodeAsciiSegment must be FormatException, %T", e)
 		}
@@ -600,6 +604,74 @@ func TestDecodedBitStreamParser_decode(t *testing.T) {
 	testDecodedBitStreamParser_decode(t, bytes, str, segments)
 }
 
+func TestDecodedBitStreamParser_decode_SymbologyModifire(t *testing.T) {
+	// no fnc1
+	bytes := []byte{'0' + 1}
+	sm := 1
+	r, e := DecodedBitStreamParser_decode(bytes)
+	if e != nil {
+		t.Fatalf("decode error: %v", e)
+	}
+	if s := r.GetSymbologyModifier(); s != sm {
+		t.Fatalf("SymbologModifier = %v, expect %v", s, sm)
+	}
+
+	// fnc1 at 0
+	bytes = []byte{232}
+	sm = 2
+	r, e = DecodedBitStreamParser_decode(bytes)
+	if e != nil {
+		t.Fatalf("decode error: %v", e)
+	}
+	if s := r.GetSymbologyModifier(); s != sm {
+		t.Fatalf("SymbologModifier = %v, expect %v", s, sm)
+	}
+
+	// fnc1 at 1
+	bytes = []byte{'0' + 1, 232}
+	sm = 3
+	r, e = DecodedBitStreamParser_decode(bytes)
+	if e != nil {
+		t.Fatalf("decode error: %v", e)
+	}
+	if s := r.GetSymbologyModifier(); s != sm {
+		t.Fatalf("SymbologModifier = %v, expect %v", s, sm)
+	}
+
+	// no fnc1 with ECI encoded
+	bytes = []byte{241, '0' + 1}
+	sm = 4
+	r, e = DecodedBitStreamParser_decode(bytes)
+	if e != nil {
+		t.Fatalf("decode error: %v", e)
+	}
+	if s := r.GetSymbologyModifier(); s != sm {
+		t.Fatalf("SymbologModifier = %v, expect %v", s, sm)
+	}
+
+	// fnc1 at 0 with ECI encoded
+	bytes = []byte{241, 232, '0' + 1}
+	sm = 5
+	r, e = DecodedBitStreamParser_decode(bytes)
+	if e != nil {
+		t.Fatalf("decode error: %v", e)
+	}
+	if s := r.GetSymbologyModifier(); s != sm {
+		t.Fatalf("SymbologModifier = %v, expect %v", s, sm)
+	}
+
+	// fnc1 at 1 with ECI encoded
+	bytes = []byte{241, '0' + 1, 232, '0' + 1}
+	sm = 6
+	r, e = DecodedBitStreamParser_decode(bytes)
+	if e != nil {
+		t.Fatalf("decode error: %v", e)
+	}
+	if s := r.GetSymbologyModifier(); s != sm {
+		t.Fatalf("SymbologModifier = %v, expect %v", s, sm)
+	}
+}
+
 func TestMode_String(t *testing.T) {
 	if s := Mode_PDA_ENCODE.String(); s != "PAD_ENCODE" {
 		t.Fatalf("PAD_ENCODE string = %v", s)
@@ -621,6 +693,9 @@ func TestMode_String(t *testing.T) {
 	}
 	if s := Mode_BASE256_ENCODE.String(); s != "BASE256_ENCODE" {
 		t.Fatalf("BASE256_ENCODE string = %v", s)
+	}
+	if s := Mode_ECI_ENCODE.String(); s != "ECI_ENCODE" {
+		t.Fatalf("ECI_ENCODE string = %v", s)
 	}
 	if s := Mode(-1).String(); s != "" {
 		t.Fatalf("unknown mode string = \"%v\"", s)
