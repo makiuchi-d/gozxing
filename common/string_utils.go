@@ -54,6 +54,17 @@ func StringUtils_guessCharset(bytes []byte, hints map[gozxing.DecodeHintType]int
 
 		return ianaindex.IANA.Encoding(name)
 	}
+
+	// First try UTF-16, assuming anything with its BOM is UTF-16
+	if len(bytes) > 2 {
+		if bytes[0] == 0xfe && bytes[1] == 0xff {
+			return unicode.UTF16(unicode.BigEndian, unicode.UseBOM), nil
+		}
+		if bytes[0] == 0xff && bytes[1] == 0xfe {
+			return unicode.UTF16(unicode.LittleEndian, unicode.UseBOM), nil
+		}
+	}
+
 	// For now, merely tries to distinguish ISO-8859-1, UTF-8 and Shift_JIS,
 	// which should be by far the most common encodings.
 	length := len(bytes)

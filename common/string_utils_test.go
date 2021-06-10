@@ -102,6 +102,15 @@ func TestUTF8(t *testing.T) {
 	doTest(t, []byte{0xF0, 0x9F, 0x8D, 0xA3, 0xC3, 0x97, 0xF0, 0x9F, 0x8D, 0xBA}, unicode.UTF8, "UTF8")
 }
 
+func TestUTF16withBOM(t *testing.T) {
+	// 调压柜
+	doTest(t, []byte{0xfe, 0xff, 0x8c, 0x03, 0x53, 0x8b, 0x67, 0xdc},
+		unicode.UTF16(unicode.BigEndian, unicode.UseBOM), "UTF-16")
+	// 调压柜
+	doTest(t, []byte{0xff, 0xfe, 0x03, 0x8c, 0x8b, 0x53, 0xdc, 0x67},
+		unicode.UTF16(unicode.LittleEndian, unicode.UseBOM), "UTF-16")
+}
+
 func TestUnknown(t *testing.T) {
 	guessed, _ := StringUtils_guessCharset([]byte{0xe1, 0xff, 0xff, 0xf8, 0x81}, nil)
 	wants := StringUtils_PLATFORM_DEFAULT_ENCODING
