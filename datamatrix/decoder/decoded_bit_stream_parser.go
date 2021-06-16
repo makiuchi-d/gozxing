@@ -77,9 +77,9 @@ func DecodedBitStreamParser_decode(bytes []byte) (*common.DecoderResult, error) 
 	result := make([]byte, 0, 100)
 	resultTrailer := make([]byte, 0)
 	byteSegments := make([][]byte, 0, 1)
-	symbologyModifier := 0
 	mode := Mode_ASCII_ENCODE
 	fnc1Positions := intSet{} // Would be replaceable by looking directly at 'bytes', if we're sure to not having to account for multi byte values.
+	symbologyModifier := 0
 	isECIencoded := false
 
 	for mode != Mode_PDA_ENCODE && bits.Available() > 0 {

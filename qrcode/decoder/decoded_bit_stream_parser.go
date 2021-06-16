@@ -21,7 +21,7 @@ func DecodedBitStreamParser_Decode(
 	byteSegments := make([][]byte, 0, 1)
 	symbolSequence := -1
 	parityData := -1
-	symbologyModifier := 1
+	symbologyModifier := 0
 
 	var currentCharacterSetECI *common.CharacterSetECI
 	fc1InEffect := false
