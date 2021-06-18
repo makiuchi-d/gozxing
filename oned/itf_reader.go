@@ -131,14 +131,16 @@ func (this *itfReader) DecodeRow(rowNumber int, row *gozxing.BitArray, hints map
 		return nil, gozxing.NewFormatException("length=%v", length)
 	}
 
-	return gozxing.NewResult(
+	resultObject := gozxing.NewResult(
 		resultString,
 		nil, // no natural byte representation for these barcodes
 		[]gozxing.ResultPoint{
 			gozxing.NewResultPoint(float64(startRange[1]), float64(rowNumber)),
 			gozxing.NewResultPoint(float64(endRange[0]), float64(rowNumber)),
 		},
-		gozxing.BarcodeFormat_ITF), nil
+		gozxing.BarcodeFormat_ITF)
+	resultObject.PutMetadata(gozxing.ResultMetadataType_SYMBOLOGY_IDENTIFIER, "]I0")
+	return resultObject, nil
 }
 
 // decodeMiddle decode middle

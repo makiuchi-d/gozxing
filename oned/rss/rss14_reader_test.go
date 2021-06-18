@@ -480,47 +480,53 @@ func TestRSS14Reader(t *testing.T) {
 	}
 
 	tests := []struct {
-		file  string
-		wants string
-		hints map[gozxing.DecodeHintType]interface{}
+		file     string
+		wants    string
+		hints    map[gozxing.DecodeHintType]interface{}
+		metadata map[gozxing.ResultMetadataType]interface{}
 	}{
 		// blackbox/rss14-1
-		{"testdata/1_1.png", "04412345678909", nil},
-		{"testdata/1_2.png", "00821935106427", nil},
-		{"testdata/1_3.png", "00075678164125", nil},
-		{"testdata/1_4.png", "20012345678909", nil},
-		{"testdata/1_5.png", "00034567890125", nil},
-		{"testdata/1_6.png", "00012345678905", nil},
+		{
+			"testdata/1_1.png", "04412345678909", nil,
+			map[gozxing.ResultMetadataType]interface{}{
+				gozxing.ResultMetadataType_SYMBOLOGY_IDENTIFIER: "]e0",
+			},
+		},
+		{"testdata/1_2.png", "00821935106427", nil, nil},
+		{"testdata/1_3.png", "00075678164125", nil, nil},
+		{"testdata/1_4.png", "20012345678909", nil, nil},
+		{"testdata/1_5.png", "00034567890125", nil, nil},
+		{"testdata/1_6.png", "00012345678905", nil, nil},
 
 		// blackbox/rss14-2
-		{"testdata/2_6.png", "02001234567893", harder},
-		{"testdata/2_7.png", "02001234567893", nil},
-		{"testdata/2_8.png", "02001234567893", nil},
-		{"testdata/2_13.png", "02001234567893", nil},
-		{"testdata/2_14.png", "02001234567893", harder},
-		{"testdata/2_20.png", "00012345678905", harder},
-		{"testdata/2_23.png", "00012345678905", harder},
-		{"testdata/2_24.png", "00012345678905", harder},
+		{"testdata/2_6.png", "02001234567893", harder, nil},
+		{"testdata/2_7.png", "02001234567893", nil, nil},
+		{"testdata/2_8.png", "02001234567893", nil, nil},
+		{"testdata/2_13.png", "02001234567893", nil, nil},
+		{"testdata/2_14.png", "02001234567893", harder, nil},
+		{"testdata/2_20.png", "00012345678905", harder, nil},
+		{"testdata/2_23.png", "00012345678905", harder, nil},
+		{"testdata/2_24.png", "00012345678905", harder, nil},
 		// original zxing could not read.
-		// {"testdata/2_1.png", "04412345678909", harder},
-		// {"testdata/2_2.png", "04412345678909", harder},
-		// {"testdata/2_3.png", "04412345678909", harder},
-		// {"testdata/2_4.png", "04412345678909", harder},
-		// {"testdata/2_5.png", "02001234567893", harder},
-		// {"testdata/2_9.png", "02001234567893", harder},
-		// {"testdata/2_10.png", "02001234567893", harder},
-		// {"testdata/2_11.png", "02001234567893", harder},
-		// {"testdata/2_12.png", "02001234567893", harder},
-		// {"testdata/2_15.png", "02001234567893", harder},
-		// {"testdata/2_16.png", "02001234567893", harder},
-		// {"testdata/2_17.png", "02001234567893", harder},
-		// {"testdata/2_18.png", "02001234567893", harder},
-		// {"testdata/2_19.png", "02001234567893", harder},
-		// {"testdata/2_21.png", "00012345678905", harder},
-		// {"testdata/2_22.png", "00012345678905", harder},
+		// {"testdata/2_1.png", "04412345678909", harder, nil},
+		// {"testdata/2_2.png", "04412345678909", harder, nil},
+		// {"testdata/2_3.png", "04412345678909", harder, nil},
+		// {"testdata/2_4.png", "04412345678909", harder, nil},
+		// {"testdata/2_5.png", "02001234567893", harder, nil},
+		// {"testdata/2_9.png", "02001234567893", harder, nil},
+		// {"testdata/2_10.png", "02001234567893", harder, nil},
+		// {"testdata/2_11.png", "02001234567893", harder, nil},
+		// {"testdata/2_12.png", "02001234567893", harder, nil},
+		// {"testdata/2_15.png", "02001234567893", harder, nil},
+		// {"testdata/2_16.png", "02001234567893", harder, nil},
+		// {"testdata/2_17.png", "02001234567893", harder, nil},
+		// {"testdata/2_18.png", "02001234567893", harder, nil},
+		// {"testdata/2_19.png", "02001234567893", harder, nil},
+		// {"testdata/2_21.png", "00012345678905", harder, nil},
+		// {"testdata/2_22.png", "00012345678905", harder, nil},
 	}
 	for _, test := range tests {
-		testutil.TestFile(t, reader, test.file, test.wants, format, test.hints, nil)
+		testutil.TestFile(t, reader, test.file, test.wants, format, test.hints, test.metadata)
 		reader.Reset()
 	}
 }

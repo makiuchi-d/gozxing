@@ -300,7 +300,7 @@ func TestITFReader(t *testing.T) {
 		{
 			"testdata/itf/1.png", "30712345000010",
 			map[gozxing.ResultMetadataType]interface{}{
-				// gozxing.ResultMetadataType_SYMBOLOGY_IDENTIFIER: "]I0", // implement in PR 1396
+				gozxing.ResultMetadataType_SYMBOLOGY_IDENTIFIER: "]I0",
 			},
 		},
 		{"testdata/itf/2.png", "00012345678905", nil},

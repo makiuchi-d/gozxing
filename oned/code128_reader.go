@@ -468,9 +468,6 @@ func (*code128Reader) DecodeRow(rowNumber int, row *gozxing.BitArray, hints map[
 						}
 					}
 					break
-				case code128CODE_FNC_2:
-					symbologyModifier = 4
-					break
 				case code128CODE_CODE_A:
 					codeSet = code128CODE_CODE_A
 					break
