@@ -1,10 +1,10 @@
 package decoder
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/makiuchi-d/gozxing"
-	"reflect"
 )
 
 const (
@@ -331,5 +331,27 @@ func TestNewBitMatrixParser(t *testing.T) {
 	_, e = NewBitMatrixParser(bm)
 	if e == nil {
 		t.Fatalf("NewBitMatrixParser must be error")
+	}
+}
+
+func TestBitMatrixParser_readModule(t *testing.T) {
+	bm, _ := gozxing.NewBitMatrix(10, 10)
+	bm.Set(4, 3)
+	p, _ := NewBitMatrixParser(bm)
+
+	if r := p.readModule(2, 3, 8, 8); !r {
+		t.Fatalf("readModule(2,3) should be true")
+	}
+
+	if r := p.readModule(-6, 3, 8, 8); !r {
+		t.Fatalf("readModule(-6,3) should be true")
+	}
+
+	if r := p.readModule(2, -5, 8, 8); !r {
+		t.Fatalf("readModule(2,-5) should be true")
+	}
+
+	if r := p.readModule(10, 3, 8, 8); !r {
+		t.Fatalf("readModule(2,-5) should be true")
 	}
 }
