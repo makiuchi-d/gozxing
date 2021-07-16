@@ -88,7 +88,7 @@ type testBitSource struct {
 
 func newTestBitSource(height int, bits string) gozxing.LuminanceSource {
 	return &testBitSource{
-		gozxing.LuminanceSourceBase{len(bits), height},
+		gozxing.LuminanceSourceBase{Width: len(bits), Height: height},
 		bits,
 	}
 }

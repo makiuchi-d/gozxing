@@ -71,7 +71,7 @@ type testBitMatrixSource struct {
 
 func newTestBitMatrixSource(matrix *gozxing.BitMatrix) gozxing.LuminanceSource {
 	return &testBitMatrixSource{
-		gozxing.LuminanceSourceBase{matrix.GetWidth(), matrix.GetHeight()},
+		gozxing.LuminanceSourceBase{Width: matrix.GetWidth(), Height: matrix.GetHeight()},
 		matrix,
 	}
 }
