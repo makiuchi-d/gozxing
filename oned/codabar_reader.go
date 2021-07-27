@@ -160,7 +160,7 @@ func (this *codabarReader) validatePattern(start int) error {
 	// We break out of this loop in the middle, in order to handle
 	// inter-character spaces properly.
 	pos := start
-	for i := 0; true; i++ {
+	for i := 0; i <= end; i++ {
 		pattern := codabarReader_CHARACTER_ENCODINGS[this.decodeRowResult[i]]
 		for j := 6; j >= 0; j-- {
 			// Even j = bars, while odd j = spaces. Categories 2 and 3 are for
@@ -169,9 +169,6 @@ func (this *codabarReader) validatePattern(start int) error {
 			sizes[category] += this.counters[pos+j]
 			counts[category]++
 			pattern >>= 1
-		}
-		if i >= end {
-			break
 		}
 		// We ignore the inter-character space - it could be of any size.
 		pos += 8
@@ -192,7 +189,7 @@ func (this *codabarReader) validatePattern(start int) error {
 
 	// Now verify that all of the stripes are within the thresholds.
 	pos = start
-	for i := 0; true; i++ {
+	for i := 0; i <= end; i++ {
 		pattern := codabarReader_CHARACTER_ENCODINGS[this.decodeRowResult[i]]
 		for j := 6; j >= 0; j-- {
 			// Even j = bars, while odd j = spaces. Categories 2 and 3 are for
@@ -203,9 +200,6 @@ func (this *codabarReader) validatePattern(start int) error {
 				return gozxing.NewNotFoundException()
 			}
 			pattern >>= 1
-		}
-		if i >= end {
-			break
 		}
 		pos += 8
 	}
