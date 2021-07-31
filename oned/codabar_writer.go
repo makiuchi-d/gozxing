@@ -25,7 +25,11 @@ func (codabarEncoder) getSupportedWriteFormats() gozxing.BarcodeFormats {
 	return gozxing.BarcodeFormats{gozxing.BarcodeFormat_CODABAR}
 }
 
-func (codabarEncoder) encode(contents string) ([]bool, error) {
+func (e codabarEncoder) encode(contents string) ([]bool, error) {
+	return e.encodeWithHints(contents, nil)
+}
+
+func (codabarEncoder) encodeWithHints(contents string, hints map[gozxing.EncodeHintType]interface{}) ([]bool, error) {
 	if len(contents) < 2 {
 		// Can't have a start/end guard, so tentatively add default guards
 		contents = codabarWriter_DEFAULT_GUARD + contents + codabarWriter_DEFAULT_GUARD

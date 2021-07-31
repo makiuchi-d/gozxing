@@ -42,7 +42,11 @@ func (itfEncoder) getSupportedWriteFormats() gozxing.BarcodeFormats {
 	return gozxing.BarcodeFormats{gozxing.BarcodeFormat_ITF}
 }
 
-func (itfEncoder) encode(contents string) ([]bool, error) {
+func (e itfEncoder) encode(contents string) ([]bool, error) {
+	return e.encodeWithHints(contents, nil)
+}
+
+func (itfEncoder) encodeWithHints(contents string, hints map[gozxing.EncodeHintType]interface{}) ([]bool, error) {
 	length := len(contents)
 	if length%2 != 0 {
 		return nil, gozxing.NewWriterException(

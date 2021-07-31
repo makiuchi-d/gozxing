@@ -26,7 +26,11 @@ func (ean8Encoder) getSupportedWriteFormats() gozxing.BarcodeFormats {
 
 // encode encode contents string
 // @return a byte array of horizontal pixels (false = white, true = black)
-func (ean8Encoder) encode(contents string) ([]bool, error) {
+func (e ean8Encoder) encode(contents string) ([]bool, error) {
+	return e.encodeWithHints(contents, nil)
+}
+
+func (ean8Encoder) encodeWithHints(contents string, hints map[gozxing.EncodeHintType]interface{}) ([]bool, error) {
 	length := len(contents)
 	switch length {
 	case 7:

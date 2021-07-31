@@ -93,6 +93,11 @@ const (
 	 * {@link String } value).
 	 */
 	EncodeHintType_GS1_FORMAT
+
+	/**
+	 * Forces which encoding will be used. Currently only used for Code-128 code sets (Type {@link String}). Valid values are "A", "B", "C".
+	 */
+	EncodeHintType_FORCE_CODE_SET
 )
 
 func (this EncodeHintType) String() string {
@@ -123,6 +128,8 @@ func (this EncodeHintType) String() string {
 		return "QR_MASK_PATTERN"
 	case EncodeHintType_GS1_FORMAT:
 		return "GS1_FORMAT"
+	case EncodeHintType_FORCE_CODE_SET:
+		return "FORCE_CODE_SET"
 	}
 	return ""
 }

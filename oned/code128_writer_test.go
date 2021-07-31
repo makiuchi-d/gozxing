@@ -269,3 +269,65 @@ func TestCode128WriterFnc3(t *testing.T) {
 		t.Fatalf("encode = %v, expect %v", r, expect)
 	}
 }
+
+func TestCode128WriterForceCodeSetFailure(t *testing.T) {
+	enc := code128Encoder{}
+
+	tests := []struct {
+		toEncode string
+		codeset  string
+	}{
+		{"ASDFx0123", "A"},
+		{"ASdf\00123", "B"},
+		{"123a5678", "C"},
+		{"123\u00f2a678", "C"},
+		{"123456789", "C"},
+		{"123456789", "D"},
+	}
+	for _, test := range tests {
+		hints := map[gozxing.EncodeHintType]interface{}{
+			gozxing.EncodeHintType_FORCE_CODE_SET: test.codeset,
+		}
+		_, e := enc.encodeWithHints(test.toEncode, hints)
+		if e == nil {
+			t.Fatalf("encode %q with force code %q must be error", test.toEncode, test.codeset)
+		}
+	}
+}
+
+func TestCode128WriterWithForceCodeSet(t *testing.T) {
+	enc := code128Encoder{}
+
+	tests := []struct {
+		toEncode string
+		codeset  string
+		expected string
+	}{
+		{
+			"AB123", "A",
+			"11010000100" + "10100011000" + "10001011000" + "10011100110" + "11001110010" + "11001011100" + "11001000100" + "1100011101011",
+		},
+		{
+			"1234", "B",
+			"11010010000" + "10011100110" + "11001110010" + "11001011100" + "11001001110" + "11110010010" + "1100011101011",
+		},
+	}
+	for _, test := range tests {
+		hints := map[gozxing.EncodeHintType]interface{}{
+			gozxing.EncodeHintType_FORCE_CODE_SET: test.codeset,
+		}
+		r, e := enc.encodeWithHints(test.toEncode, hints)
+		if e != nil {
+			t.Fatalf("encode(%q, %q): %v", test.toEncode, test.codeset, e)
+		}
+		if lr, le := len(r), len(test.expected); lr != le {
+			t.Fatalf("encode(%q, %q): len(ret) = %v, wants %v", test.toEncode, test.codeset, lr, le)
+		}
+		for i := range r {
+			ex := test.expected[i] == '1'
+			if r[i] != ex {
+				t.Fatalf("encode(%q, %q) [%v] = %v, wants %v", test.toEncode, test.codeset, i, r[i], ex)
+			}
+		}
+	}
+}

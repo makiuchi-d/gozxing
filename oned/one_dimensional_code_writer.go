@@ -7,7 +7,21 @@ import (
 )
 
 type encoder interface {
+	// encodeWithoutHint Encode the contents to boolean array expression of one-dimensional barcode.
+	// Start code and end code should be included in result, and side margins should not be included.
+	//
+	// @param contents barcode contents to encode
+	// @return a {@code boolean[]} of horizontal pixels (false = white, true = black)
+	//
 	encode(contents string) ([]bool, error)
+
+	// Can be overwritten if the encode requires to read the hints map. Otherwise it defaults to {@code encode}.
+	// @param contents barcode contents to encode
+	// @param hints encoding hints
+	// @return a {@code boolean[]} of horizontal pixels (false = white, true = black)
+	//
+	encodeWithHints(contents string, hints map[gozxing.EncodeHintType]interface{}) ([]bool, error)
+
 	getSupportedWriteFormats() gozxing.BarcodeFormats
 }
 
@@ -67,7 +81,7 @@ func (this *OneDimensionalCodeWriter) Encode(
 		}
 	}
 
-	code, e := this.encode(contents)
+	code, e := this.encodeWithHints(contents, hints)
 	if e != nil {
 		return nil, e
 	}

@@ -16,9 +16,13 @@ func (code93Encoder) getSupportedWriteFormats() gozxing.BarcodeFormats {
 	return gozxing.BarcodeFormats{gozxing.BarcodeFormat_CODE_93}
 }
 
+func (e code93Encoder) encode(contents string) ([]bool, error) {
+	return e.encodeWithHints(contents, nil)
+}
+
 // @param contents barcode contents to encode. It should not be encoded for extended characters.
 // @return a {@code boolean[]} of horizontal pixels (false = white, true = black)
-func (code93Encoder) encode(contents string) ([]bool, error) {
+func (code93Encoder) encodeWithHints(contents string, hints map[gozxing.EncodeHintType]interface{}) ([]bool, error) {
 	var e error
 	contents, e = code93ConvertToExtended(contents)
 	if e != nil {

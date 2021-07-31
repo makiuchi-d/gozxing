@@ -15,7 +15,11 @@ func (dummyEncoder) getSupportedWriteFormats() gozxing.BarcodeFormats {
 	return gozxing.BarcodeFormats{gozxing.BarcodeFormat_UPC_A}
 }
 
-func (dummyEncoder) encode(contents string) ([]bool, error) {
+func (e dummyEncoder) encode(contents string) ([]bool, error) {
+	return e.encodeWithHints(contents, nil)
+}
+
+func (dummyEncoder) encodeWithHints(contents string, hints map[gozxing.EncodeHintType]interface{}) ([]bool, error) {
 	code := make([]bool, 0)
 	for _, c := range contents {
 		if c != '1' && c != '0' {

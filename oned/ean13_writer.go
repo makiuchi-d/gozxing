@@ -24,7 +24,11 @@ func (ean13Encoder) getSupportedWriteFormats() gozxing.BarcodeFormats {
 	return gozxing.BarcodeFormats{gozxing.BarcodeFormat_EAN_13}
 }
 
-func (ean13Encoder) encode(contents string) ([]bool, error) {
+func (e ean13Encoder) encode(contents string) ([]bool, error) {
+	return e.encodeWithHints(contents, nil)
+}
+
+func (ean13Encoder) encodeWithHints(contents string, hints map[gozxing.EncodeHintType]interface{}) ([]bool, error) {
 	length := len(contents)
 	switch length {
 	case 12:

@@ -16,7 +16,11 @@ func (code39Encoder) getSupportedWriteFormats() gozxing.BarcodeFormats {
 	return gozxing.BarcodeFormats{gozxing.BarcodeFormat_CODE_39}
 }
 
-func (code39Encoder) encode(contents string) ([]bool, error) {
+func (e code39Encoder) encode(contents string) ([]bool, error) {
+	return e.encodeWithHints(contents, nil)
+}
+
+func (code39Encoder) encodeWithHints(contents string, hints map[gozxing.EncodeHintType]interface{}) ([]bool, error) {
 	length := len(contents)
 	if length > 80 {
 		return nil, gozxing.NewWriterException("IllegalArgumentException: "+

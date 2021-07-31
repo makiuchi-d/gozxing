@@ -48,7 +48,11 @@ func (code128Encoder) getSupportedWriteFormats() gozxing.BarcodeFormats {
 	return gozxing.BarcodeFormats{gozxing.BarcodeFormat_CODE_128}
 }
 
-func (code128Encoder) encode(contentsStr string) ([]bool, error) {
+func (e code128Encoder) encode(contents string) ([]bool, error) {
+	return e.encodeWithHints(contents, nil)
+}
+
+func (code128Encoder) encodeWithHints(contentsStr string, hints map[gozxing.EncodeHintType]interface{}) ([]bool, error) {
 	contents := []rune(contentsStr)
 	length := len(contents)
 	// Check length
@@ -56,18 +60,66 @@ func (code128Encoder) encode(contentsStr string) ([]bool, error) {
 		return nil, gozxing.NewWriterException("IllegalArgumentException: "+
 			"Contents length should be between 1 and 80 characters, but got %v", length)
 	}
+
+	// Check for forced code set hint.
+	forcedCodeSet := -1;
+	if codeSetHint, ok := hints[gozxing.EncodeHintType_FORCE_CODE_SET]; ok {
+		switch s := codeSetHint.(string); s {
+		case "A":
+			forcedCodeSet = code128CODE_CODE_A
+			break
+		case "B":
+			forcedCodeSet = code128CODE_CODE_B
+			break
+		case "C":
+			forcedCodeSet = code128CODE_CODE_C
+			break
+		default:
+			return nil, gozxing.NewWriterException(
+				"IllegalArgumentException: Unsupported code set hint: %v", codeSetHint)
+		}
+    }
+
 	// Check content
 	for i := 0; i < length; i++ {
 		c := contents[i]
+		// check for non ascii characters that are not special GS1 characters
 		switch c {
+		// special function characters
 		case code128ESCAPE_FNC_1, code128ESCAPE_FNC_2, code128ESCAPE_FNC_3, code128ESCAPE_FNC_4:
 			break
+		// non ascii characters
 		default:
 			if c > 127 {
-				// support for FNC4 isn't implemented, no full Latin-1 character set available at the moment
+				// no full Latin-1 character set available at the moment
+				// shift and manual code change are not supported
 				return nil, gozxing.NewWriterException(
-					"IllegalArgumentException: Bad character in input: %v", c)
+					"IllegalArgumentException: Bad character in input: ASCII value=%v", int(c));
 			}
+		}
+		// check characters for compatibility with forced code set
+		switch (forcedCodeSet) {
+		case code128CODE_CODE_A:
+			// allows no ascii above 95 (no lower caps, no special symbols)
+			if c > 95 && c <= 127 {
+				return nil, gozxing.NewWriterException(
+					"IllegalArgumentException: Bad character in input for forced code set A: ASCII value=%v", int(c))
+			}
+			break
+		case code128CODE_CODE_B:
+			// allows no ascii below 32 (terminal symbols)
+			if c <= 32 {
+				return nil, gozxing.NewWriterException(
+					"IllegalArgumentException: Bad character in input for forced code set B: ASCII value=%v", int(c))
+			}
+			break
+		case code128CODE_CODE_C:
+			// allows only numbers and no FNC 2/3/4
+			if c < 48 || (c > 57 && c <= 127) || c == code128ESCAPE_FNC_2 || c == code128ESCAPE_FNC_3 || c == code128ESCAPE_FNC_4 {
+				return nil, gozxing.NewWriterException(
+					"IllegalArgumentException: Bad character in input for forced code set C: ASCII value=%v", int(c))
+			}
+			break
 		}
 	}
 
@@ -79,7 +131,12 @@ func (code128Encoder) encode(contentsStr string) ([]bool, error) {
 
 	for position < length {
 		//Select code to use
-		newCodeSet := code128ChooseCode(contents, position, codeSet)
+		var newCodeSet int
+		if (forcedCodeSet == -1) {
+			newCodeSet = code128ChooseCode(contents, position, codeSet)
+		} else {
+			newCodeSet = forcedCodeSet
+		}
 
 		//Get the pattern index
 		var patternIndex int
@@ -118,6 +175,11 @@ func (code128Encoder) encode(contentsStr string) ([]bool, error) {
 					break
 				default:
 					// CODE_CODE_C
+					if position + 1 == length {
+						// this is the last character, but the encoding is C, which always encodes two characers
+						return nil, gozxing.NewWriterException(
+							"IllegalArgumentException: Bad number of characters for digit only encoding.")
+					}
 					patternIndex = (int(contents[position])-'0')*10 + (int(contents[position+1]) - '0')
 					position++ // Also incremented below
 					break

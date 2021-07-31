@@ -22,7 +22,11 @@ func (upcEEncoder) getSupportedWriteFormats() gozxing.BarcodeFormats {
 	return gozxing.BarcodeFormats{gozxing.BarcodeFormat_UPC_E}
 }
 
-func (upcEEncoder) encode(contents string) ([]bool, error) {
+func (e upcEEncoder) encode(contents string) ([]bool, error) {
+	return e.encodeWithHints(contents, nil)
+}
+
+func (upcEEncoder) encodeWithHints(contents string, hints map[gozxing.EncodeHintType]interface{}) ([]bool, error) {
 	length := len(contents)
 	switch length {
 	case 7:
