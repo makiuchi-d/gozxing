@@ -112,3 +112,11 @@ func TestUPCAReader(t *testing.T) {
 		testutil.TestFile(t, reader, test.file, test.wants, format, test.harder, nil)
 	}
 }
+
+func TestUpcAReader_getBarcodeFormat(t *testing.T) {
+	reader := NewUPCAReader().(*upcAReader)
+	wants := gozxing.BarcodeFormat_UPC_A
+	if f := reader.getBarcodeFormat(); f != wants {
+		t.Fatalf("getBarcodeFormat() = %v, wants =%v", f, wants)
+	}
+}
