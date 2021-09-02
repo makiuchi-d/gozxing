@@ -7,7 +7,6 @@ import (
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/charmap"
 	"golang.org/x/text/transform"
-	"golang.org/x/xerrors"
 
 	"github.com/makiuchi-d/gozxing"
 	"github.com/makiuchi-d/gozxing/aztec/detector"
@@ -70,7 +69,7 @@ func (this *Decoder) Decode(detectorResult *detector.AztecDetectorResult) (*comm
 	rawbits := this.extractBits(matrix)
 	correctedBits, err := this.correctBits(rawbits)
 	if err != nil {
-		return nil, xerrors.Errorf("Detector.Decode: %w", err)
+		return nil, gozxing.WrapFormatException(err)
 	}
 	rawBytes := convertBoolArrayToByteArray(correctedBits.correctBits)
 	result, e := this.getEncodedData(correctedBits.correctBits)
