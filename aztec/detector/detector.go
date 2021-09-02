@@ -479,7 +479,7 @@ func (this *Detector) getColor(p1, p2 Point) int {
 
 	colorModel := this.image.Get(p1.getX(), p1.getY())
 
-	iMax := int(math.Ceil(d))
+	iMax := int(math.Floor(d))
 	for i := 0; i < iMax; i++ {
 		px += dx
 		py += dy
