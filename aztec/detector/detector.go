@@ -470,6 +470,9 @@ func min(a, b int) int {
 //
 func (this *Detector) getColor(p1, p2 Point) int {
 	d := distanceP(p1, p2)
+	if d == 0.0 {
+		return 0
+	}
 	dx := float64(p2.getX()-p1.getX()) / d
 	dy := float64(p2.getY()-p1.getY()) / d
 	err := 0
@@ -481,11 +484,11 @@ func (this *Detector) getColor(p1, p2 Point) int {
 
 	iMax := int(math.Floor(d))
 	for i := 0; i < iMax; i++ {
-		px += dx
-		py += dy
 		if this.image.Get(util.MathUtils_Round(px), util.MathUtils_Round(py)) != colorModel {
 			err++
 		}
+		px += dx
+		py += dy
 	}
 
 	errRatio := float64(err) / d

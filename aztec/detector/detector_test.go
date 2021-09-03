@@ -418,13 +418,13 @@ func TestMinMax(t *testing.T) {
 
 func TestDetector_getColor(t *testing.T) {
 	img, _ := gozxing.ParseStringToBitMatrix(""+
-		"################    \n"+
-		"###############     \n"+
-		"###############     \n"+
-		"###############     \n"+
-		"############        \n"+
-		"############        \n"+
-		"                    \n",
+		"################            \n"+
+		"###############             \n"+
+		"###############             \n"+
+		"###############             \n"+
+		"###########                 \n"+
+		"###########                 \n"+
+		"                            \n",
 		"#", " ")
 	det := NewDetector(img)
 
@@ -432,9 +432,10 @@ func TestDetector_getColor(t *testing.T) {
 		x1, y1, x2, y2 int
 		wants          int
 	}{
+		{0, 0, 0, 0, 0},
 		{0, 0, 13, 5, 1},
 		{0, 0, 14, 5, 0},
-		{15, 0, 19, 5, -1},
+		{15, 0, 26, 5, -1},
 	}
 
 	for _, test := range tests {
