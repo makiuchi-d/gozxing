@@ -100,7 +100,7 @@ func (this *Detector) Detect(isMirror bool) (*AztecDetectorResult, error) {
 func (this *Detector) extractParameters(bullsEyeCorners []gozxing.ResultPoint) (e error) {
 	if !this.isValidPoint(bullsEyeCorners[0]) || !this.isValidPoint(bullsEyeCorners[1]) ||
 		!this.isValidPoint(bullsEyeCorners[2]) || !this.isValidPoint(bullsEyeCorners[3]) {
-		return gozxing.NewNotFoundException()
+		return gozxing.NewNotFoundException("invalid bulls eye enters: %v", bullsEyeCorners)
 	}
 	length := 2 * this.nbCenterLayers
 	// Get the bits around the bull's eye
@@ -182,7 +182,7 @@ func getRotation(sides []int, length int) (int, error) {
 			return shift, nil
 		}
 	}
-	return 0, gozxing.NewNotFoundException()
+	return 0, gozxing.NewNotFoundException("rotation not found")
 }
 
 // getCorrectedParameterData Corrects the parameter bits using Reed-Solomon algorithm.
@@ -265,7 +265,7 @@ func (this *Detector) getBullsEyeCorners(pCenter Point) ([]gozxing.ResultPoint, 
 	}
 
 	if this.nbCenterLayers != 5 && this.nbCenterLayers != 7 {
-		return nil, gozxing.NewNotFoundException()
+		return nil, gozxing.NewNotFoundException("nbCenterLayers = %v", this.nbCenterLayers)
 	}
 
 	this.compact = this.nbCenterLayers == 5

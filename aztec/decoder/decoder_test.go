@@ -6,6 +6,7 @@ import (
 
 	"github.com/makiuchi-d/gozxing"
 	"github.com/makiuchi-d/gozxing/aztec/detector"
+	"github.com/makiuchi-d/gozxing/testutil"
 )
 
 func TestDecoder_Decode(t *testing.T) {
@@ -28,6 +29,7 @@ func TestDecoder_Decode(t *testing.T) {
 		"####      ######  ##  ##    ##\n"+
 		"########    ####  ####  ##  ##\n",
 		"##", "  ")
+	bmp = testutil.ExpandBitMatrix(bmp, 3)
 	ddata, _ := detector.NewDetector(bmp).Detect(false)
 
 	r, e := dec.Decode(ddata)
@@ -65,6 +67,7 @@ func TestDecoder_Decode(t *testing.T) {
 		"      ####        ##  ##  ####\n"+
 		"##  ##      ######  ####    ##\n",
 		"##", "  ")
+	bmp = testutil.ExpandBitMatrix(bmp, 3)
 	ddata, _ = detector.NewDetector(bmp).Detect(false)
 	_, e = dec.Decode(ddata)
 	if e == nil {
@@ -113,6 +116,7 @@ func TestDecoder_Decode(t *testing.T) {
 		"  ########  ####    ##  ##  ####  ##  ##  ######  ##########  ##  ######  ##  \n"+
 		"                                                                              \n",
 		"##", "  ")
+	bmp = testutil.ExpandBitMatrix(bmp, 3)
 	ddata, e = detector.NewDetector(bmp).Detect(false)
 	r, e = dec.Decode(ddata)
 	if e != nil {
