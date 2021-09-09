@@ -21,13 +21,9 @@ var (
 	}
 )
 
-/**
- * Encapsulates logic that can detect an Aztec Code in an image, even if the Aztec Code
- * is rotated or skewed, or partially obscured.
- *
- * @author David Olivier
- * @author Frank Yellin
- */
+// Detector : Encapsulates logic that can detect an Aztec Code in an image, even if the Aztec Code
+// is rotated or skewed, or partially obscured.
+//
 type Detector struct {
 	image *gozxing.BitMatrix
 
