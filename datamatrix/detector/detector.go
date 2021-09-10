@@ -319,10 +319,8 @@ func (this *Detector) transitionsBetween(from, to gozxing.ResultPoint) int {
 	fromX := int(from.GetX())
 	fromY := int(from.GetY())
 	toX := int(to.GetX())
-	toY := this.image.GetHeight() - 1
-	if y := int(to.GetY()); y < toY {
-		toY = y
-	}
+	toY := min(this.image.GetHeight()-1, int(to.GetY()))
+
 	steep := abs(toY-fromY) > abs(toX-fromX)
 	if steep {
 		fromX, fromY = fromY, fromX
@@ -379,6 +377,13 @@ func abs(a int) int {
 
 func max(a, b int) int {
 	if a > b {
+		return a
+	}
+	return b
+}
+
+func min(a, b int) int {
+	if a < b {
 		return a
 	}
 	return b

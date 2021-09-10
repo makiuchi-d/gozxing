@@ -47,10 +47,19 @@ func TestAbs(t *testing.T) {
 
 func TestMax(t *testing.T) {
 	if r := max(-1, 10); r != 10 {
-		t.Fatalf("mzx(-1, 10) = %v, expect 10", r)
+		t.Fatalf("max(-1, 10) = %v, expect 10", r)
 	}
 	if r := max(20, 10); r != 20 {
-		t.Fatalf("mzx(20, 10) = %v, expect 20", r)
+		t.Fatalf("max(20, 10) = %v, expect 20", r)
+	}
+}
+
+func TestMin(t *testing.T) {
+	if r := min(-1, 10); r != -1 {
+		t.Fatalf("min(-1, 10) = %v, expect -1", r)
+	}
+	if r := min(20, 10); r != 10 {
+		t.Fatalf("min(-1, 10) = %v, expect 10", r)
 	}
 }
 
