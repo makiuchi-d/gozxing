@@ -1,6 +1,7 @@
 package gozxing
 
 import (
+	"fmt"
 	"testing"
 
 	errors "golang.org/x/xerrors"
@@ -62,11 +63,12 @@ func TestWrapFormatException(t *testing.T) {
 	}
 
 	wants := "FormatException: newformatexception"
-	if msg := e.Error(); msg != wants {
+	if msg := fmt.Sprintf("%v", e); msg != wants {
 		t.Fatalf("e.Error() = \"%s\", wants \"%s\"", msg, wants)
 	}
 	e = WrapFormatException(e)
-	if msg := e.Error(); msg != wants {
+	wants = "FormatException: FormatException: newformatexception"
+	if msg := fmt.Sprintf("%v", e); msg != wants {
 		t.Fatalf("e.Error() = \"%s\", wants \"%s\"", msg, wants)
 	}
 }

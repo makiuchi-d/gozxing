@@ -1,6 +1,7 @@
 package gozxing
 
 import (
+	"fmt"
 	"testing"
 
 	errors "golang.org/x/xerrors"
@@ -43,11 +44,12 @@ func TestWrapWriterException(t *testing.T) {
 	}
 
 	wants := "WriterException: test error"
-	if msg := e.Error(); msg != wants {
+	if msg := fmt.Sprintf("%v", e); msg != wants {
 		t.Fatalf("e.Error() = \"%s\", wants \"%s\"", msg, wants)
 	}
 	e = WrapWriterException(e)
-	if msg := e.Error(); msg != wants {
+	wants = "WriterException: WriterException: test error"
+	if msg := fmt.Sprintf("%v", e); msg != wants {
 		t.Fatalf("e.Error() = \"%s\", wants \"%s\"", msg, wants)
 	}
 }

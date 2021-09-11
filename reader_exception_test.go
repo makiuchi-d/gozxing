@@ -40,7 +40,7 @@ func TestWrapReaderException(t *testing.T) {
 
 	s := fmt.Sprintf("%+v", e)
 	cases := []string{
-		"ReaderException: base error",
+		"base error",
 		"gozxing.TestWrapReaderException",
 		"reader_exception_test.go:35",
 		"reader_exception_test.go:34",

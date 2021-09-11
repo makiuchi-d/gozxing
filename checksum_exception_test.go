@@ -65,11 +65,12 @@ func TestWrapChecksumException(t *testing.T) {
 	}
 
 	wants := "ChecksumException: newchecksumexceptionstring"
-	if msg := e.Error(); msg != wants {
+	if msg := fmt.Sprintf("%v", e); msg != wants {
 		t.Fatalf("e.Error() = \"%s\", wants \"%s\"", msg, wants)
 	}
 	e = WrapChecksumException(e)
-	if msg := e.Error(); msg != wants {
+	wants = "ChecksumException: ChecksumException: newchecksumexceptionstring"
+	if msg := fmt.Sprintf("%v", e); msg != wants {
 		t.Fatalf("e.Error() = \"%s\", wants \"%s\"", msg, wants)
 	}
 }

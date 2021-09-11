@@ -2,7 +2,6 @@ package gozxing
 
 import (
 	"fmt"
-	"strings"
 
 	errors "golang.org/x/xerrors"
 )
@@ -42,14 +41,7 @@ func newException(prefix string, args ...interface{}) exception {
 	}
 }
 
-func wrapException(prefix string, next error) exception {
-	msg := prefix
-	if next != nil {
-		msg = next.Error()
-	}
-	if !strings.HasPrefix(msg, prefix) {
-		msg = prefix + ": " + msg
-	}
+func wrapException(msg string, next error) exception {
 	return exception{
 		msg,
 		next,

@@ -72,11 +72,12 @@ func TestWrapNotFoundException(t *testing.T) {
 	}
 
 	wants := "NotFoundException: newnotfoundexception"
-	if msg := e.Error(); msg != wants {
+	if msg := fmt.Sprintf("%v", e); msg != wants {
 		t.Fatalf("e.Error() = \"%s\", wants \"%s\"", msg, wants)
 	}
 	e = WrapNotFoundException(e)
-	if msg := e.Error(); msg != wants {
+	wants = "NotFoundException: NotFoundException: newnotfoundexception"
+	if msg := fmt.Sprintf("%v", e); msg != wants {
 		t.Fatalf("e.Error() = \"%s\", wants \"%s\"", msg, wants)
 	}
 }
