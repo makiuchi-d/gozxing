@@ -14,7 +14,7 @@ This project is a port of ZXing core library to pure Go.
 |-------------|--------------------|--------------------|
 | QR Code     | :heavy_check_mark: | :heavy_check_mark: |
 | Data Matrix | :heavy_check_mark: | :heavy_check_mark: |
-| Aztec       |                    |                    |
+| Aztec       | :heavy_check_mark: |                    |
 | PDF 417     |                    |                    |
 | MaxiCode    |                    |                    |
 
