@@ -167,10 +167,15 @@ func (b *BitArray) AppendBits(value int, numBits int) error {
 	if numBits < 0 || numBits > 32 {
 		return errors.New("IllegalArgumentException: Num bits must be between 0 and 32")
 	}
-	b.ensureCapacity(b.size + numBits)
-	for numBitsLeft := numBits; numBitsLeft > 0; numBitsLeft-- {
-		b.AppendBit(((value >> uint(numBitsLeft-1)) & 0x01) == 1)
+	nextSize := b.size
+	b.ensureCapacity(nextSize + numBits)
+	for numBitsLeft := numBits -1; numBitsLeft >= 0; numBitsLeft-- {
+		if ((value & (1 << numBitsLeft)) != 0) {
+			b.bits[nextSize / 32] |= 1 << (nextSize & 0x1F)
+		}
+		nextSize++;
 	}
+	b.size = nextSize
 	return nil
 }
 
