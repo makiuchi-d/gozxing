@@ -75,7 +75,7 @@ func (this *ReedSolomonDecoder) runEuclideanAlgorithm(a, b *GenericGFPoly, R int
 	t := this.field.GetOne()
 
 	// Run Euclidean algorithm until r's degree is less than R/2
-	for r.GetDegree() >= R/2 {
+	for 2*r.GetDegree() >= R {
 		rLastLast := rLast
 		tLastLast := tLast
 		rLast = r
@@ -124,7 +124,8 @@ func (this *ReedSolomonDecoder) runEuclideanAlgorithm(a, b *GenericGFPoly, R int
 		}
 
 		if r.GetDegree() >= rLast.GetDegree() {
-			return nil, nil, errors.New("IllegalStateException: Division algorithm failed to reduce polynomial?")
+			return nil, nil, errors.Errorf(
+				"IllegalStateException: Division algorithm failed to reduce polynomial? r: %v, rLast: %v", r, rLast)
 		}
 	}
 

@@ -455,9 +455,9 @@ func TestDecoderRunEuclideanAlgorithm(t *testing.T) {
 
 	a, _ = NewGenericGFPoly(field, []int{1})
 	b, _ = NewGenericGFPoly(field, []int{1, 1})
-	_, _, e = decoder.runEuclideanAlgorithm(a, b, 1)
+	_, _, e = decoder.runEuclideanAlgorithm(a, b, 0)
 	if e == nil {
-		t.Fatalf("runEuclideanAlgorithm({1}, {1,1}, 1) must be error")
+		t.Fatalf("runEuclideanAlgorithm({1}, {1,1}, 0) must be error")
 	}
 
 	a, _ = NewGenericGFPoly(field, []int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
