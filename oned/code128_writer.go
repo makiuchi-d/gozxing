@@ -62,7 +62,7 @@ func (code128Encoder) encodeWithHints(contentsStr string, hints map[gozxing.Enco
 	}
 
 	// Check for forced code set hint.
-	forcedCodeSet := -1;
+	forcedCodeSet := -1
 	if codeSetHint, ok := hints[gozxing.EncodeHintType_FORCE_CODE_SET]; ok {
 		switch s := codeSetHint.(string); s {
 		case "A":
@@ -78,7 +78,7 @@ func (code128Encoder) encodeWithHints(contentsStr string, hints map[gozxing.Enco
 			return nil, gozxing.NewWriterException(
 				"IllegalArgumentException: Unsupported code set hint: %v", codeSetHint)
 		}
-    }
+	}
 
 	// Check content
 	for i := 0; i < length; i++ {
@@ -94,11 +94,11 @@ func (code128Encoder) encodeWithHints(contentsStr string, hints map[gozxing.Enco
 				// no full Latin-1 character set available at the moment
 				// shift and manual code change are not supported
 				return nil, gozxing.NewWriterException(
-					"IllegalArgumentException: Bad character in input: ASCII value=%v", int(c));
+					"IllegalArgumentException: Bad character in input: ASCII value=%v", int(c))
 			}
 		}
 		// check characters for compatibility with forced code set
-		switch (forcedCodeSet) {
+		switch forcedCodeSet {
 		case code128CODE_CODE_A:
 			// allows no ascii above 95 (no lower caps, no special symbols)
 			if c > 95 && c <= 127 {
@@ -132,7 +132,7 @@ func (code128Encoder) encodeWithHints(contentsStr string, hints map[gozxing.Enco
 	for position < length {
 		//Select code to use
 		var newCodeSet int
-		if (forcedCodeSet == -1) {
+		if forcedCodeSet == -1 {
 			newCodeSet = code128ChooseCode(contents, position, codeSet)
 		} else {
 			newCodeSet = forcedCodeSet
@@ -175,7 +175,7 @@ func (code128Encoder) encodeWithHints(contentsStr string, hints map[gozxing.Enco
 					break
 				default:
 					// CODE_CODE_C
-					if position + 1 == length {
+					if position+1 == length {
 						// this is the last character, but the encoding is C, which always encodes two characers
 						return nil, gozxing.NewWriterException(
 							"IllegalArgumentException: Bad number of characters for digit only encoding.")

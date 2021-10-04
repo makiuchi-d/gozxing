@@ -169,11 +169,11 @@ func (b *BitArray) AppendBits(value int, numBits int) error {
 	}
 	nextSize := b.size
 	b.ensureCapacity(nextSize + numBits)
-	for numBitsLeft := numBits -1; numBitsLeft >= 0; numBitsLeft-- {
-		if ((value & (1 << numBitsLeft)) != 0) {
-			b.bits[nextSize / 32] |= 1 << (nextSize & 0x1F)
+	for numBitsLeft := numBits - 1; numBitsLeft >= 0; numBitsLeft-- {
+		if (value & (1 << numBitsLeft)) != 0 {
+			b.bits[nextSize/32] |= 1 << (nextSize & 0x1F)
 		}
-		nextSize++;
+		nextSize++
 	}
 	b.size = nextSize
 	return nil
