@@ -203,6 +203,7 @@ func TestDetector_extractParameters(t *testing.T) {
 	img.SetRegion(18, 45, 3, 3)
 	// reedsolomon decode error
 	img.SetRegion(45, 21, 3, 3)
+	img.SetRegion(45, 24, 3, 3)
 	img.SetRegion(45, 39, 3, 3)
 	img.SetRegion(15, 36, 3, 3)
 	e = det.extractParameters(points)
