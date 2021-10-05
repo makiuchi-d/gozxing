@@ -150,6 +150,12 @@ func (this *Decoder) getEncodedData(correctedBits []bool) (string, error) {
 				}
 				n := readCode(correctedBits, index, 3)
 				index += 3
+				// flush bytes before changing character set
+				result, _, e = transform.Append(encoding.NewDecoder(), result, decodedBytes)
+				if e != nil {
+					return string(result), e
+				}
+				decodedBytes = decodedBytes[:0]
 				switch n {
 				case 0:
 					result = append(result, 29) // translate FNC1 as ASCII 29
@@ -157,13 +163,6 @@ func (this *Decoder) getEncodedData(correctedBits []bool) (string, error) {
 				case 7:
 					return string(result), gozxing.NewFormatException("FLG(7) is reserved and illegal")
 				default:
-					// flush bytes before changing character set
-					result, _, e = transform.Append(encoding.NewDecoder(), result, decodedBytes)
-					if e != nil {
-						return string(result), e
-					}
-					decodedBytes = decodedBytes[:0]
-
 					// ECI is decimal integer encoded as 1-6 codes in DIGIT mode
 					eci := 0
 					if endIndex-index < 4*n {

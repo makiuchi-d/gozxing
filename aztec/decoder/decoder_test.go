@@ -147,6 +147,20 @@ func TestDecoder_HighLevelDecode(t *testing.T) {
 	if r != wants {
 		t.Fatalf("HighLevelDecode = %q, wants %q", r, wants)
 	}
+
+	// GS1 data
+	// P/S FLG(n) 0  D/L 1 0 1 2 3 P/S FLG(n) 0 3 7 4 2
+	bits = strToBools("" +
+		"00000" + "00000" + "000" + "11110" + "0011" + "0010" + "0011" + "0100" + "0101" +
+		"0000" + "00000" + "000" + "0101" + "1001" + "0110" + "0100")
+	r, e = dec.HighLevelDecode(bits)
+	if e != nil {
+		t.Fatalf("HighLevelDecode error: %v", e)
+	}
+	wants = "\x1d10123\x1d3742"
+	if r != wants {
+		t.Fatalf("HighLevelDecode = %q, wants %q", r, wants)
+	}
 }
 
 func TestDecoder_getEncodedData(t *testing.T) {
