@@ -95,7 +95,8 @@ const (
 	EncodeHintType_GS1_FORMAT
 
 	/**
-	 * Forces which encoding will be used. Currently only used for Code-128 code sets (Type {@link String}). Valid values are "A", "B", "C".
+	 * Forces which encoding will be used. Currently only used for Code-128 code sets (Type {@link String}).
+	 *  Valid values are "A", "B", "C".
 	 */
 	EncodeHintType_FORCE_CODE_SET
 )

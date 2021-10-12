@@ -78,7 +78,8 @@ func DecodedBitStreamParser_decode(bytes []byte) (*common.DecoderResult, error) 
 	resultTrailer := make([]byte, 0)
 	byteSegments := make([][]byte, 0, 1)
 	mode := Mode_ASCII_ENCODE
-	fnc1Positions := intSet{} // Would be replaceable by looking directly at 'bytes', if we're sure to not having to account for multi byte values.
+	// Could look directly at 'bytes', if we're sure of not having to account for multi byte values
+	fnc1Positions := intSet{}
 	symbologyModifier := 0
 	isECIencoded := false
 
