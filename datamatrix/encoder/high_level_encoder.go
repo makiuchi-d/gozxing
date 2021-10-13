@@ -373,18 +373,10 @@ func isSpecialB256(ch byte) bool {
 // @return the requested character count
 //
 func HighLevelEncoder_determineConsecutiveDigitCount(msg []byte, startpos int) int {
-	count := 0
 	len := len(msg)
 	idx := startpos
-	if idx < len {
-		ch := msg[idx]
-		for HighLevelEncoder_isDigit(ch) && idx < len {
-			count++
-			idx++
-			if idx < len {
-				ch = msg[idx]
-			}
-		}
+	for idx < len && HighLevelEncoder_isDigit(msg[idx]) {
+		idx++
 	}
-	return count
+	return idx - startpos
 }
