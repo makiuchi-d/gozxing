@@ -22,12 +22,33 @@ func NewLuminanceSourceFromImage(img image.Image) LuminanceSource {
 
 	luminance := make([]byte, width*height)
 	index := 0
-	for y := rect.Min.Y; y < rect.Max.Y; y++ {
-		for x := rect.Min.X; x < rect.Max.X; x++ {
-			r, g, b, a := img.At(x, y).RGBA()
-			lum := (r + 2*g + b) * 255 / (4 * 0xffff)
-			luminance[index] = byte((lum*a + (0xffff-a)*255) / 0xffff)
-			index++
+	// Optimize special cases.
+	switch img := img.(type) {
+	case *image.Gray:
+		for y := rect.Min.Y; y < rect.Max.Y; y++ {
+			for x := rect.Min.X; x < rect.Max.X; x++ {
+				y := img.GrayAt(x, y).Y
+				luminance[index] = y
+				index++
+			}
+		}
+	case image.RGBA64Image:
+		for y := rect.Min.Y; y < rect.Max.Y; y++ {
+			for x := rect.Min.X; x < rect.Max.X; x++ {
+				r, g, b, a := img.RGBA64At(x, y).RGBA()
+				lum := (r + 2*g + b) * 255 / (4 * 0xffff)
+				luminance[index] = byte((lum*a + (0xffff-a)*255) / 0xffff)
+				index++
+			}
+		}
+	default:
+		for y := rect.Min.Y; y < rect.Max.Y; y++ {
+			for x := rect.Min.X; x < rect.Max.X; x++ {
+				r, g, b, a := img.At(x, y).RGBA()
+				lum := (r + 2*g + b) * 255 / (4 * 0xffff)
+				luminance[index] = byte((lum*a + (0xffff-a)*255) / 0xffff)
+				index++
+			}
 		}
 	}
 
