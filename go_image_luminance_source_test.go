@@ -3,6 +3,7 @@ package gozxing
 import (
 	"image"
 	"image/color"
+	"image/draw"
 	"testing"
 )
 
@@ -43,7 +44,35 @@ func TestNewBinaryBitmapFromImage(t *testing.T) {
 
 func TestNewLuminanceSourceFromImage(t *testing.T) {
 	img := newTestImage(10, 10)
-	src := NewLuminanceSourceFromImage(img)
+	rgba := image.NewRGBA(img.Bounds())
+	draw.Draw(rgba, rgba.Bounds(), img, img.Bounds().Min, draw.Src)
+	imgs := []image.Image{img, rgba}
+	for _, img := range imgs {
+
+		src := NewLuminanceSourceFromImage(img)
+
+		if _, ok := src.(*GoImageLuminanceSource); !ok {
+			t.Fatalf("NewLuminanceSourceFromImage must return *RGBLuminanceSource, %T", src)
+		}
+
+		matrix := src.GetMatrix()
+		for y := 0; y < 10; y++ {
+			for x := 0; x < 10; x++ {
+				expect := rgb2lumina(xy2rgb(x, y, 10, 10))
+				lumina := matrix[y*10+x]
+				if lumina != expect {
+					t.Fatalf("matrix[%v,%v] = %v, expect %v", x, y, lumina, expect)
+				}
+			}
+		}
+	}
+}
+
+func TestNewLuminanceSourceFromGray(t *testing.T) {
+	img := newTestImage(10, 10)
+	gray := image.NewGray(img.Bounds())
+	draw.Draw(gray, gray.Bounds(), img, img.Bounds().Min, draw.Src)
+	src := NewLuminanceSourceFromImage(gray)
 
 	if _, ok := src.(*GoImageLuminanceSource); !ok {
 		t.Fatalf("NewLuminanceSourceFromImage must return *RGBLuminanceSource, %T", src)
@@ -52,7 +81,7 @@ func TestNewLuminanceSourceFromImage(t *testing.T) {
 	matrix := src.GetMatrix()
 	for y := 0; y < 10; y++ {
 		for x := 0; x < 10; x++ {
-			expect := rgb2lumina(xy2rgb(x, y, 10, 10))
+			expect := gray.GrayAt(x, y).Y
 			lumina := matrix[y*10+x]
 			if lumina != expect {
 				t.Fatalf("matrix[%v,%v] = %v, expect %v", x, y, lumina, expect)
