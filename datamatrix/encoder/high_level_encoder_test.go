@@ -339,4 +339,14 @@ func TestEncodeHighLevel(t *testing.T) {
 	if !reflect.DeepEqual(b, expect) {
 		t.Fatalf("EncodeHighLevel = %v, expect %v", b, expect)
 	}
+
+	str = "\u00e8a"
+	b, e = EncodeHighLevel(str, shape, nil, nil)
+	expect = []byte{232, 98, 129}
+	if e != nil {
+		t.Fatalf("EncodeHighLevel returns error: %v", e)
+	}
+	if !reflect.DeepEqual(b, expect) {
+		t.Fatalf("EncodeHighLevel = %v, expect %v", b, expect)
+	}
 }
