@@ -8,10 +8,10 @@ import (
 	"golang.org/x/text/encoding/charmap"
 	"golang.org/x/text/transform"
 
-	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/aztec/detector"
-	"github.com/makiuchi-d/gozxing/common"
-	"github.com/makiuchi-d/gozxing/common/reedsolomon"
+	"github.com/mechiko/gozxing"
+	"github.com/mechiko/gozxing/aztec/detector"
+	"github.com/mechiko/gozxing/common"
+	"github.com/mechiko/gozxing/common/reedsolomon"
 )
 
 type Table int

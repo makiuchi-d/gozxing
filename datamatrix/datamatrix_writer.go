@@ -1,9 +1,9 @@
 package datamatrix
 
 import (
-	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/datamatrix/encoder"
-	qrencoder "github.com/makiuchi-d/gozxing/qrcode/encoder"
+	"github.com/mechiko/gozxing"
+	"github.com/mechiko/gozxing/datamatrix/encoder"
+	qrencoder "github.com/mechiko/gozxing/qrcode/encoder"
 )
 
 // DataMatrixWriter This object renders a Data Matrix code as a BitMatrix 2D array of greyscale values.

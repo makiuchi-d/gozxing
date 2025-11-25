@@ -1,7 +1,7 @@
 package oned
 
 import (
-	"github.com/makiuchi-d/gozxing"
+	"github.com/mechiko/gozxing"
 )
 
 var extensionStartPattern = []int{1, 1, 2}

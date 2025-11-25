@@ -1,7 +1,7 @@
 package gozxing
 
 import (
-	"github.com/makiuchi-d/gozxing/common/util"
+	"github.com/mechiko/gozxing/common/util"
 )
 
 type ResultPoint interface {

@@ -3,7 +3,7 @@ package decoder
 import (
 	"testing"
 
-	"github.com/makiuchi-d/gozxing"
+	"github.com/mechiko/gozxing"
 )
 
 func TestDecodeBoolMap(t *testing.T) {

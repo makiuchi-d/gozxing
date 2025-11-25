@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/testutil"
+	"github.com/mechiko/gozxing"
+	"github.com/mechiko/gozxing/testutil"
 )
 
 func TestRSS14Reader_addOrTally(t *testing.T) {

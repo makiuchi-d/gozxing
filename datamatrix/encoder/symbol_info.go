@@ -3,7 +3,7 @@ package encoder
 import (
 	"fmt"
 
-	"github.com/makiuchi-d/gozxing"
+	"github.com/mechiko/gozxing"
 )
 
 // Symbol info table for DataMatrix.

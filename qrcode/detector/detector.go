@@ -3,10 +3,10 @@ package detector
 import (
 	"math"
 
-	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/common"
-	"github.com/makiuchi-d/gozxing/common/util"
-	"github.com/makiuchi-d/gozxing/qrcode/decoder"
+	"github.com/mechiko/gozxing"
+	"github.com/mechiko/gozxing/common"
+	"github.com/mechiko/gozxing/common/util"
+	"github.com/mechiko/gozxing/qrcode/decoder"
 )
 
 type Detector struct {

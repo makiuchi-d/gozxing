@@ -3,7 +3,7 @@ package detector
 import (
 	"math"
 
-	"github.com/makiuchi-d/gozxing"
+	"github.com/mechiko/gozxing"
 )
 
 type FinderPattern struct {

@@ -5,8 +5,8 @@ import (
 
 	"golang.org/x/text/encoding/charmap"
 
-	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/common"
+	"github.com/mechiko/gozxing"
+	"github.com/mechiko/gozxing/common"
 )
 
 // Data Matrix Codes can encode text as bits in one of several modes, and can use multiple modes
@@ -170,7 +170,7 @@ func decodeAsciiSegment(bits *common.BitSource, result, resultTrailer []byte, fn
 				return Mode_BASE256_ENCODE, result, resultTrailer, nil
 			case 232: // FNC1
 				fnc1positions.add(len(result))
-				result = append(result, 29) // translate as ASCII 29
+				result = append(result, 232) // translate as ASCII 29
 				break
 			case 233, 234: // Structured Append, Reader Programming
 				// Ignore these symbols for now

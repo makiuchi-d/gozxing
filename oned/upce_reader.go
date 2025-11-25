@@ -1,7 +1,7 @@
 package oned
 
 import (
-	"github.com/makiuchi-d/gozxing"
+	"github.com/mechiko/gozxing"
 )
 
 // upce_MIDDLE_END_PATTERN The pattern that marks the middle, and end, of a UPC-E pattern.

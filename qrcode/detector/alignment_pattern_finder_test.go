@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/makiuchi-d/gozxing"
+	"github.com/mechiko/gozxing"
 )
 
 func unsetRegion(image *gozxing.BitMatrix, x, y, w, h int) {

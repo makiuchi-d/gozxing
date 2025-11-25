@@ -4,10 +4,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/aztec/decoder"
-	"github.com/makiuchi-d/gozxing/aztec/detector"
-	"github.com/makiuchi-d/gozxing/common"
+	"github.com/mechiko/gozxing"
+	"github.com/mechiko/gozxing/aztec/decoder"
+	"github.com/mechiko/gozxing/aztec/detector"
+	"github.com/mechiko/gozxing/common"
 )
 
 // AztecReader : This implementation can detect and decode Aztec codes in an image.

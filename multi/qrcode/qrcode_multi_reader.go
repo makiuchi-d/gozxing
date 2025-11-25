@@ -3,11 +3,11 @@ package qrcode
 import (
 	"sort"
 
-	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/multi"
-	"github.com/makiuchi-d/gozxing/multi/qrcode/detector"
-	"github.com/makiuchi-d/gozxing/qrcode"
-	"github.com/makiuchi-d/gozxing/qrcode/decoder"
+	"github.com/mechiko/gozxing"
+	"github.com/mechiko/gozxing/multi"
+	"github.com/mechiko/gozxing/multi/qrcode/detector"
+	"github.com/mechiko/gozxing/qrcode"
+	"github.com/mechiko/gozxing/qrcode/decoder"
 )
 
 // This implementation can detect and decode multiple QR Codes in an image.

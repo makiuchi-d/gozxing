@@ -4,7 +4,7 @@ import (
 	"math"
 	"strings"
 
-	"github.com/makiuchi-d/gozxing"
+	"github.com/mechiko/gozxing"
 )
 
 // DataMatrix ECC 200 data encoder following the algorithm described in ISO/IEC 16022:200(E) in annex S.

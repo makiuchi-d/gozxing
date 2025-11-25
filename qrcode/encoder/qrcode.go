@@ -3,7 +3,7 @@ package encoder
 import (
 	"strconv"
 
-	"github.com/makiuchi-d/gozxing/qrcode/decoder"
+	"github.com/mechiko/gozxing/qrcode/decoder"
 )
 
 const QRCode_NUM_MASK_PATERNS = 8
