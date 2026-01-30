@@ -130,10 +130,12 @@ func (this *Decoder) decode(parser *BitMatrixParser, hints map[gozxing.DecodeHin
 	resultOffset := 0
 
 	// Error-correct and copy data blocks together into a stream of bytes
+	errorsCorrected := 0
 	for _, dataBlock := range dataBlocks {
 		codewordBytes := dataBlock.GetCodewords()
 		numDataCodewords := dataBlock.GetNumDataCodewords()
-		e := this.correctErrors(codewordBytes, numDataCodewords)
+		c, e := this.correctErrors(codewordBytes, numDataCodewords)
+		errorsCorrected += c
 		if e != nil {
 			return nil, e
 		}
@@ -144,10 +146,15 @@ func (this *Decoder) decode(parser *BitMatrixParser, hints map[gozxing.DecodeHin
 	}
 
 	// Decode the contents of that stream of bytes
-	return DecodedBitStreamParser_Decode(resultBytes, version, ecLevel, hints)
+	result, e := DecodedBitStreamParser_Decode(resultBytes, version, ecLevel, hints)
+	if e != nil {
+		return result, e
+	}
+	result.SetErrorsCorrected(errorsCorrected)
+	return result, nil
 }
 
-func (this *Decoder) correctErrors(codewordBytes []byte, numDataCodewords int) error {
+func (this *Decoder) correctErrors(codewordBytes []byte, numDataCodewords int) (int, error) {
 	numCodewords := len(codewordBytes)
 	// First read into an array of ints
 	codewordsInts := make([]int, numCodewords)
@@ -155,14 +162,16 @@ func (this *Decoder) correctErrors(codewordBytes []byte, numDataCodewords int) e
 		codewordsInts[i] = int(codewordBytes[i] & 0xFF)
 	}
 
-	e := this.rsDecoder.Decode(codewordsInts, numCodewords-numDataCodewords)
+	errorsCorrected := 0
+
+	errorsCorrected, e := this.rsDecoder.DecodeWithECCount(codewordsInts, numCodewords-numDataCodewords)
 	if e != nil {
-		return gozxing.WrapChecksumException(e)
+		return 0, gozxing.WrapChecksumException(e)
 	}
 	// Copy back into array of bytes -- only need to worry about the bytes that were data
 	// We don't care about errors in the error-correction codewords
 	for i := 0; i < numDataCodewords; i++ {
 		codewordBytes[i] = byte(codewordsInts[i])
 	}
-	return nil
+	return errorsCorrected, nil
 }

@@ -13,9 +13,14 @@ func NewReedSolomonDecoder(field *GenericGF) *ReedSolomonDecoder {
 }
 
 func (this *ReedSolomonDecoder) Decode(received []int, twoS int) ReedSolomonException {
+	_, e := this.DecodeWithECCount(received, twoS)
+	return e
+}
+
+func (this *ReedSolomonDecoder) DecodeWithECCount(received []int, twoS int) (int, ReedSolomonException) {
 	poly, e := NewGenericGFPoly(this.field, received)
 	if e != nil {
-		return WrapReedSolomonException(e)
+		return 0, WrapReedSolomonException(e)
 	}
 	syndromeCoefficients := make([]int, twoS)
 	noError := true
@@ -27,40 +32,40 @@ func (this *ReedSolomonDecoder) Decode(received []int, twoS int) ReedSolomonExce
 		}
 	}
 	if noError {
-		return nil
+		return 0, nil
 	}
 	syndrome, e := NewGenericGFPoly(this.field, syndromeCoefficients)
 	if e != nil {
-		return WrapReedSolomonException(e)
+		return 0, WrapReedSolomonException(e)
 	}
 	monomial, e := this.field.BuildMonomial(twoS, 1)
 	if e != nil {
-		return WrapReedSolomonException(e)
+		return 0, WrapReedSolomonException(e)
 	}
 	sigma, omega, e := this.runEuclideanAlgorithm(monomial, syndrome, twoS)
 	if e != nil {
-		return WrapReedSolomonException(e)
+		return 0, WrapReedSolomonException(e)
 	}
 	errorLocations, e := this.findErrorLocations(sigma)
 	if e != nil {
-		return WrapReedSolomonException(e)
+		return 0, WrapReedSolomonException(e)
 	}
 	errorMagnitudes, e := this.findErrorMagnitudes(omega, errorLocations)
 	if e != nil {
-		return WrapReedSolomonException(e)
+		return 0, WrapReedSolomonException(e)
 	}
 	for i := 0; i < len(errorLocations); i++ {
 		log, e := this.field.Log(errorLocations[i])
 		if e != nil {
-			return WrapReedSolomonException(e)
+			return 0, WrapReedSolomonException(e)
 		}
 		position := len(received) - 1 - log
 		if position < 0 {
-			return NewReedSolomonException("Bad error location")
+			return 0, NewReedSolomonException("Bad error location")
 		}
 		received[position] = GenericGF_addOrSubtract(received[position], errorMagnitudes[i])
 	}
-	return nil
+	return len(errorLocations), nil
 }
 
 func (this *ReedSolomonDecoder) runEuclideanAlgorithm(a, b *GenericGFPoly, R int) (sigma, omega *GenericGFPoly, e error) {

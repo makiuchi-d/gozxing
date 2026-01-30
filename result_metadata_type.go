@@ -35,6 +35,11 @@ const (
 	ResultMetadataType_ERROR_CORRECTION_LEVEL
 
 	/**
+	 * The number of errors corrected. If applicable, maps to an {@link Integer} of value greater than or equal to zero.
+	 */
+	ResultMetadataType_ERRORS_CORRECTED
+
+	/**
 	 * For some periodicals, indicates the issue number as an {@link Integer}.
 	 */
 	ResultMetadataType_ISSUE_NUMBER
@@ -91,6 +96,8 @@ func (t ResultMetadataType) String() string {
 		return "BYTE_SEGMENTS"
 	case ResultMetadataType_ERROR_CORRECTION_LEVEL:
 		return "ERROR_CORRECTION_LEVEL"
+	case ResultMetadataType_ERRORS_CORRECTED:
+		return "ERRORS_CORRECTED"
 	case ResultMetadataType_ISSUE_NUMBER:
 		return "ISSUE_NUMBER"
 	case ResultMetadataType_SUGGESTED_PRICE:

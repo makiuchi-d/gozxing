@@ -80,6 +80,7 @@ func (this *QRCodeReader) Decode(image *gozxing.BinaryBitmap, hints map[gozxing.
 			gozxing.ResultMetadataType_STRUCTURED_APPEND_PARITY,
 			decoderResult.GetStructuredAppendParity())
 	}
+	result.PutMetadata(gozxing.ResultMetadataType_ERRORS_CORRECTED, decoderResult.GetErrorsCorrected())
 	result.PutMetadata(
 		gozxing.ResultMetadataType_SYMBOLOGY_IDENTIFIER, "]Q"+strconv.Itoa(decoderResult.GetSymbologyModifier()))
 	return result, nil
