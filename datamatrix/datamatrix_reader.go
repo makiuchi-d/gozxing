@@ -80,6 +80,7 @@ func (r *DataMatrixReader) Decode(image *gozxing.BinaryBitmap, hints map[gozxing
 	if ecLevel != "" {
 		result.PutMetadata(gozxing.ResultMetadataType_ERROR_CORRECTION_LEVEL, ecLevel)
 	}
+	result.PutMetadata(gozxing.ResultMetadataType_ERRORS_CORRECTED, decoderResult.GetErrorsCorrected())
 	result.PutMetadata(gozxing.ResultMetadataType_SYMBOLOGY_IDENTIFIER, "]d"+strconv.Itoa(decoderResult.GetSymbologyModifier()))
 	return result, nil
 }

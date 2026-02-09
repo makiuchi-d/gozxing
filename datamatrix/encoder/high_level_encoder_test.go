@@ -78,68 +78,68 @@ func TestHighLevelEncoder_isExtendedASCII(t *testing.T) {
 	}
 }
 
-func TestIsNativeC40(t *testing.T) {
+func TestHighLevelEncoder_isNativeC40(t *testing.T) {
 	tcs := []byte{' ', '0', '9', 'A', 'Z'}
 	fcs := []byte{'!', '@', '^', 'a', '~'}
 	for _, c := range tcs {
-		if isNativeC40(c) != true {
+		if HighLevelEncoder_isNativeC40(c) != true {
 			t.Fatalf("isNativeC40(%v) must true", c)
 		}
 	}
 	for _, c := range fcs {
-		if isNativeC40(c) != false {
+		if HighLevelEncoder_isNativeC40(c) != false {
 			t.Fatalf("isNativeC40(%v) must false", c)
 		}
 	}
 }
 
-func TestIsNativeText(t *testing.T) {
+func TestHighLevelEncoder_isNativeText(t *testing.T) {
 	tcs := []byte{' ', '0', '9', 'a', 'z'}
 	fcs := []byte{'!', '@', '^', 'A', '~'}
 	for _, c := range tcs {
-		if isNativeText(c) != true {
+		if HighLevelEncoder_isNativeText(c) != true {
 			t.Fatalf("isNativeText(%v) must true", c)
 		}
 	}
 	for _, c := range fcs {
-		if isNativeText(c) != false {
+		if HighLevelEncoder_isNativeText(c) != false {
 			t.Fatalf("isNativeText(%v) must false", c)
 		}
 	}
 }
 
-func TestIsNativeX12(t *testing.T) {
+func TestHighLevelEncoder_isNativeX12(t *testing.T) {
 	tcs := []byte{'\r', '*', '>', ' ', '0', '9', 'A', 'Z'}
 	fcs := []byte{'!', '@', '^', 'a', '~'}
 	for _, c := range tcs {
-		if isNativeX12(c) != true {
+		if HighLevelEncoder_isNativeX12(c) != true {
 			t.Fatalf("isNativeX12(%v) must true", c)
 		}
 	}
 	for _, c := range fcs {
-		if isNativeX12(c) != false {
+		if HighLevelEncoder_isNativeX12(c) != false {
 			t.Fatalf("isNativeX12(%v) must false", c)
 		}
 	}
 }
 
-func TestIsNativeEDIFACT(t *testing.T) {
+func TestHighLevelEncoder_isNativeEDIFACT(t *testing.T) {
 	tcs := []byte{' ', '!', '@', '0', 'A', '^'}
 	fcs := []byte{'\r', '_', 'a', '~'}
 	for _, c := range tcs {
-		if isNativeEDIFACT(c) != true {
+		if HighLevelEncoder_isNativeEDIFACT(c) != true {
 			t.Fatalf("isNativeEDIFACT(%v) must true", c)
 		}
 	}
 	for _, c := range fcs {
-		if isNativeEDIFACT(c) != false {
+		if HighLevelEncoder_isNativeEDIFACT(c) != false {
 			t.Fatalf("isNativeEDIFACT(%v) must false", c)
 		}
 	}
 }
 
-func TestIsSpecialB256(t *testing.T) {
-	if isSpecialB256(0) {
+func TestHighLevelEncoder_isSpecialB256(t *testing.T) {
+	if HighLevelEncoder_isSpecialB256(0) {
 		t.Fatalf("isSpecialB256 must false (not implemented yet)")
 	}
 }
@@ -293,16 +293,16 @@ func TestHighLevelEncoder_lookAheadTest(t *testing.T) {
 	}
 }
 
-func TestEncodeHighLevel(t *testing.T) {
+func TestHighLevelEncoder_EncodeHighLevel(t *testing.T) {
 	shape := SymbolShapeHint_FORCE_NONE
 
-	_, e := EncodeHighLevel("Mосква", shape, nil, nil)
+	_, e := HighLevelEncoder_EncodeHighLevel("Mосква", shape, nil, nil, false)
 	if e == nil {
 		t.Fatalf("EncodeHighLevel(Mосква) must be error")
 	}
 
 	str := string(make([]byte, 1559))
-	_, e = EncodeHighLevel(str, shape, nil, nil)
+	_, e = HighLevelEncoder_EncodeHighLevel(str, shape, nil, nil, false)
 	if e == nil {
 		t.Fatalf("EncodeHighLevel([1559]) must be error")
 	}
@@ -312,7 +312,7 @@ func TestEncodeHighLevel(t *testing.T) {
 		230, 19, 111, 19, 111, 19, 111, 19, 111, 254, 130, 130, 130, 129, 87, 237, 133, 28,
 	}
 	min, _ := gozxing.NewDimension(16, 16)
-	b, e := EncodeHighLevel(str, shape, min, nil)
+	b, e := HighLevelEncoder_EncodeHighLevel(str, shape, min, nil, false)
 	if e != nil {
 		t.Fatalf("EncodeHighLevel returns error: %v", e)
 	}
@@ -321,7 +321,7 @@ func TestEncodeHighLevel(t *testing.T) {
 	}
 
 	str = "[)>\u001E05\u001Daaaaaa\u001E\u0004"
-	b, e = EncodeHighLevel(str, shape, nil, nil)
+	b, e = HighLevelEncoder_EncodeHighLevel(str, shape, nil, nil, false)
 	expect = []byte{236, 239, 89, 191, 89, 191, 254, 129}
 	if e != nil {
 		t.Fatalf("EncodeHighLevel returns error: %v", e)
@@ -331,8 +331,18 @@ func TestEncodeHighLevel(t *testing.T) {
 	}
 
 	str = "[)>\u001E06\u001Daaaaaa\u001E\u0004"
-	b, e = EncodeHighLevel(str, shape, nil, nil)
+	b, e = HighLevelEncoder_EncodeHighLevel(str, shape, nil, nil, false)
 	expect = []byte{237, 239, 89, 191, 89, 191, 254, 129}
+	if e != nil {
+		t.Fatalf("EncodeHighLevel returns error: %v", e)
+	}
+	if !reflect.DeepEqual(b, expect) {
+		t.Fatalf("EncodeHighLevel = %v, expect %v", b, expect)
+	}
+
+	str = "000000"
+	b, e = HighLevelEncoder_EncodeHighLevel(str, shape, nil, nil, true)
+	expect = []byte{230, 0x19, 0xa5, 0x19, 0xa5}
 	if e != nil {
 		t.Fatalf("EncodeHighLevel returns error: %v", e)
 	}

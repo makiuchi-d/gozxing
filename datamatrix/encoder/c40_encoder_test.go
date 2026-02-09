@@ -149,3 +149,26 @@ func TestC40Encoder_encode(t *testing.T) {
 		t.Fatalf("encode context.pos = %v, expect 12", ctx.pos)
 	}
 }
+
+func TestC40Encoder_encodeMaximal(t *testing.T) {
+	enc := NewC40Encoder().(*C40Encoder)
+
+	ctx, _ := NewEncoderContext("0A 0A 0A 0A 0A")
+	err := enc.encodeMaximal(ctx)
+	if err != nil {
+		t.Fatalf("error: %v", err)
+	}
+	cws := ctx.GetCodewords()
+	exp := []byte{HighLevelEncoder_LATCH_TO_C40, 27, 52, 27, 52, 27, 52, 27, 52, 254}
+	if !reflect.DeepEqual(cws, exp) {
+		t.Fatalf("codewords=%v, expect=%v", cws, exp)
+	}
+
+	ctx, _ = NewEncoderContext("0A 0A 0A 0A 0A")
+	dim, _ := gozxing.NewDimension(10, 10)
+	ctx.SetSizeConstraints(dim, dim)
+	e := enc.encodeMaximal(ctx)
+	if e == nil {
+		t.Fatalf("encodeMaximal must be error")
+	}
+}

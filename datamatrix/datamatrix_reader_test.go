@@ -142,6 +142,39 @@ func TestDataMatrixReader_Reset(t *testing.T) {
 	d.Reset() // do nothing
 }
 
+func TestDataMatrixReader_Metadata(t *testing.T) {
+	// Tests ERRORS_CORRECTED and SYMBOLOGY_IDENTIFIER metadata (GS1 reader support)
+	reader := NewDataMatrixReader()
+	pure := map[gozxing.DecodeHintType]interface{}{
+		gozxing.DecodeHintType_PURE_BARCODE: true,
+	}
+	format := gozxing.BarcodeFormat_DATA_MATRIX
+
+	tests := []struct {
+		file            string
+		wants           string
+		hints           map[gozxing.DecodeHintType]interface{}
+		errorsCorrected int
+		symbologyID     string
+	}{
+		{"testdata/0123456789.png", "0123456789", nil, 0, "]d1"},
+		{"testdata/HelloWorld_Text_L_Kaywa.png", "Hello World", pure, 0, "]d1"},
+		{"testdata/HelloWorld_Text_L_Kaywa_1_error_byte.png", "Hello World", pure, 1, "]d1"},
+		{"testdata/HelloWorld_Text_L_Kaywa_2_error_byte.png", "Hello World", pure, 2, "]d1"},
+		{"testdata/HelloWorld_Text_L_Kaywa_3_error_byte.png", "Hello World", pure, 3, "]d1"},
+		{"testdata/HelloWorld_Text_L_Kaywa_4_error_byte.png", "Hello World", pure, 5, "]d1"},
+		// GS1 format: FNC1 in first position, symbology modifier ]d2
+		{"testdata/gs1.png", "\x1d0105391538880109172611301028967\x1d211049931544602459836", nil, 0, "]d2"},
+	}
+	for _, tt := range tests {
+		metadata := map[gozxing.ResultMetadataType]interface{}{
+			gozxing.ResultMetadataType_ERRORS_CORRECTED: tt.errorsCorrected,
+			gozxing.ResultMetadataType_SYMBOLOGY_IDENTIFIER: tt.symbologyID,
+		}
+		testutil.TestFile(t, reader, tt.file, tt.wants, format, tt.hints, metadata)
+	}
+}
+
 func TestDataMatrixReader_DecodePureBarcode(t *testing.T) {
 	reader := NewDataMatrixReader()
 	hints := map[gozxing.DecodeHintType]interface{}{
@@ -244,16 +277,37 @@ func TestDataMatrixReader_Decode(t *testing.T) {
 			"testdata/0123456789.png", "0123456789", nil,
 			map[gozxing.ResultMetadataType]interface{}{
 				gozxing.ResultMetadataType_SYMBOLOGY_IDENTIFIER: "]d1",
+				gozxing.ResultMetadataType_ERRORS_CORRECTED:     0,
 			},
 		},
 		{"testdata/C40.png", "Testing C40", pure, nil},
 		{"testdata/EDIFACT.png", "EDIFACTEDIFACT", pure, nil},
 		{"testdata/GUID.png", "10f27ce-acb7-4e4e-a7ae-a0b98da6ed4a", nil, nil},
 		{"testdata/HelloWorld_Text_L_Kaywa.png", "Hello World", pure, nil},
-		{"testdata/HelloWorld_Text_L_Kaywa_1_error_byte.png", "Hello World", pure, nil},
-		{"testdata/HelloWorld_Text_L_Kaywa_2_error_byte.png", "Hello World", pure, nil},
-		{"testdata/HelloWorld_Text_L_Kaywa_3_error_byte.png", "Hello World", pure, nil},
-		{"testdata/HelloWorld_Text_L_Kaywa_4_error_byte.png", "Hello World", pure, nil},
+		{
+			"testdata/HelloWorld_Text_L_Kaywa_1_error_byte.png", "Hello World", pure,
+			map[gozxing.ResultMetadataType]interface{}{
+				gozxing.ResultMetadataType_ERRORS_CORRECTED: 1,
+			},
+		},
+		{
+			"testdata/HelloWorld_Text_L_Kaywa_2_error_byte.png", "Hello World", pure,
+			map[gozxing.ResultMetadataType]interface{}{
+				gozxing.ResultMetadataType_ERRORS_CORRECTED: 2,
+			},
+		},
+		{
+			"testdata/HelloWorld_Text_L_Kaywa_3_error_byte.png", "Hello World", pure,
+			map[gozxing.ResultMetadataType]interface{}{
+				gozxing.ResultMetadataType_ERRORS_CORRECTED: 3,
+			},
+		},
+		{
+			"testdata/HelloWorld_Text_L_Kaywa_4_error_byte.png", "Hello World", pure,
+			map[gozxing.ResultMetadataType]interface{}{
+				gozxing.ResultMetadataType_ERRORS_CORRECTED: 5,
+			},
+		},
 		{"testdata/X12.png", "X12X12X12X12", pure, nil},
 		{"testdata/abcd-18x8.png", "abcde", pure, nil},
 		{"testdata/abcd-26x12.png", "abcdefghijklm", pure, nil},
@@ -269,6 +323,14 @@ func TestDataMatrixReader_Decode(t *testing.T) {
 			"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*(),./\\", pure, nil},
 		{"testdata/abcdefg.png", "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*(),./\\", pure, nil},
 		{"testdata/zxing_URL_L_Kayway.png", "http://code.google.com/p/zxing/", pure, nil},
+		// GS1 format: FNC1 in first position
+		{
+			"testdata/gs1.png", "\x1d0105391538880109172611301028967\x1d211049931544602459836", nil,
+			map[gozxing.ResultMetadataType]interface{}{
+				gozxing.ResultMetadataType_SYMBOLOGY_IDENTIFIER: "]d2",
+				gozxing.ResultMetadataType_ERRORS_CORRECTED:     0,
+			},
+		},
 
 		// testdata from zxing core/src/test/resources/blackbox/datamatrix-2/
 		{"testdata/01.png", "http://google.com/m", nil, nil},

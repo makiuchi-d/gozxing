@@ -25,6 +25,22 @@ const (
 	EncodeHintType_DATA_MATRIX_SHAPE
 
 	/**
+	 * Specifies whether to use compact mode for Data Matrix (type {@link Boolean}, or "true" or "false"
+	 * {@link String } value).
+	 * The compact encoding mode also supports the encoding of characters that are not in the ISO-8859-1
+	 * character set via ECIs.
+	 * Please note that in that case, the most compact character encoding is chosen for characters in
+	 * the input that are not in the ISO-8859-1 character set. Based on experience, some scanners do not
+	 * support encodings like cp-1256 (Arabic). In such cases the encoding can be forced to UTF-8 by
+	 * means of the {@link #CHARACTER_SET} encoding hint.
+	 * Compact encoding also provides GS1-FNC1 support when {@link #GS1_FORMAT} is selected. In this case
+	 * group-separator character (ASCII 29 decimal) can be used to encode the positions of FNC1 codewords
+	 * for the purpose of delimiting AIs.
+	 * This option and {@link #FORCE_C40} are mutually exclusive.
+	 */
+	EncodeHintType_DATA_MATRIX_COMPACT
+
+	/**
 	 * Specifies a minimum barcode size (type {@link Dimension}). Only applicable to Data Matrix now.
 	 *
 	 * @deprecated use width/height params in
@@ -99,6 +115,12 @@ const (
 	 *  Valid values are "A", "B", "C".
 	 */
 	EncodeHintType_FORCE_CODE_SET
+
+	/**
+	 * Forces C40 encoding for DataMatrix (type {@link Boolean}, or "true" or "false"
+	 * {@link String} value).
+	 */
+	EncodeHintType_FORCE_C40
 )
 
 func (this EncodeHintType) String() string {
@@ -109,6 +131,8 @@ func (this EncodeHintType) String() string {
 		return "CHARACTER_SET"
 	case EncodeHintType_DATA_MATRIX_SHAPE:
 		return "DATA_MATRIX_SHAPE"
+	case EncodeHintType_DATA_MATRIX_COMPACT:
+		return "DATA_MATRIX_COMPACT"
 	case EncodeHintType_MIN_SIZE:
 		return "MIN_SIZE"
 	case EncodeHintType_MAX_SIZE:
@@ -131,6 +155,8 @@ func (this EncodeHintType) String() string {
 		return "GS1_FORMAT"
 	case EncodeHintType_FORCE_CODE_SET:
 		return "FORCE_CODE_SET"
+	case EncodeHintType_FORCE_C40:
+		return "FORCE_C40"
 	}
 	return ""
 }

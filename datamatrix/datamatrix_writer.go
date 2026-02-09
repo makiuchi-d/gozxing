@@ -1,6 +1,9 @@
 package datamatrix
 
 import (
+	"golang.org/x/text/encoding"
+	"golang.org/x/text/encoding/ianaindex"
+
 	"github.com/makiuchi-d/gozxing"
 	"github.com/makiuchi-d/gozxing/datamatrix/encoder"
 	qrencoder "github.com/makiuchi-d/gozxing/qrcode/encoder"
@@ -58,7 +61,60 @@ func (this *DataMatrixWriter) Encode(contents string, format gozxing.BarcodeForm
 	}
 
 	//1. step: Data encodation
-	encoded, e := encoder.EncodeHighLevel(contents, shape, minSize, maxSize)
+	var encoded []byte
+	var e error
+
+	hasCompactionHint := false
+	if hints != nil {
+		if compactionHint, ok := hints[gozxing.EncodeHintType_DATA_MATRIX_COMPACT]; ok {
+			switch v := compactionHint.(type) {
+			case bool:
+				hasCompactionHint = v
+			case string:
+				hasCompactionHint = v == "true"
+			}
+		}
+	}
+
+	if hasCompactionHint {
+		hasGS1FormatHint := false
+		var priorityCharset encoding.Encoding
+		if hints != nil {
+			if gs1FormatHint, ok := hints[gozxing.EncodeHintType_GS1_FORMAT]; ok {
+				switch v := gs1FormatHint.(type) {
+				case bool:
+					hasGS1FormatHint = v
+				case string:
+					hasGS1FormatHint = v == "true"
+				}
+			}
+			if charsetHint, ok := hints[gozxing.EncodeHintType_CHARACTER_SET]; ok {
+				if charsetName, ok := charsetHint.(string); ok {
+					if enc, err := ianaindex.IANA.Encoding(charsetName); err == nil {
+						priorityCharset = enc
+					}
+				}
+			}
+		}
+		fnc1 := -1
+		if hasGS1FormatHint {
+			fnc1 = 0x1D // GS1 FNC1 character
+		}
+		encoded, e = encoder.MinimalEncoder_EncodeHighLevel(contents, priorityCharset, fnc1, shape)
+	} else {
+		hasForceC40Hint := false
+		if hints != nil {
+			if forceC40Hint, ok := hints[gozxing.EncodeHintType_FORCE_C40]; ok {
+				switch v := forceC40Hint.(type) {
+				case bool:
+					hasForceC40Hint = v
+				case string:
+					hasForceC40Hint = v == "true"
+				}
+			}
+		}
+		encoded, e = encoder.HighLevelEncoder_EncodeHighLevel(contents, shape, minSize, maxSize, hasForceC40Hint)
+	}
 	if e != nil {
 		return nil, e
 	}
@@ -82,7 +138,6 @@ func (this *DataMatrixWriter) Encode(contents string, format gozxing.BarcodeForm
 // @param placement  The DataMatrix placement.
 // @param symbolInfo The symbol info to encode.
 // @return The bit matrix generated.
-//
 func encodeLowLevel(placement *encoder.DefaultPlacement,
 	symbolInfo *encoder.SymbolInfo, width, height int) *gozxing.BitMatrix {
 
@@ -140,7 +195,6 @@ func encodeLowLevel(placement *encoder.DefaultPlacement,
 // @param reqWidth The requested width of the image (in pixels) with the Datamatrix code
 // @param matrix The input matrix.
 // @return The output matrix.
-//
 func convertByteMatrixToBitMatrix(matrix *qrencoder.ByteMatrix, reqWidth, reqHeight int) *gozxing.BitMatrix {
 	matrixWidth := matrix.GetWidth()
 	matrixHeight := matrix.GetHeight()

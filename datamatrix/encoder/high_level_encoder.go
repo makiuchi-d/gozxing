@@ -81,20 +81,22 @@ func randomize253State(codewordPosition int) byte {
 	return byte(tempVariable - 254)
 }
 
-// EncodeHighLevel Performs message encoding of a DataMatrix message using the
+// HighLevelEncoder_EncodeHighLevel Performs message encoding of a DataMatrix message using the
 // algorithm described in annex P of ISO/IEC 16022:2000(E).
 //
 // @param msg     the message
 // @param shape   requested shape. May be {@code SymbolShapeHint.FORCE_NONE},
-//                {@code SymbolShapeHint.FORCE_SQUARE} or {@code SymbolShapeHint.FORCE_RECTANGLE}.
+// {@code SymbolShapeHint.FORCE_SQUARE} or {@code SymbolShapeHint.FORCE_RECTANGLE}.
+//
 // @param minSize the minimum symbol size constraint or null for no constraint
 // @param maxSize the maximum symbol size constraint or null for no constraint
+// @param forceC40 enforce C40 encoding
 // @return the encoded message (the char values range from 0 to 255)
-//
-func EncodeHighLevel(msg string, shape SymbolShapeHint, minSize, maxSize *gozxing.Dimension) ([]byte, error) {
+func HighLevelEncoder_EncodeHighLevel(msg string, shape SymbolShapeHint, minSize, maxSize *gozxing.Dimension, forceC40 bool) ([]byte, error) {
 	//the codewords 0..255 are encoded as Unicode characters
+	c40Encoder := NewC40Encoder().(*C40Encoder)
 	encoders := []Encoder{
-		NewASCIIEncoder(), NewC40Encoder(), NewTextEncoder(),
+		NewASCIIEncoder(), c40Encoder, NewTextEncoder(),
 		NewX12Encoder(), NewEdifactEncoder(), NewBase256Encoder(),
 	}
 
@@ -118,6 +120,16 @@ func EncodeHighLevel(msg string, shape SymbolShapeHint, minSize, maxSize *gozxin
 	}
 
 	encodingMode := HighLevelEncoder_ASCII_ENCODATION //Default mode
+
+	if forceC40 {
+		e = c40Encoder.encodeMaximal(context)
+		if e != nil {
+			return nil, e
+		}
+		encodingMode = context.GetNewEncoding()
+		context.ResetEncoderSignal()
+	}
+
 	for context.HasMoreCharacters() {
 		encoders[encodingMode].encode(context)
 		if context.GetNewEncoding() >= 0 {
@@ -209,7 +221,7 @@ func HighLevelEncoder_lookAheadTest(msg []byte, startpos, currentMode int) int {
 		}
 
 		//step M
-		if isNativeC40(c) {
+		if HighLevelEncoder_isNativeC40(c) {
 			charCounts[HighLevelEncoder_C40_ENCODATION] += 2.0 / 3.0
 		} else if HighLevelEncoder_isExtendedASCII(c) {
 			charCounts[HighLevelEncoder_C40_ENCODATION] += 8.0 / 3.0
@@ -218,7 +230,7 @@ func HighLevelEncoder_lookAheadTest(msg []byte, startpos, currentMode int) int {
 		}
 
 		//step N
-		if isNativeText(c) {
+		if HighLevelEncoder_isNativeText(c) {
 			charCounts[HighLevelEncoder_TEXT_ENCODATION] += 2.0 / 3.0
 		} else if HighLevelEncoder_isExtendedASCII(c) {
 			charCounts[HighLevelEncoder_TEXT_ENCODATION] += 8.0 / 3.0
@@ -227,7 +239,7 @@ func HighLevelEncoder_lookAheadTest(msg []byte, startpos, currentMode int) int {
 		}
 
 		//step O
-		if isNativeX12(c) {
+		if HighLevelEncoder_isNativeX12(c) {
 			charCounts[HighLevelEncoder_X12_ENCODATION] += 2.0 / 3.0
 		} else if HighLevelEncoder_isExtendedASCII(c) {
 			charCounts[HighLevelEncoder_X12_ENCODATION] += 13.0 / 3.0
@@ -236,7 +248,7 @@ func HighLevelEncoder_lookAheadTest(msg []byte, startpos, currentMode int) int {
 		}
 
 		//step P
-		if isNativeEDIFACT(c) {
+		if HighLevelEncoder_isNativeEDIFACT(c) {
 			charCounts[HighLevelEncoder_EDIFACT_ENCODATION] += 3.0 / 4.0
 		} else if HighLevelEncoder_isExtendedASCII(c) {
 			charCounts[HighLevelEncoder_EDIFACT_ENCODATION] += 17.0 / 4.0
@@ -245,7 +257,7 @@ func HighLevelEncoder_lookAheadTest(msg []byte, startpos, currentMode int) int {
 		}
 
 		// step Q
-		if isSpecialB256(c) {
+		if HighLevelEncoder_isSpecialB256(c) {
 			charCounts[HighLevelEncoder_BASE256_ENCODATION] += 4.0
 		} else {
 			charCounts[HighLevelEncoder_BASE256_ENCODATION]++
@@ -289,10 +301,10 @@ func HighLevelEncoder_lookAheadTest(msg []byte, startpos, currentMode int) int {
 					p := startpos + charsProcessed + 1
 					for p < len(msg) {
 						tc := msg[p]
-						if isX12TermSep(tc) {
+						if HighLevelEncoder_isX12TermSep(tc) {
 							return HighLevelEncoder_X12_ENCODATION
 						}
-						if !isNativeX12(tc) {
+						if !HighLevelEncoder_isNativeX12(tc) {
 							break
 						}
 						p++
@@ -340,29 +352,29 @@ func HighLevelEncoder_isExtendedASCII(ch byte) bool {
 	return ch >= 128 && ch <= 255
 }
 
-func isNativeC40(ch byte) bool {
+func HighLevelEncoder_isNativeC40(ch byte) bool {
 	return (ch == ' ') || (ch >= '0' && ch <= '9') || (ch >= 'A' && ch <= 'Z')
 }
 
-func isNativeText(ch byte) bool {
+func HighLevelEncoder_isNativeText(ch byte) bool {
 	return (ch == ' ') || (ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'z')
 }
 
-func isNativeX12(ch byte) bool {
-	return isX12TermSep(ch) || (ch == ' ') || (ch >= '0' && ch <= '9') || (ch >= 'A' && ch <= 'Z')
+func HighLevelEncoder_isNativeX12(ch byte) bool {
+	return HighLevelEncoder_isX12TermSep(ch) || (ch == ' ') || (ch >= '0' && ch <= '9') || (ch >= 'A' && ch <= 'Z')
 }
 
-func isX12TermSep(ch byte) bool {
+func HighLevelEncoder_isX12TermSep(ch byte) bool {
 	return (ch == '\r') || //CR
 		(ch == '*') ||
 		(ch == '>')
 }
 
-func isNativeEDIFACT(ch byte) bool {
+func HighLevelEncoder_isNativeEDIFACT(ch byte) bool {
 	return ch >= ' ' && ch <= '^'
 }
 
-func isSpecialB256(ch byte) bool {
+func HighLevelEncoder_isSpecialB256(ch byte) bool {
 	return false //TODO NOT IMPLEMENTED YET!!!
 }
 
@@ -371,7 +383,6 @@ func isSpecialB256(ch byte) bool {
 // @param msg      the message
 // @param startpos the start position within the message
 // @return the requested character count
-//
 func HighLevelEncoder_determineConsecutiveDigitCount(msg []byte, startpos int) int {
 	len := len(msg)
 	idx := startpos
