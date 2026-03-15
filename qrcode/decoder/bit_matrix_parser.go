@@ -16,7 +16,10 @@ func NewBitMatrixParser(bitMatrix *gozxing.BitMatrix) (*BitMatrixParser, error) 
 	if dimension < 21 || (dimension&0x03) != 1 {
 		return nil, gozxing.NewFormatException("dimension = %v", dimension)
 	}
-	return &BitMatrixParser{bitMatrix: bitMatrix}, nil
+	// Clone the matrix so that mutations during decoding (UnmaskBitMatrix,
+	// Remask, Mirror) do not corrupt the shared cached copy returned by
+	// BinaryBitmap.GetBlackMatrix().
+	return &BitMatrixParser{bitMatrix: bitMatrix.Clone()}, nil
 }
 
 func (this *BitMatrixParser) ReadFormatInformation() (*FormatInformation, error) {

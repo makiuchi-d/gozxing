@@ -51,8 +51,8 @@ func TestNewBitMatrixParser(t *testing.T) {
 	if e != nil {
 		t.Fatalf("NewBitMatrixParser(21x21) returns error, %v", e)
 	}
-	if p.bitMatrix != img {
-		t.Fatalf("p.bitMatrix = %p, expect %p", p.bitMatrix, img)
+	if p.bitMatrix == img {
+		t.Fatalf("p.bitMatrix must be a clone, not the same pointer")
 	}
 	if p.parsedVersion != nil {
 		t.Fatalf("p.parsedVersion is not nil, %p", p.parsedVersion)
@@ -313,14 +313,14 @@ func TestBitMatrixParser_Remask(t *testing.T) {
 	p, _ := NewBitMatrixParser(img)
 
 	p.Remask()
-	compareBitMatrix(t, img, unmasked)
+	compareBitMatrix(t, p.bitMatrix, unmasked)
 
 	p.ReadFormatInformation()
 	p.Remask()
-	compareBitMatrix(t, img, masked)
+	compareBitMatrix(t, p.bitMatrix, masked)
 
 	p.Remask()
-	compareBitMatrix(t, img, unmasked)
+	compareBitMatrix(t, p.bitMatrix, unmasked)
 }
 
 func TestBitMatrixParser_Mirror(t *testing.T) {
@@ -352,8 +352,8 @@ func TestBitMatrixParser_Mirror(t *testing.T) {
 	p, _ := NewBitMatrixParser(img)
 
 	p.Mirror()
-	compareBitMatrix(t, img, mirrored)
+	compareBitMatrix(t, p.bitMatrix, mirrored)
 
 	p.Mirror()
-	compareBitMatrix(t, img, unmirrored)
+	compareBitMatrix(t, p.bitMatrix, unmirrored)
 }

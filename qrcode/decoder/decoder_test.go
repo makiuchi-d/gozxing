@@ -1,6 +1,7 @@
 package decoder
 
 import (
+	"sync"
 	"testing"
 
 	"github.com/makiuchi-d/gozxing"
@@ -150,5 +151,35 @@ func TestDecoder_decode(t *testing.T) {
 	}
 	if r := result.GetText(); r != "hello" {
 		t.Fatalf("decoder result text=\"%v\", expect \"hello\"", r)
+	}
+}
+
+func TestDecoder_ConcurrentDecode(t *testing.T) {
+	bits, _ := gozxing.ParseStringToBitMatrix(qrstr, "##", "  ")
+
+	var wg sync.WaitGroup
+	errs := make(chan error, 10)
+
+	for i := 0; i < 10; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			decoder := NewDecoder()
+			result, err := decoder.Decode(bits, nil)
+			if err != nil {
+				errs <- err
+				return
+			}
+			if r := result.GetText(); r != "hello" {
+				errs <- gozxing.NewFormatException("got %q, want %q", r, "hello")
+			}
+		}()
+	}
+
+	wg.Wait()
+	close(errs)
+
+	for err := range errs {
+		t.Errorf("Concurrent decode error: %v", err)
 	}
 }

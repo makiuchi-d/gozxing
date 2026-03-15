@@ -449,3 +449,34 @@ func TestBitMatrix_String(t *testing.T) {
 		t.Fatalf("String is\n%s\nexpect:\n%s", r, s2)
 	}
 }
+
+func TestBitMatrix_Clone(t *testing.T) {
+	original, _ := NewBitMatrix(8, 8)
+	original.Set(0, 0)
+	original.Set(3, 4)
+	original.Set(7, 7)
+
+	clone := original.Clone()
+
+	if clone.GetWidth() != original.GetWidth() || clone.GetHeight() != original.GetHeight() {
+		t.Fatalf("Clone dimensions %dx%d != original %dx%d",
+			clone.GetWidth(), clone.GetHeight(), original.GetWidth(), original.GetHeight())
+	}
+	for y := 0; y < 8; y++ {
+		for x := 0; x < 8; x++ {
+			if clone.Get(x, y) != original.Get(x, y) {
+				t.Errorf("Clone differs at (%d, %d): got %v, want %v",
+					x, y, clone.Get(x, y), original.Get(x, y))
+			}
+		}
+	}
+
+	clone.Flip(0, 0)
+	clone.Set(1, 1)
+	if !original.Get(0, 0) {
+		t.Error("Mutating clone affected original at (0, 0)")
+	}
+	if original.Get(1, 1) {
+		t.Error("Mutating clone affected original at (1, 1)")
+	}
+}

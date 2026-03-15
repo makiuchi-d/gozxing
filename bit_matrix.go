@@ -389,4 +389,9 @@ func (b *BitMatrix) ToStringWithLineSeparator(setString, unsetString, lineSepara
 	return string(result)
 }
 
-//  public BitMatrix clone()
+// Clone returns a deep copy of the BitMatrix.
+func (b *BitMatrix) Clone() *BitMatrix {
+	bits := make([]uint32, len(b.bits))
+	copy(bits, b.bits)
+	return &BitMatrix{b.width, b.height, b.rowSize, bits}
+}
