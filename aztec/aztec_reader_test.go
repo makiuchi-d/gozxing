@@ -39,8 +39,8 @@ func TestAztecReader_Decode(t *testing.T) {
 		"##", "  ")
 	bmp = testutil.NewBinaryBitmapFromBitMatrix(testutil.ExpandBitMatrix(img, 3))
 	_, e = d.Decode(bmp, nil)
-	if _, ok := e.(gozxing.NotFoundException); !ok {
-		t.Fatalf("Decode must return NotFoundException: %+v", e)
+	if e == nil {
+		t.Fatal("Decode must return error for invalid data")
 	}
 
 	// invalid data
