@@ -39,7 +39,23 @@ func (f *FinderPatternFinder) GetPossibleCenters() []*FinderPattern {
 }
 
 func (f *FinderPatternFinder) Find(hints map[gozxing.DecodeHintType]interface{}) (*FinderPatternInfo, gozxing.NotFoundException) {
-	_, tryHarder := hints[gozxing.DecodeHintType_TRY_HARDER]
+	return f.find(hints, true)
+}
+
+// FindExhaustive scans the full image without early termination, collecting
+// all possible finder pattern candidates. This produces more candidates for
+// SelectBestPatterns to choose from, at the cost of scanning the entire image.
+func (f *FinderPatternFinder) FindExhaustive() (*FinderPatternInfo, gozxing.NotFoundException) {
+	f.possibleCenters = make([]*FinderPattern, 0)
+	f.hasSkipped = false
+	return f.find(nil, false)
+}
+
+func (f *FinderPatternFinder) find(hints map[gozxing.DecodeHintType]interface{}, allowEarlyStop bool) (*FinderPatternInfo, gozxing.NotFoundException) {
+	tryHarder := false
+	if hints != nil {
+		_, tryHarder = hints[gozxing.DecodeHintType_TRY_HARDER]
+	}
 	maxI := f.image.GetHeight()
 	maxJ := f.image.GetWidth()
 
@@ -67,7 +83,9 @@ func (f *FinderPatternFinder) Find(hints map[gozxing.DecodeHintType]interface{})
 							if confirmed {
 								iSkip = 2
 								if f.hasSkipped {
-									done = f.HaveMultiplyConfirmedCenters()
+									if allowEarlyStop {
+										done = f.HaveMultiplyConfirmedCenters()
+									}
 								} else {
 									rowSkip := f.FindRowSkip()
 									if rowSkip > stateCount[2] {
@@ -99,7 +117,7 @@ func (f *FinderPatternFinder) Find(hints map[gozxing.DecodeHintType]interface{})
 			confirmed := f.HandlePossibleCenter(stateCount, i, maxJ)
 			if confirmed {
 				iSkip = stateCount[0]
-				if f.hasSkipped {
+				if f.hasSkipped && allowEarlyStop {
 					done = f.HaveMultiplyConfirmedCenters()
 				}
 			}

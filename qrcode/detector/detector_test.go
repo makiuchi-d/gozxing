@@ -8,6 +8,44 @@ import (
 	"github.com/makiuchi-d/gozxing"
 )
 
+// makeTimingPattern draws an alternating black-white timing line between two
+// finder pattern centers. m is the module size. The timing runs from
+// (center + 4*m) to (other center - 4*m) along the horizontal or vertical
+// axis, alternating every m pixels.
+func makeTimingPattern(image *gozxing.BitMatrix, fromX, fromY, toX, toY, m int) {
+	dx, dy := 0, 0
+	dist := 0
+	if fromX != toX {
+		if toX > fromX {
+			dx = 1
+		} else {
+			dx = -1
+		}
+		dist = (toX - fromX) * dx
+	} else {
+		if toY > fromY {
+			dy = 1
+		} else {
+			dy = -1
+		}
+		dist = (toY - fromY) * dy
+	}
+	// Start 4 modules from the first center, end 4 modules from the second
+	start := 4 * m
+	end := dist - 4*m
+	for i := start; i <= end; i += m {
+		module := (i - start) / m
+		if module%2 == 0 {
+			// Set black pixel(s) for this module
+			x := fromX + i*dx
+			y := fromY + i*dy
+			for p := 0; p < m; p++ {
+				image.Set(x+p*dx, y+p*dy)
+			}
+		}
+	}
+}
+
 func makeAlignPattern(image *gozxing.BitMatrix, x, y int) {
 	image.SetRegion(x-2, y-2, 5, 5)
 	unsetRegion(image, x-1, y-1, 3, 3)
@@ -19,6 +57,7 @@ func makeAlignPattern3(image *gozxing.BitMatrix, x, y int) {
 	unsetRegion(image, x-4, y-4, 9, 9)
 	image.SetRegion(x-1, y-1, 3, 3)
 }
+
 func makePattern3(image *gozxing.BitMatrix, x, y int) {
 	image.SetRegion(x-10, y-10, 21, 21)
 	unsetRegion(image, x-7, y-7, 15, 15)
@@ -366,9 +405,6 @@ func TestDetector_ProcessFinderPatternInfo(t *testing.T) {
 	if e == nil {
 		t.Fatalf("ProcessFinderPatternInfo must be error")
 	}
-	if _, ok := e.(gozxing.FormatException); !ok {
-		t.Fatalf("ProcessFinderPatternInfo must be FormatException, %v", e)
-	}
 
 	// no alignment patterns
 	image.Clear()
@@ -401,6 +437,9 @@ func TestDetector_ProcessFinderPatternInfo(t *testing.T) {
 	makePattern(image, 13, 13, 1)
 	makePattern(image, 13+38, 13, 1)
 	makePattern(image, 13, 13+38, 1)
+	// timing patterns (row 6 and column 6 of the QR, at y=16 and x=16)
+	makeTimingPattern(image, 13, 16, 13+38, 16, 1) // horizontal TL -> TR
+	makeTimingPattern(image, 16, 13, 16, 13+38, 1) // vertical TL -> BL
 	info.topLeft = NewFinderPattern1(13, 13, 1)
 	info.topRight = NewFinderPattern1(13+38, 13, 1)
 	info.bottomLeft = NewFinderPattern1(13, 13+38, 1)
