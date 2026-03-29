@@ -1,5 +1,7 @@
 package gozxing
 
+import "sync"
+
 const (
 	LUMINANCE_BITS    = 5
 	LUMINANCE_SHIFT   = 8 - LUMINANCE_BITS
@@ -7,6 +9,7 @@ const (
 )
 
 type GlobalHistogramBinarizer struct {
+	mu         sync.Mutex
 	source     LuminanceSource
 	luminances []byte
 	buckets    []int
@@ -33,6 +36,9 @@ func (this *GlobalHistogramBinarizer) GetHeight() int {
 }
 
 func (this *GlobalHistogramBinarizer) GetBlackRow(y int, row *BitArray) (*BitArray, error) {
+	this.mu.Lock()
+	defer this.mu.Unlock()
+
 	source := this.GetLuminanceSource()
 	width := source.GetWidth()
 	if row == nil || row.GetSize() < width {
@@ -79,6 +85,9 @@ func (this *GlobalHistogramBinarizer) GetBlackRow(y int, row *BitArray) (*BitArr
 }
 
 func (this *GlobalHistogramBinarizer) GetBlackMatrix() (*BitMatrix, error) {
+	this.mu.Lock()
+	defer this.mu.Unlock()
+
 	source := this.GetLuminanceSource()
 	width := source.GetWidth()
 	height := source.GetHeight()
