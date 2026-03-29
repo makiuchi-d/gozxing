@@ -448,7 +448,46 @@ func (f *FinderPatternFinder) HaveMultiplyConfirmedCenters() bool {
 	for _, pattern := range f.possibleCenters {
 		totalDeviation += math.Abs(pattern.GetEstimatedModuleSize() - average)
 	}
-	return totalDeviation <= 0.05*totalModuleSize
+	if totalDeviation > 0.05*totalModuleSize {
+		return false
+	}
+
+	// Module sizes are consistent, but the patterns may include a false
+	// positive from QR data that mimics the 1:1:3:1:1 ratio. Verify
+	// that the confirmed centers form a shape consistent with a QR code
+	// (approximately isosceles right triangle) before stopping the scan.
+	// Without this check the scanner can stop early, missing a real
+	// finder pattern that hasn't been reached yet.
+	if confirmedCount == 3 && len(f.possibleCenters) >= 3 {
+		confirmed := make([]*FinderPattern, 0, 3)
+		for _, p := range f.possibleCenters {
+			if p.GetCount() >= FinderPatternFinder_CENTER_QUORUM {
+				confirmed = append(confirmed, p)
+			}
+		}
+		a := squaredDistance(confirmed[0], confirmed[1])
+		b := squaredDistance(confirmed[1], confirmed[2])
+		c := squaredDistance(confirmed[0], confirmed[2])
+		// Sort so that a <= b <= c (c is the hypotenuse)
+		if a > b {
+			a, b = b, a
+		}
+		if b > c {
+			b, c = c, b
+		}
+		if a > b {
+			a, b = b, a
+		}
+		// For an isosceles right triangle: a ≈ b, c ≈ 2a
+		// Reject if the two shorter sides differ by more than 40%.
+		// A false positive from QR data typically produces a triangle
+		// with sides differing by 50%+ (e.g. ratio 1.67).
+		if a > 0 && b/a > 1.4 {
+			return false
+		}
+	}
+
+	return true
 }
 
 // squaredDistance get square of distance between a and b.
