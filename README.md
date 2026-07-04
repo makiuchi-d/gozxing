@@ -1,7 +1,7 @@
 # gozxing A Barcode Scanning/Encoding Library for Go
 
-[![Build Status](https://github.com/makiuchi-d/gozxing/actions/workflows/main.yml/badge.svg)](https://github.com/makiuchi-d/gozxing/actions/workflows/main.yml)
-[![codecov](https://codecov.io/gh/makiuchi-d/gozxing/branch/master/graph/badge.svg)](https://codecov.io/gh/makiuchi-d/gozxing)
+[![Build Status](https://github.com/nagaseitteam/gozxing/actions/workflows/main.yml/badge.svg)](https://github.com/nagaseitteam/gozxing/actions/workflows/main.yml)
+[![codecov](https://codecov.io/gh/nagaseitteam/gozxing/branch/master/graph/badge.svg)](https://codecov.io/gh/nagaseitteam/gozxing)
 
 [ZXing](https://github.com/zxing/zxing) is an open-source, multi-format 1D/2D barcode image processing library for Java.
 This project is a port of ZXing core library to pure Go.
@@ -65,8 +65,8 @@ import (
 	_ "image/jpeg"
 	"os"
 
-	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/qrcode"
+	"github.com/nagaseitteam/gozxing"
+	"github.com/nagaseitteam/gozxing/qrcode"
 )
 
 func main() {
@@ -94,8 +94,8 @@ import (
 	"image/png"
 	"os"
 
-	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/oned"
+	"github.com/nagaseitteam/gozxing"
+	"github.com/nagaseitteam/gozxing/oned"
 )
 
 func main() {
@@ -174,8 +174,8 @@ import (
     "image/jpeg"
     "sync"
     
-    "github.com/makiuchi-d/gozxing"
-    "github.com/makiuchi-d/gozxing/qrcode"
+    "github.com/nagaseitteam/gozxing"
+    "github.com/nagaseitteam/gozxing/qrcode"
 )
 
 type QRResult struct {

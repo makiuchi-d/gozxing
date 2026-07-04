@@ -3,7 +3,7 @@ package decoder
 import (
 	"testing"
 
-	"github.com/makiuchi-d/gozxing"
+	"github.com/nagaseitteam/gozxing"
 )
 
 func testMask(t testing.TB, mask DataMask, dimension int, condition func(int, int) bool) {

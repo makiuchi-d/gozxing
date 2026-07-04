@@ -6,7 +6,7 @@ import (
 
 	errors "golang.org/x/xerrors"
 
-	"github.com/makiuchi-d/gozxing"
+	"github.com/nagaseitteam/gozxing"
 )
 
 func TestRecordPattern(t *testing.T) {

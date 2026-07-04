@@ -10,8 +10,8 @@ import (
 
 	errors "golang.org/x/xerrors"
 
-	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/common"
+	"github.com/nagaseitteam/gozxing"
+	"github.com/nagaseitteam/gozxing/common"
 )
 
 func ExpandBitMatrix(src *gozxing.BitMatrix, factor int) *gozxing.BitMatrix {

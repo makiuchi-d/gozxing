@@ -4,7 +4,7 @@ import (
 	"math"
 	"sort"
 
-	"github.com/makiuchi-d/gozxing"
+	"github.com/nagaseitteam/gozxing"
 )
 
 const (

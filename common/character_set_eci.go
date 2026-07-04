@@ -1,7 +1,7 @@
 package common
 
 import (
-	"github.com/makiuchi-d/gozxing"
+	"github.com/nagaseitteam/gozxing"
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/charmap"
 	"golang.org/x/text/encoding/ianaindex"

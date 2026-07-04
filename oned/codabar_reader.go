@@ -3,7 +3,7 @@ package oned
 import (
 	"math"
 
-	"github.com/makiuchi-d/gozxing"
+	"github.com/nagaseitteam/gozxing"
 )
 
 // Decodes Codabar barcodes.

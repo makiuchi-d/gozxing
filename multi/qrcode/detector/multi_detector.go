@@ -1,9 +1,9 @@
 package detector
 
 import (
-	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/common"
-	"github.com/makiuchi-d/gozxing/qrcode/detector"
+	"github.com/nagaseitteam/gozxing"
+	"github.com/nagaseitteam/gozxing/common"
+	"github.com/nagaseitteam/gozxing/qrcode/detector"
 )
 
 // MultiDetector Encapsulates logic that can detect one or more QR Codes in an image,

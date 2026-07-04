@@ -4,8 +4,8 @@ import (
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/transform"
 
-	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/common"
+	"github.com/nagaseitteam/gozxing"
+	"github.com/nagaseitteam/gozxing/common"
 )
 
 const GB2312_SUBSET = 1

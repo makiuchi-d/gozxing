@@ -3,8 +3,8 @@ package oned
 import (
 	"testing"
 
-	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/testutil"
+	"github.com/nagaseitteam/gozxing"
+	"github.com/nagaseitteam/gozxing/testutil"
 )
 
 func TestUPCEReader_decodeMiddle(t *testing.T) {

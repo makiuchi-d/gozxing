@@ -3,7 +3,7 @@ package encoder
 import (
 	"testing"
 
-	"github.com/makiuchi-d/gozxing"
+	"github.com/nagaseitteam/gozxing"
 )
 
 func TestDefaultPlacement_module(t *testing.T) {

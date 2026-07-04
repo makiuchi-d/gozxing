@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/makiuchi-d/gozxing"
+	"github.com/nagaseitteam/gozxing"
 )
 
 func TestUPCEANReader_findStartGuardPattern(t *testing.T) {

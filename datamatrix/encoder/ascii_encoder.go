@@ -1,7 +1,7 @@
 package encoder
 
 import (
-	"github.com/makiuchi-d/gozxing"
+	"github.com/nagaseitteam/gozxing"
 )
 
 type ASCIIEncoder struct{}

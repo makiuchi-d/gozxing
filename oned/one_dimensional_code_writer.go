@@ -3,7 +3,7 @@ package oned
 import (
 	"strconv"
 
-	"github.com/makiuchi-d/gozxing"
+	"github.com/nagaseitteam/gozxing"
 )
 
 type encoder interface {

@@ -1,7 +1,7 @@
 package rss
 
 import (
-	"github.com/makiuchi-d/gozxing"
+	"github.com/nagaseitteam/gozxing"
 )
 
 // Encapsulates an RSS barcode finder pattern, including its start/end position and row.

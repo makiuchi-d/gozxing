@@ -1,7 +1,7 @@
 package oned
 
 import (
-	"github.com/makiuchi-d/gozxing"
+	"github.com/nagaseitteam/gozxing"
 )
 
 // This object renders a CODE128 code as a {@link BitMatrix}.

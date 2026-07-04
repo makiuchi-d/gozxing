@@ -1,7 +1,7 @@
 package decoder
 
 import (
-	"github.com/makiuchi-d/gozxing"
+	"github.com/nagaseitteam/gozxing"
 )
 
 var DataMaskValues = []DataMask{

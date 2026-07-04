@@ -9,10 +9,10 @@ import (
 	textencoding "golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/unicode"
 
-	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/common"
-	"github.com/makiuchi-d/gozxing/common/reedsolomon"
-	"github.com/makiuchi-d/gozxing/qrcode/decoder"
+	"github.com/nagaseitteam/gozxing"
+	"github.com/nagaseitteam/gozxing/common"
+	"github.com/nagaseitteam/gozxing/common/reedsolomon"
+	"github.com/nagaseitteam/gozxing/qrcode/decoder"
 )
 
 var (

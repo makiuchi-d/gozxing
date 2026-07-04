@@ -5,11 +5,11 @@ import (
 	"math"
 	"math/bits"
 
-	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/common"
-	"github.com/makiuchi-d/gozxing/common/detector"
-	"github.com/makiuchi-d/gozxing/common/reedsolomon"
-	"github.com/makiuchi-d/gozxing/common/util"
+	"github.com/nagaseitteam/gozxing"
+	"github.com/nagaseitteam/gozxing/common"
+	"github.com/nagaseitteam/gozxing/common/detector"
+	"github.com/nagaseitteam/gozxing/common/reedsolomon"
+	"github.com/nagaseitteam/gozxing/common/util"
 )
 
 var (

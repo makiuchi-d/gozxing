@@ -3,7 +3,7 @@ package decoder
 import (
 	"strconv"
 
-	"github.com/makiuchi-d/gozxing"
+	"github.com/nagaseitteam/gozxing"
 )
 
 // Version The Version object encapsulates attributes about a particular

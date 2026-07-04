@@ -1,7 +1,7 @@
 package oned
 
 import (
-	"github.com/makiuchi-d/gozxing"
+	"github.com/nagaseitteam/gozxing"
 )
 
 type upcAWriter struct {

@@ -5,8 +5,8 @@ import (
 
 	"golang.org/x/text/encoding/charmap"
 
-	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/common"
+	"github.com/nagaseitteam/gozxing"
+	"github.com/nagaseitteam/gozxing/common"
 )
 
 // Data Matrix Codes can encode text as bits in one of several modes, and can use multiple modes
