@@ -163,6 +163,22 @@ func TestDecoder_HighLevelDecode(t *testing.T) {
 	}
 }
 
+func TestDecoder_HighLevelDecodeShortInput(t *testing.T) {
+	// Fewer than 2 corrected bits makes the preallocation size
+	// (len(correctedBits)-5)/4 negative; make() must not be called with
+	// a negative capacity (previously panicked "makeslice: cap out of range").
+	dec := NewDecoder()
+	for _, bits := range [][]bool{{}, {false}, {true}} {
+		r, e := dec.HighLevelDecode(bits)
+		if e != nil {
+			t.Fatalf("HighLevelDecode(%v) error: %v", bits, e)
+		}
+		if r != "" {
+			t.Fatalf("HighLevelDecode(%v) = %q, wants empty", bits, r)
+		}
+	}
+}
+
 func TestDecoder_getEncodedData(t *testing.T) {
 	dec := NewDecoder()
 

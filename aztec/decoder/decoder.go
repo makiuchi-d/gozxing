@@ -97,7 +97,11 @@ func (this *Decoder) getEncodedData(correctedBits []bool) (string, error) {
 
 	// Final decoded string result
 	// (correctedBits-5) / 4 is an upper bound on the size (all-digit result)
-	result := make([]byte, 0, (len(correctedBits)-5)/4)
+	capacity := (len(correctedBits) - 5) / 4
+	if capacity < 0 {
+		capacity = 0
+	}
+	result := make([]byte, 0, capacity)
 
 	// Intermediary buffer of decoded bytes, which is decoded into a string and flushed
 	// when character encoding changes (ECI) or input ends.
