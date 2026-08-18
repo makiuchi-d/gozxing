@@ -368,6 +368,15 @@ func TestBitArray_Reverse(t *testing.T) {
 	}
 }
 
+func TestBitArray_ReverseEmpty(t *testing.T) {
+	// Reversing an empty bit array must be a no-op, not panic.
+	b := NewBitArray(0)
+	b.Reverse()
+	if b.GetSize() != 0 {
+		t.Fatalf("size is %v, expect 0", b.GetSize())
+	}
+}
+
 func TestBitArray_String(t *testing.T) {
 	b := NewBitArray(24)
 	expect := " XX....X. XXX..X.. ..XX...."

@@ -215,6 +215,11 @@ func (b *BitArray) GetBitArray() []uint32 {
 }
 
 func (b *BitArray) Reverse() {
+	if b.size == 0 {
+		// Reversing an empty bit array is a no-op; the loops below would
+		// otherwise index into a zero-length backing slice and panic.
+		return
+	}
 	newBits := make([]uint32, len(b.bits))
 	len := (b.size - 1) / 32
 	oldBitsLen := len + 1
