@@ -64,6 +64,22 @@ func TestUPCEWriter_encode(t *testing.T) {
 	}
 }
 
+func TestUPCEWriter_omittedCheckUsesExpandedUPCA(t *testing.T) {
+	enc := upcEEncoder{}
+
+	seven, e := enc.encode("0123000")
+	if e != nil {
+		t.Fatalf("encode returns error, %v", e)
+	}
+	eight, e := enc.encode("01230004")
+	if e != nil {
+		t.Fatalf("encode returns error, %v", e)
+	}
+	if !reflect.DeepEqual(seven, eight) {
+		t.Fatalf("encode 0123000:\n%v\nexpect 01230004:\n%v", seven, eight)
+	}
+}
+
 func TestUPCEWriter(t *testing.T) {
 	writer := NewUPCEWriter()
 
