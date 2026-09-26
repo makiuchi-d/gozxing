@@ -30,8 +30,8 @@ func (upcEEncoder) encodeWithHints(contents string, hints map[gozxing.EncodeHint
 	length := len(contents)
 	switch length {
 	case 7:
-		// No check digit present, calculate it and add it
-		check, e := upceanReader_getStandardUPCEANChecksum(contents)
+		// No check digit present. It is the UPC-A check of the expanded code.
+		check, e := upceanReader_getStandardUPCEANChecksum(convertUPCEtoUPCA(contents))
 		if e != nil {
 			return nil, gozxing.NewWriterException("IllegalArgumentException: %s", e.Error())
 		}
